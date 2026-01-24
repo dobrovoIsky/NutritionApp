@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:NutritionApp.ViewModels"
+             x:Class="NutritionApp.Views.WorkoutPage"
+             Title="Тренування">
+
+    <ContentPage.BindingContext>
+        <viewModels:WorkoutViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="Ціль тренувань:" FontAttributes="Bold"/>
+            <Entry Text="{Binding Goal}" />
+
+            <Label Text="Інтенсивність (low / medium / high):" FontAttributes="Bold"/>
+            <Entry Text="{Binding Intensity}" />
+
+            <Label Text="Тривалість (хв/день):" FontAttributes="Bold"/>
+            <Entry Text="{Binding DurationMinutes}" Keyboard="Numeric"/>
+
+            <Button Text="Згенерувати план" Command="{Binding GenerateCommand}" />
+
+            <!-- Відповідь Gemini -->
+            <Label Text="Згенерований план:" FontAttributes="Bold" Margin="0,20,0,0"/>
+            <Label Text="{Binding GeneratedPlanText}" LineBreakMode="WordWrap"/>
+
+            <Label Text="Історія тренувань" FontAttributes="Bold" Margin="0,20,0,0"/>
+            <Button Text="Оновити" Command="{Binding LoadHistoryCommand}" />
+
+            <CollectionView ItemsSource="{Binding WorkoutPlans}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="0,10" Padding="10" BorderColor="LightGray">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Goal}" FontAttributes="Bold"/>
+                                <Label Text="{Binding Intensity}" />
+                                <Label Text="{Binding DurationMinutes, StringFormat='Тривалість: {0} хв'}"/>
+                                <Label Text="{Binding CreatedAt, StringFormat='{0:dd.MM.yyyy HH:mm}'}" FontSize="12"/>
+                                <Label Text="{Binding PlanText}" LineBreakMode="WordWrap" FontSize="12"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

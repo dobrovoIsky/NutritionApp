@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutritionApp.Views.RegisterPage"
+             Title="Реєстрація">
+    <ScrollView>
+        <VerticalStackLayout Spacing="10" Padding="30,20">
+            <Label Text="Реєстрація" Style="{StaticResource TitleLabel}" />
+            <Entry x:Name="UsernameEntry" Placeholder="Ім'я користувача" />
+            <Entry x:Name="PasswordEntry" Placeholder="Пароль (мін. 8 символів)" IsPassword="True" />
+            <Entry x:Name="HeightEntry" Placeholder="Зріст (см)" Keyboard="Numeric" />
+            <Entry x:Name="WeightEntry" Placeholder="Вага (кг)" Keyboard="Numeric" />
+            <Entry x:Name="AgeEntry" Placeholder="Вік" Keyboard="Numeric" />
+            <Picker x:Name="GoalPicker" Title="Ваша мета">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>схуднення</x:String>
+                        <x:String>підтримка ваги</x:String>
+                        <x:String>набір маси</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
+            <Picker x:Name="ActivityPicker" Title="Рівень активності">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>сидячий</x:String>
+                        <x:String>легка активність</x:String>
+                        <x:String>помірна активність</x:String>
+                        <x:String>висока активність</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
+            <Button Text="Зареєструватися" Clicked="OnRegisterButtonClicked" Margin="0,20,0,0" />
+            <ActivityIndicator x:Name="LoadingIndicator" IsRunning="False" HorizontalOptions="Center"/>
+            <Label x:Name="ErrorLabel" TextColor="Red" HorizontalOptions="Center" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

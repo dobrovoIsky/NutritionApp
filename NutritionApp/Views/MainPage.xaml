@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:NutritionApp.ViewModels"
+             x:DataType="viewModels:MainPageViewModel"
+             x:Class="NutritionApp.Views.MainPage"
+             Title="Головна">
+    <ScrollView Padding="20">
+        <VerticalStackLayout Spacing="15">
+            <Label Text="{Binding UserProfile.Username, StringFormat='Вітаємо, {0}!'}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center"/>
+            <ActivityIndicator IsVisible="{Binding IsLoading}" IsRunning="{Binding IsLoading}" HorizontalOptions="Center" />
+
+            <Frame>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Ваша добова норма" FontSize="18" FontAttributes="Bold"/>
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="5">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Калорії, ккал" TextColor="{StaticResource SecondaryText}"/>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding UserProfile.CalculatedBju.Calories}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                        <Label Grid.Row="1" Grid.Column="0" Text="Білки, г" TextColor="{StaticResource SecondaryText}"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding UserProfile.CalculatedBju.Proteins}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                        <Label Grid.Row="2" Grid.Column="0" Text="Жири, г" TextColor="{StaticResource SecondaryText}"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding UserProfile.CalculatedBju.Fats}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                        <Label Grid.Row="3" Grid.Column="0" Text="Вуглеводи, г" TextColor="{StaticResource SecondaryText}"/>
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding UserProfile.CalculatedBju.Carbs}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Ваші показники" FontSize="18" FontAttributes="Bold"/>
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="5">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Вага, кг" TextColor="{StaticResource SecondaryText}"/>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding UserProfile.Weight}"/>
+                        <Label Grid.Row="1" Grid.Column="0" Text="Зріст, см" TextColor="{StaticResource SecondaryText}"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding UserProfile.Height}"/>
+                        <Label Grid.Row="2" Grid.Column="0" Text="Вік" TextColor="{StaticResource SecondaryText}"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding UserProfile.Age}"/>
+                        <Label Grid.Row="3" Grid.Column="0" Text="Мета" TextColor="{StaticResource SecondaryText}"/>
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding UserProfile.Goal}"/>
+                    </Grid>
+                    <Button Text="Редагувати показники" Command="{Binding GoToEditProfileCommand}" Margin="0,10,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

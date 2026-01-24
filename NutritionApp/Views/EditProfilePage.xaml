@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutritionApp.Views.EditProfilePage"
+             xmlns:fonts="clr-namespace:Fonts" Title="Редагувати профіль">
+    <ScrollView>
+        <VerticalStackLayout Spacing="10" Padding="30,20">
+            <Label Text="Редагування профілю" FontSize="26" HorizontalOptions="Center" />
+
+            <Label Text="Зріст (см)"/>
+            <Entry Text="{Binding UserProfile.Height}" Keyboard="Numeric" />
+
+            <Label Text="Вага (кг)"/>
+            <Entry Text="{Binding UserProfile.Weight}" Keyboard="Numeric" />
+
+            <Label Text="Вік"/>
+            <Entry Text="{Binding UserProfile.Age}" Keyboard="Numeric" />
+
+            <Label Text="Ваша мета"/>
+            <Picker SelectedItem="{Binding UserProfile.Goal}">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>схуднення</x:String>
+                        <x:String>підтримка ваги</x:String>
+                        <x:String>набір маси</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
+
+            <Label Text="Рівень активності"/>
+            <Picker SelectedItem="{Binding UserProfile.ActivityLevel}">
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>сидячий</x:String>
+                        <x:String>легка активність</x:String>
+                        <x:String>помірна активність</x:String>
+                        <x:String>висока активність</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
+
+            <Button Text="Зберегти зміни" Command="{Binding SaveProfileCommand}" Margin="0,20,0,0">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="{x:Static fonts:FluentUI.save_24_regular}"
+                         FontFamily="FluentIcons"
+                         Color="White"/>
+                </Button.ImageSource>
+            </Button>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
