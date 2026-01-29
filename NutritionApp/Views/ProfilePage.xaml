@@ -1,29 +1,216 @@
-<?xml version="1.0" encoding="utf-8" ?>
+
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NutritionApp.Views.ProfilePage"
-             Title="Профіль">
-    <VerticalStackLayout Spacing="20" Padding="30,0">
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBackground}">
 
-        <Label 
-            Text="Налаштування"
-            FontSize="22"
-            FontAttributes="Bold"
-            HorizontalOptions="Center" />
+    <Grid RowDefinitions="260,*" Padding="0">
 
-        <Frame Padding="10" CornerRadius="10">
-            <HorizontalStackLayout VerticalOptions="Center" Spacing="15">
-                <Label Text="Темна тема" VerticalOptions="Center" FontSize="18"/>
-                <Switch x:Name="ThemeSwitch" Toggled="OnThemeToggled"/>
-            </HorizontalStackLayout>
-        </Frame>
+        <!-- Верхній блок з градієнтом -->
+        <Grid Row="0" Padding="0,16,0,16">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4F7DFF" Offset="0.0" />
+                    <GradientStop Color="#E27D5F" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
 
-        <Button
-            Text="Вийти з профілю" 
-            Clicked="OnLogoutButtonClicked"
-            HorizontalOptions="Center"
-            BackgroundColor="Red"
-            TextColor="White"/>
+            <VerticalStackLayout Spacing="14"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Border HeightRequest="96"
+                        WidthRequest="96"
+                        Stroke="#FFFFFF33"
+                        StrokeThickness="1.5"
+                        StrokeShape="RoundRectangle 52"
+                        BackgroundColor="#FFFFFF22"
+                        HorizontalOptions="Center">
+                    <Label x:Name="AvatarInitials"
+                           Text="FT"
+                           FontSize="32"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"/>
+                </Border>
 
-    </VerticalStackLayout>
+                <Label x:Name="UsernameLabel"
+                       Text="{Binding UserProfile.Username, StringFormat='Вітаємо, {0}!'}"
+                       FontAttributes="Bold"
+                       FontSize="22"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+
+                <Label Text="Твій профіль та показники"
+                       FontSize="14"
+                       TextColor="#FFEFF2"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Контент -->
+        <Border Grid.Row="1"
+                BackgroundColor="{StaticResource CardBackground}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                Padding="20"
+                Margin="16,-32,16,0"
+                StrokeShape="RoundRectangle 24">
+
+            <ScrollView>
+                <VerticalStackLayout Spacing="18">
+
+                    <!-- Кнопки дій -->
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="10">
+                        <Button Text="Edit profile"
+                                Clicked="OnEditProfileClicked"
+                                HeightRequest="48"
+                                CornerRadius="14"
+                                BackgroundColor="{StaticResource Primary}"
+                                TextColor="White"
+                                FontAttributes="Bold"/>
+
+                        <Button Grid.Column="1"
+                                Text="Logout"
+                                Clicked="OnLogoutButtonClicked"
+                                HeightRequest="48"
+                                CornerRadius="14"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}"
+                                BorderColor="{StaticResource Primary}"
+                                BorderWidth="1.2"/>
+                    </Grid>
+
+                    <!-- Блок з основними даними -->
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Мої показники"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"/>
+
+                        <Grid ColumnDefinitions="*,*"
+                              RowSpacing="12"
+                              ColumnSpacing="12">
+
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Height"
+                                           FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label x:Name="HeightValue"
+                                           Text="—"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Column="1"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Weight"
+                                           FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label x:Name="WeightValue"
+                                           Text="—"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Row="1"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Age"
+                                           FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label x:Name="AgeValue"
+                                           Text="—"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Row="1" Grid.Column="1"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Activity"
+                                           FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label x:Name="ActivityValue"
+                                           Text="—"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Row="2" Grid.ColumnSpan="2"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Goal"
+                                           FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label x:Name="GoalValue"
+                                           Text="—"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Перемикач теми -->
+                    <Border Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="Темна тема"
+                                       FontSize="15"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}"/>
+                                <Label Text="Перемкнути фон застосунку"
+                                       FontSize="12"
+                                       TextColor="{StaticResource TextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Switch x:Name="ThemeSwitch"
+                                    Grid.Column="1"
+                                    Toggled="OnThemeToggled"
+                                    VerticalOptions="Center"/>
+                        </Grid>
+                    </Border>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+
+    </Grid>
 </ContentPage>

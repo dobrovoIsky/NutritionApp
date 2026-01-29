@@ -2,18 +2,138 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NutritionApp.Views.LoginPage"
-             Title="Вхід" Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBackground}">
 
-    <VerticalStackLayout Spacing="20" Padding="30,0" VerticalOptions="Center">
-        <Label Text="BJU App" FontSize="40" FontAttributes="Bold" HorizontalOptions="Center"/>
+    <Grid RowDefinitions="260,Auto,*" Padding="0">
 
-        <Entry x:Name="UsernameEntry" Placeholder="Ім'я користувача" />
-        <Entry x:Name="PasswordEntry" Placeholder="Пароль" IsPassword="True" />
+        <!-- Верхній блок з градієнтом та відступами -->
+        <Grid Row="0" Padding="0,16,0,16">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4F7DFF" Offset="0.0" />
+                    <GradientStop Color="#E27D5F" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
 
-        <Button Text="Увійти" Clicked="OnLoginButtonClicked" />
-        <Button Text="Немає акаунту? Зареєструватися" Clicked="OnGoToRegisterButtonClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}"/>
+            <VerticalStackLayout Spacing="12"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Image Source="logo.png"
+                       HeightRequest="110"
+                       WidthRequest="110"
+                       Aspect="AspectFit"
+                       HorizontalOptions="Center"/>
+                <Label Text="TrackBite"
+                       FontAttributes="Bold"
+                       FontSize="26"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label Text="Увійди, щоб продовжити"
+                       FontSize="14"
+                       TextColor="#FFEFF2"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
 
-        <ActivityIndicator x:Name="LoadingIndicator" IsRunning="False" HorizontalOptions="Center"/>
-        <Label x:Name="ErrorLabel" TextColor="Red" HorizontalOptions="Center" />
-    </VerticalStackLayout>
+        <!-- Карта форми -->
+        <Border Grid.Row="1"
+                BackgroundColor="{StaticResource CardBackground}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                Padding="24"
+                Margin="16,-32,16,0"
+                StrokeShape="RoundRectangle 26">
+            <VerticalStackLayout Spacing="18">
+
+                <Label Text="Sign In"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"
+                       HorizontalOptions="Center"/>
+
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Username"
+                           FontSize="13"
+                           TextColor="{StaticResource TextSecondary}"/>
+                    <Border Stroke="{StaticResource BorderColor}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            Padding="12,8">
+                        <Entry x:Name="UsernameEntry"
+                               Placeholder="hello@trackbite.app"
+                               Keyboard="Email"
+                               TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource TextSecondary}"
+                               BackgroundColor="Transparent" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Password"
+                           FontSize="13"
+                           TextColor="{StaticResource TextSecondary}"/>
+                    <Border Stroke="{StaticResource BorderColor}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 12"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            Padding="12,8">
+                        <Entry x:Name="PasswordEntry"
+                               Placeholder="Пароль (мін. 8 символів)"
+                               IsPassword="True"
+                               TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource TextSecondary}"
+                               BackgroundColor="Transparent" />
+                    </Border>
+                    <Label Text="Використовуйте 8 або більше символів"
+                           FontSize="12"
+                           TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="" />
+                    <Button Text="Forgot Password?"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource TextSecondary}"
+                            FontSize="13"
+                            Padding="0"
+                            Clicked="OnForgotPasswordClicked"/>
+                </Grid>
+
+                <Button Text="Sign In"
+                        Clicked="OnLoginButtonClicked"
+                        HeightRequest="52"
+                        CornerRadius="26"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        FontAttributes="Bold" />
+
+                <ActivityIndicator x:Name="LoadingIndicator"
+                                   IsRunning="False"
+                                   IsVisible="False"
+                                   Color="{StaticResource Primary}"
+                                   HorizontalOptions="Center"/>
+
+                <Label x:Name="ErrorLabel"
+                       Style="{StaticResource ErrorLabel}"
+                       IsVisible="False"
+                       HorizontalTextAlignment="Center"/>
+
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                    <Label Text="Don't have an account?" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
+                    <Button x:Name="SignUpButton"
+                            Text="Sign up"
+                            Clicked="OnGoToRegisterButtonClicked"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource Primary}"
+                            FontAttributes="Bold"
+                            FontSize="13"
+                            Padding="0"/>
+                </HorizontalStackLayout>
+
+            </VerticalStackLayout>
+        </Border>
+
+    </Grid>
 </ContentPage>

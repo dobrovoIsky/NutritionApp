@@ -4,7 +4,6 @@ using NutritionApp.ViewModels;
 using NutritionApp.Views;
 using Microsoft.Maui.Controls;
 
-
 namespace NutritionApp
 {
     public static class MauiProgram
@@ -14,23 +13,22 @@ namespace NutritionApp
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-               .ConfigureFonts(fonts =>
-               {
-                   fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                   fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                   // Додайте цей рядок
-                   fonts.AddFont("FluentSystemIcons-Regular.ttf", "FluentIcons");
-
-               });
+                .ConfigureFonts(fonts =>
+                {
+                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont("FluentSystemIcons-Regular.ttf", "FluentIcons");
+                });
 
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
-            // Реєструємо сервіс та сторінки
+            // Сервіси й сторінки
+            builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddSingleton<ApiService>();
 
             builder.Services.AddSingleton<LoginPage>();
-            builder.Services.AddTransient<RegisterPage>(); // Створюється кожен раз заново
+            builder.Services.AddSingleton<RegisterPage>();   // стало Singleton
             builder.Services.AddSingleton<MainPage>();
 
             builder.Services.AddSingleton<MainPageViewModel>();
@@ -44,8 +42,6 @@ namespace NutritionApp
             builder.Services.AddTransient<HistoryPage>();
             builder.Services.AddTransient<HistoryViewModel>();
             builder.Services.AddTransient<HistoryDetailPage>();
-
-
 
             return builder.Build();
         }

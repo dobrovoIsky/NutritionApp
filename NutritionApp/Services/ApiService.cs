@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using NutritionApp.Models;
 
@@ -10,33 +11,16 @@ namespace NutritionApp.Services
 
         public ApiService()
         {
-#if DEBUG
-            // ⚠️ сюди підстав свій порт з BjuApiServer (з Swagger)
-            var baseUrl = DeviceInfo.Platform == DevicePlatform.Android
-                ? "http://10.0.2.2:7157"   // для Android-емулятора
-                : "https://localhost:5001"; // для Windows
-#else
-        var baseUrl = "https://bjuapiserver.azurewebsites.net";
-#endif
-
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(baseUrl)
-            };
+            var baseUrl = "https://bjuapiserver20260127151810.azurewebsites.net"; // прод-сервер
+            _httpClient = new HttpClient { BaseAddress = new Uri(baseUrl) };
         }
-
 
         public async Task<AuthResponse> RegisterUserAsync(object payload)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/Auth/register", payload);
-
             if (response.IsSuccessStatusCode)
-            {
-                // Якщо успіх (код 200), читаємо JSON
                 return await response.Content.ReadFromJsonAsync<AuthResponse>();
-            }
 
-            // Якщо помилка, читаємо тіло як звичайний текст
             var errorContent = await response.Content.ReadAsStringAsync();
             return new AuthResponse { Message = errorContent, UserId = 0 };
         }
@@ -44,57 +28,45 @@ namespace NutritionApp.Services
         public async Task<AuthResponse> LoginUserAsync(object payload)
         {
             var response = await _httpClient.PostAsJsonAsync("/api/Auth/login", payload);
-
             if (response.IsSuccessStatusCode)
-            {
-                // Якщо успіх, читаємо JSON
                 return await response.Content.ReadFromJsonAsync<AuthResponse>();
-            }
 
-            // Якщо помилка, читаємо тіло як звичайний текст
             var errorContent = await response.Content.ReadAsStringAsync();
             return new AuthResponse { Message = errorContent, UserId = 0 };
         }
 
-        public async Task<UserProfile> GetUserProfileAsync(int userId)
-        {
-            return await _httpClient.GetFromJsonAsync<UserProfile>($"/api/Profile/{userId}");
-        }
+        public async Task<UserProfile> GetUserProfileAsync(int userId) =>
+            await _httpClient.GetFromJsonAsync<UserProfile>($"/api/Profile/{userId}");
 
         public async Task<UserProfile> UpdateUserProfileAsync(int userId, object payload)
         {
             var response = await _httpClient.PutAsJsonAsync($"/api/Profile/{userId}", payload);
             if (response.IsSuccessStatusCode)
-            {
                 return await response.Content.ReadFromJsonAsync<UserProfile>();
-            }
             return null;
         }
 
+        // Відповідь бекенду: { "mealPlan": "<текст>" }
         public class MealPlanResponse
         {
+            [JsonPropertyName("mealPlan")]
             public string MealPlan { get; set; }
         }
 
-        // Новий метод для генерації плану харчування
         public async Task<MealPlanResponse> GenerateMealPlanAsync(int userId)
         {
-            var response = await _httpClient.PostAsJsonAsync("/api/Nutrition/generate-custom-plan",
-                new { userId }); // Надсилаємо userId в тілі запиту
+            var response = await _httpClient.PostAsJsonAsync("/api/Nutrition/generate-custom-plan", new { userId });
+            response.EnsureSuccessStatusCode(); // якщо 4xx/5xx — кине виняток з текстом помилки
 
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadFromJsonAsync<MealPlanResponse>();
-            }
-            return null;
+            var payload = await response.Content.ReadFromJsonAsync<MealPlanResponse>();
+            if (payload == null || string.IsNullOrWhiteSpace(payload.MealPlan))
+                throw new Exception("Порожня відповідь від сервера");
+
+            return payload;
         }
 
-        public async Task<List<MealPlan>> GetMealPlanHistoryAsync(int userId)
-        {
-            return await _httpClient.GetFromJsonAsync<List<MealPlan>>($"/api/nutrition/history/{userId}");
-        }
-
-
+        public async Task<List<MealPlan>> GetMealPlanHistoryAsync(int userId) =>
+            await _httpClient.GetFromJsonAsync<List<MealPlan>>($"/api/nutrition/history/{userId}");
 
         public async Task<WorkoutPlan> GenerateWorkoutAsync(object payload)
         {
@@ -107,8 +79,17 @@ namespace NutritionApp.Services
         {
             var response = await _httpClient.GetAsync($"/api/Workouts/history/{userId}");
             response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadFromJsonAsync<List<WorkoutPlan>>();
-            return result ?? new List<WorkoutPlan>();
+            return await response.Content.ReadFromJsonAsync<List<WorkoutPlan>>() ?? new List<WorkoutPlan>();
+        }
+
+        // Виклик AI напряму (prompt рядком)
+        public class AIMealPlanResponse { public string Result { get; set; } }
+        public async Task<string> GenerateAiMealPlanAsync(string prompt)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/ai/mealplan", prompt);
+            response.EnsureSuccessStatusCode();
+            var payload = await response.Content.ReadFromJsonAsync<AIMealPlanResponse>();
+            return payload?.Result ?? string.Empty;
         }
     }
 }

@@ -1,70 +1,92 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <Color x:Key="Primary">#3A77D7</Color>
-    <Color x:Key="PrimaryDarkText">#222222</Color>
-    <Color x:Key="PrimaryLightText">#FAFAFA</Color>
-    <Color x:Key="SecondaryText">#8A8A8A</Color>
-    <Color x:Key="PageBackground">#F7F8FC</Color>
-    <Color x:Key="FrameBackground">White</Color>
-    <Color x:Key="BorderColor">#E0E0E0</Color>
-    <Color x:Key="TabBarBackground">#FFFFFF</Color>
-
+    <!-- Shell -->
     <Style TargetType="Shell">
-        <Setter Property="Shell.BackgroundColor" Value="{StaticResource FrameBackground}" />
-        <Setter Property="Shell.TitleColor" Value="{StaticResource PrimaryDarkText}" />
-        <Setter Property="Shell.ForegroundColor" Value="{StaticResource PrimaryDarkText}" />
-
-        <Setter Property="Shell.TabBarBackgroundColor" Value="{StaticResource TabBarBackground}" />
+        <Setter Property="Shell.BackgroundColor" Value="{StaticResource PageBackground}" />
+        <Setter Property="Shell.TitleColor" Value="{StaticResource TextPrimary}" />
+        <Setter Property="Shell.ForegroundColor" Value="{StaticResource TextPrimary}" />
+        <Setter Property="Shell.TabBarBackgroundColor" Value="{StaticResource CardBackground}" />
         <Setter Property="Shell.TabBarTitleColor" Value="{StaticResource Primary}" />
-        <Setter Property="Shell.TabBarUnselectedColor" Value="{StaticResource SecondaryText}" />
+        <Setter Property="Shell.TabBarUnselectedColor" Value="{StaticResource TextSecondary}" />
     </Style>
-    
+
+    <!-- ContentPage -->
     <Style TargetType="ContentPage" ApplyToDerivedTypes="True">
         <Setter Property="BackgroundColor" Value="{StaticResource PageBackground}" />
     </Style>
 
+    <!-- Label -->
     <Style TargetType="Label">
-        <Setter Property="TextColor" Value="{StaticResource PrimaryDarkText}" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
         <Setter Property="FontFamily" Value="OpenSansRegular" />
     </Style>
 
     <Style x:Key="TitleLabel" TargetType="Label">
-        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontSize" Value="28" />
         <Setter Property="FontAttributes" Value="Bold" />
         <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
     </Style>
 
-    <Style TargetType="Button">
+    <!-- Buttons -->
+    <Style x:Key="BaseButton" TargetType="Button">
         <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
         <Setter Property="TextColor" Value="White" />
         <Setter Property="FontFamily" Value="OpenSansSemibold" />
-        <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="Padding" Value="14,10" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="16,12" />
     </Style>
 
+    <!-- Неявний стиль для всіх кнопок -->
+    <Style TargetType="Button" BasedOn="{StaticResource BaseButton}" />
+
+    <!-- Акцентна кнопка -->
+    <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource BaseButton}">
+        <Setter Property="BackgroundColor" Value="{StaticResource Accent}" />
+    </Style>
+
+    <!-- Entry -->
     <Style TargetType="Entry">
-        <Setter Property="BackgroundColor" Value="White"/>
-        <Setter Property="TextColor" Value="{StaticResource PrimaryDarkText}"/>
-        <Setter Property="PlaceholderColor" Value="{StaticResource SecondaryText}"/>
+        <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}"/>
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="PlaceholderColor" Value="{StaticResource TextSecondary}"/>
         <Setter Property="HeightRequest" Value="48"/>
     </Style>
 
+    <!-- Picker -->
     <Style TargetType="Picker">
-        <Setter Property="BackgroundColor" Value="White"/>
-        <Setter Property="TextColor" Value="{StaticResource PrimaryDarkText}"/>
-        <Setter Property="TitleColor" Value="{StaticResource SecondaryText}"/>
+        <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}"/>
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="TitleColor" Value="{StaticResource TextSecondary}"/>
         <Setter Property="HeightRequest" Value="48"/>
     </Style>
 
+    <!-- Frame -->
     <Style TargetType="Frame">
         <Setter Property="HasShadow" Value="False" />
         <Setter Property="BorderColor" Value="{StaticResource BorderColor}" />
         <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Padding" Value="15" />
-        <Setter Property="BackgroundColor" Value="{StaticResource FrameBackground}"/>
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}"/>
     </Style>
 
+    <!-- Border -->
+    <Style TargetType="Border">
+        <Setter Property="Stroke" Value="{StaticResource BorderColor}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}" />
+        <Setter Property="Padding" Value="12,10" />
+    </Style>
+
+    <!-- Error label -->
+    <Style x:Key="ErrorLabel" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource Error}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+    </Style>
 </ResourceDictionary>
