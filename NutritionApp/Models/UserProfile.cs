@@ -9,6 +9,10 @@
         public int Age { get; set; }
         public string Goal { get; set; }
         public string ActivityLevel { get; set; }
-        public BjuResult CalculatedBju { get; set; }
+        public string Gender { get; set; }
+        public string Theme { get; set; }
+        public string Language { get; set; }
+        public int AvatarId { get; set; }
+        public BjuResult Bju { get; set; }
     }
 }

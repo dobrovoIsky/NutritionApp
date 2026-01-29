@@ -7,7 +7,6 @@ using NutritionApp.Services;
 
 namespace NutritionApp.ViewModels
 {
-    [QueryProperty(nameof(UserProfile), "UserProfile")]
     public class EditProfileViewModel : INotifyPropertyChanged
     {
         private readonly ApiService _apiService;
@@ -19,33 +18,65 @@ namespace NutritionApp.ViewModels
             set { _userProfile = value; OnPropertyChanged(); }
         }
 
-        public ICommand SaveProfileCommand { get; }
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set { _isLoading = value; OnPropertyChanged(); }
+        }
 
         public EditProfileViewModel(ApiService apiService)
         {
             _apiService = apiService;
-            SaveProfileCommand = new Command(async () => await SaveProfileAsync());
+            SaveCommand = new Command(async () => await SaveProfileAsync());
+            LoadProfileCommand = new Command(async () => await LoadProfileAsync());
+        }
+
+        public ICommand SaveCommand { get; }
+        public ICommand LoadProfileCommand { get; }
+
+        private async Task LoadProfileAsync()
+        {
+            if (IsLoading) return;
+            try
+            {
+                IsLoading = true;
+                int userId = Preferences.Get("userId", 0);
+                if (userId > 0)
+                {
+                    UserProfile = await _apiService.GetUserProfileAsync(userId);
+                }
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         private async Task SaveProfileAsync()
         {
-            if (UserProfile == null) return;
-            var updateDto = new
+            if (IsLoading || UserProfile == null) return;
+            try
             {
-                height = UserProfile.Height,
-                weight = UserProfile.Weight,
-                age = UserProfile.Age,
-                goal = UserProfile.Goal,
-                activityLevel = UserProfile.ActivityLevel
-            };
-            var updatedProfile = await _apiService.UpdateUserProfileAsync(UserProfile.Id, updateDto);
-            if (updatedProfile != null)
-            {
-                await Shell.Current.GoToAsync("..");
+                IsLoading = true;
+                var updatedProfile = await _apiService.UpdateUserProfileAsync(UserProfile.Id, UserProfile);
+                if (updatedProfile != null)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Успіх", "Профіль оновлено!", "OK");
+                    await Shell.Current.GoToAsync("..");
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert("Помилка", "Не вдалося оновити профіль.", "OK");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Помилка", "Не вдалося оновити профіль", "OK");
+                await Application.Current.MainPage.DisplayAlert("Помилка", $"Помилка: {ex.Message}", "OK");
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 

@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NutritionApp.Views.ProfilePage"
@@ -19,6 +19,7 @@
             <VerticalStackLayout Spacing="14"
                                  VerticalOptions="Center"
                                  HorizontalOptions="Center">
+                <!-- Аватар у кругу зверху -->
                 <Border HeightRequest="96"
                         WidthRequest="96"
                         Stroke="#FFFFFF33"
@@ -26,13 +27,11 @@
                         StrokeShape="RoundRectangle 52"
                         BackgroundColor="#FFFFFF22"
                         HorizontalOptions="Center">
-                    <Label x:Name="AvatarInitials"
-                           Text="FT"
-                           FontSize="32"
-                           FontAttributes="Bold"
-                           TextColor="White"
-                           VerticalOptions="Center"
-                           HorizontalOptions="Center"/>
+                    <Image x:Name="AvatarImage"
+                           Source="{Binding SelectedAvatar.ImageSource}"
+                           HeightRequest="90"
+                           WidthRequest="90"
+                           Aspect="AspectFill"/>
                 </Border>
 
                 <Label x:Name="UsernameLabel"
@@ -60,6 +59,43 @@
 
             <ScrollView>
                 <VerticalStackLayout Spacing="18">
+
+                    <!-- Вибір аватара нижче -->
+                    <Border Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 16"
+                            Padding="16">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Обери аватар"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   HorizontalOptions="Center"/>
+                            <CollectionView ItemsSource="{Binding AvatarOptions}"
+                                            SelectionMode="Single"
+                                            SelectedItem="{Binding SelectedAvatar}"
+                                            HorizontalOptions="Center">
+                                <CollectionView.ItemsLayout>
+                                    <GridItemsLayout Orientation="Horizontal" Span="4"/>
+                                </CollectionView.ItemsLayout>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border HeightRequest="60"
+                                                WidthRequest="60"
+                                                Stroke="White"
+                                                StrokeThickness="2"
+                                                BackgroundColor="Transparent"
+                                                HorizontalOptions="Center">
+                                            <Image Source="{Binding ImageSource}"
+                                                   HeightRequest="50"
+                                                   WidthRequest="50"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Border>
 
                     <!-- Кнопки дій -->
                     <Grid ColumnDefinitions="*,*"

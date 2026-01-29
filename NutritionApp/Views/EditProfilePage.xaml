@@ -2,50 +2,179 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NutritionApp.Views.EditProfilePage"
-             xmlns:fonts="clr-namespace:Fonts" Title="Редагувати профіль">
-    <ScrollView>
-        <VerticalStackLayout Spacing="10" Padding="30,20">
-            <Label Text="Редагування профілю" FontSize="26" HorizontalOptions="Center" />
+             Title="Редагувати профіль"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBackground}">
 
-            <Label Text="Зріст (см)"/>
-            <Entry Text="{Binding UserProfile.Height}" Keyboard="Numeric" />
+    <Grid RowDefinitions="120,*" Padding="0">
 
-            <Label Text="Вага (кг)"/>
-            <Entry Text="{Binding UserProfile.Weight}" Keyboard="Numeric" />
+        <!-- Верхній блок з градієнтом -->
+        <Grid Row="0" Padding="0,16,0,16">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4F7DFF" Offset="0.0" />
+                    <GradientStop Color="#E27D5F" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
 
-            <Label Text="Вік"/>
-            <Entry Text="{Binding UserProfile.Age}" Keyboard="Numeric" />
+            <VerticalStackLayout VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Label Text="Редагувати профіль"
+                       FontAttributes="Bold"
+                       FontSize="24"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
 
-            <Label Text="Ваша мета"/>
-            <Picker SelectedItem="{Binding UserProfile.Goal}">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>схуднення</x:String>
-                        <x:String>підтримка ваги</x:String>
-                        <x:String>набір маси</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
+        <!-- Контент -->
+        <Border Grid.Row="1"
+                BackgroundColor="{StaticResource CardBackground}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                Padding="20"
+                Margin="16,-32,16,0"
+                StrokeShape="RoundRectangle 24">
 
-            <Label Text="Рівень активності"/>
-            <Picker SelectedItem="{Binding UserProfile.ActivityLevel}">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>сидячий</x:String>
-                        <x:String>легка активність</x:String>
-                        <x:String>помірна активність</x:String>
-                        <x:String>висока активність</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
+            <ScrollView>
+                <VerticalStackLayout Spacing="18">
 
-            <Button Text="Зберегти зміни" Command="{Binding SaveProfileCommand}" Margin="0,20,0,0">
-                <Button.ImageSource>
-                    <FontImageSource Glyph="{x:Static fonts:FluentUI.save_24_regular}"
-                         FontFamily="FluentIcons"
-                         Color="White"/>
-                </Button.ImageSource>
-            </Button>
-        </VerticalStackLayout>
-    </ScrollView>
+                    <Label Text="Особиста інформація"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"/>
+
+                    <Border Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 16"
+                            Padding="16">
+                        <VerticalStackLayout Spacing="16">
+
+                            <Label Text="Ім'я користувача"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Entry Text="{Binding UserProfile.Username}"
+                                   Placeholder="Введіть ім'я"
+                                   BackgroundColor="{StaticResource PageBackground}"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   FontSize="16"/>
+
+                            <Label Text="Зріст (см)"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Entry Text="{Binding UserProfile.Height}"
+                                   Keyboard="Numeric"
+                                   Placeholder="Введіть зріст"
+                                   BackgroundColor="{StaticResource PageBackground}"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   FontSize="16"/>
+
+                            <Label Text="Вага (кг)"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Entry Text="{Binding UserProfile.Weight}"
+                                   Keyboard="Numeric"
+                                   Placeholder="Введіть вагу"
+                                   BackgroundColor="{StaticResource PageBackground}"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   FontSize="16"/>
+
+                            <Label Text="Вік"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Entry Text="{Binding UserProfile.Age}"
+                                   Keyboard="Numeric"
+                                   Placeholder="Введіть вік"
+                                   BackgroundColor="{StaticResource PageBackground}"
+                                   TextColor="{StaticResource PageBackground}"
+                                   FontSize="16"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Label Text="Налаштування"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"/>
+
+                    <Border Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 16"
+                            Padding="16">
+                        <VerticalStackLayout Spacing="16">
+
+                            <Label Text="Ціль"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Picker SelectedItem="{Binding UserProfile.Goal}"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    FontSize="16">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>lose weight</x:String>
+                                        <x:String>maintain weight</x:String>
+                                        <x:String>gain muscle</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+
+                            <Label Text="Рівень активності"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Picker SelectedItem="{Binding UserProfile.ActivityLevel}"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    FontSize="16">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>sedentary</x:String>
+                                        <x:String>lightly active</x:String>
+                                        <x:String>moderately active</x:String>
+                                        <x:String>very active</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+
+                            <Label Text="Стать"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Picker SelectedItem="{Binding UserProfile.Gender}"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    FontSize="16">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>male</x:String>
+                                        <x:String>female</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Button Text="Зберегти"
+                            Command="{Binding SaveCommand}"
+                            HeightRequest="50"
+                            CornerRadius="25"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            FontSize="18"
+                            HorizontalOptions="Center"
+                            WidthRequest="200"/>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+
+    </Grid>
 </ContentPage>
