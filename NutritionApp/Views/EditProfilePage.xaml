@@ -91,7 +91,7 @@
                                    Keyboard="Numeric"
                                    Placeholder="Введіть вік"
                                    BackgroundColor="{StaticResource PageBackground}"
-                                   TextColor="{StaticResource PageBackground}"
+                                   TextColor="{StaticResource TextPrimary}"
                                    FontSize="16"/>
                         </VerticalStackLayout>
                     </Border>

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -41,7 +42,7 @@ namespace NutritionApp.ViewModels
             try
             {
                 IsLoading = true;
-                int userId = Preferences.Get("userId", 0);
+                int userId = Preferences.Get("UserId", 0);
                 if (userId > 0)
                 {
                     UserProfile = await _apiService.GetUserProfileAsync(userId);
@@ -62,6 +63,7 @@ namespace NutritionApp.ViewModels
                 var updatedProfile = await _apiService.UpdateUserProfileAsync(UserProfile.Id, UserProfile);
                 if (updatedProfile != null)
                 {
+                    UserProfile = updatedProfile;
                     await Application.Current.MainPage.DisplayAlert("Успіх", "Профіль оновлено!", "OK");
                     await Shell.Current.GoToAsync("..");
                 }

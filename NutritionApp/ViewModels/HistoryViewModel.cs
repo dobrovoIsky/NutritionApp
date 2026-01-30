@@ -38,7 +38,7 @@ namespace NutritionApp.ViewModels
             {
                 IsLoading = true;
                 MealPlans.Clear();
-                int userId = Preferences.Get("userId", 0);
+                int userId = Preferences.Get("UserId", 0);
                 if (userId > 0)
                 {
                     var plans = await _apiService.GetMealPlanHistoryAsync(userId);

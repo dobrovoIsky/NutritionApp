@@ -55,7 +55,7 @@ namespace NutritionApp.ViewModels
             try
             {
                 IsLoading = true;
-                int userId = Preferences.Get("userId", 0);
+                int userId = Preferences.Get("UserId", 0);
                 if (userId > 0)
                 {
                     UserProfile = await _apiService.GetUserProfileAsync(userId);

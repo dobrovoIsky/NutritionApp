@@ -39,7 +39,7 @@ namespace NutritionApp.ViewModels
             {
                 IsLoading = true;
                 MealPlanText = "";
-                int userId = Preferences.Get("userId", 0);
+                int userId = Preferences.Get("UserId", 0);
                 if (userId > 0)
                 {
                     var result = await _apiService.GenerateMealPlanAsync(userId);

@@ -15,13 +15,13 @@
                     <Label Text="Ваша добова норма" FontSize="18" FontAttributes="Bold"/>
                     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="5">
                         <Label Grid.Row="0" Grid.Column="0" Text="Калорії, ккал" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding UserProfile.CalculatedBju.Calories}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding UserProfile.Bju.Calories}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
                         <Label Grid.Row="1" Grid.Column="0" Text="Білки, г" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding UserProfile.CalculatedBju.Proteins}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding UserProfile.Bju.Proteins}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
                         <Label Grid.Row="2" Grid.Column="0" Text="Жири, г" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding UserProfile.CalculatedBju.Fats}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding UserProfile.Bju.Fats}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
                         <Label Grid.Row="3" Grid.Column="0" Text="Вуглеводи, г" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding UserProfile.CalculatedBju.Carbs}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding UserProfile.Bju.Carbs}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
                     </Grid>
                 </VerticalStackLayout>
             </Frame>

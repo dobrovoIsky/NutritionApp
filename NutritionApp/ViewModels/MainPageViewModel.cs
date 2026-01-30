@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -45,10 +46,12 @@ namespace NutritionApp.ViewModels
             try
             {
                 IsLoading = true;
-                int userId = Preferences.Get("userId", 0);
+                int userId = Preferences.Get("UserId", 0);
+                Debug.WriteLine($"Loading profile for userId: {userId}");
                 if (userId > 0)
                 {
                     UserProfile = await _apiService.GetUserProfileAsync(userId);
+                    Debug.WriteLine($"Profile loaded: Bju.Calories = {UserProfile?.Bju?.Calories}");
                 }
             }
             finally
