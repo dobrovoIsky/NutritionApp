@@ -43,7 +43,8 @@ namespace NutritionApp.ViewModels
                 if (userId > 0)
                 {
                     var result = await _apiService.GenerateMealPlanAsync(userId);
-                    MealPlanText = result?.MealPlan ?? "Не вдалося отримати план харчування.";
+                    // Виправлено: якщо повертається MealPlan з властивістю Plan
+                    MealPlanText = result?.Plan ?? "Не вдалося отримати план харчування.";
                 }
                 else
                 {

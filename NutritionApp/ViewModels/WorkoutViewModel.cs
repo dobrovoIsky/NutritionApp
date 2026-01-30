@@ -68,15 +68,8 @@ namespace NutritionApp.ViewModels
                     return;
                 }
 
-                var payload = new
-                {
-                    UserId = userId,
-                    Goal,
-                    Intensity,
-                    DurationMinutes
-                };
-
-                var plan = await _apiService.GenerateWorkoutAsync(payload);
+                // Pass the required arguments directly to the method
+                var plan = await _apiService.GenerateWorkoutAsync(userId, Goal, Intensity, DurationMinutes);
 
                 GeneratedPlanText = plan.PlanText;
                 WorkoutPlans.Insert(0, plan);
