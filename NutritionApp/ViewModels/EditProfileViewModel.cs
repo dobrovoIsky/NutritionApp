@@ -3,8 +3,10 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Microsoft.Maui.Storage;
 using NutritionApp.Models;
 using NutritionApp.Services;
+using Microsoft.Maui.Controls;
 
 namespace NutritionApp.ViewModels
 {
@@ -43,9 +45,11 @@ namespace NutritionApp.ViewModels
             {
                 IsLoading = true;
                 int userId = Preferences.Get("UserId", 0);
+                Debug.WriteLine($"EditProfile: loading profile for userId={userId}");
                 if (userId > 0)
                 {
                     UserProfile = await _apiService.GetUserProfileAsync(userId);
+                    Debug.WriteLine($"EditProfile loaded: username={UserProfile?.Username}, avatarId={UserProfile?.AvatarId}");
                 }
             }
             finally
@@ -60,20 +64,24 @@ namespace NutritionApp.ViewModels
             try
             {
                 IsLoading = true;
+                Debug.WriteLine($"EditProfile: saving profile for userId={UserProfile.Id}");
                 var updatedProfile = await _apiService.UpdateUserProfileAsync(UserProfile.Id, UserProfile);
                 if (updatedProfile != null)
                 {
                     UserProfile = updatedProfile;
+                    Debug.WriteLine("EditProfile: profile updated successfully");
                     await Application.Current.MainPage.DisplayAlert("Успіх", "Профіль оновлено!", "OK");
                     await Shell.Current.GoToAsync("..");
                 }
                 else
                 {
+                    Debug.WriteLine("EditProfile: update returned null");
                     await Application.Current.MainPage.DisplayAlert("Помилка", "Не вдалося оновити профіль.", "OK");
                 }
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"EditProfile: exception while saving - {ex.Message}");
                 await Application.Current.MainPage.DisplayAlert("Помилка", $"Помилка: {ex.Message}", "OK");
             }
             finally

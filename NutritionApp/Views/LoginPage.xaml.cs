@@ -1,87 +1,92 @@
+using System;
+using System.Diagnostics;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
 using NutritionApp.Services;
 
-namespace NutritionApp.Views;
-
-public partial class LoginPage : ContentPage
+namespace NutritionApp.Views
 {
-    private readonly ApiService _apiService;
-
-    public LoginPage(ApiService apiService)
+    public partial class LoginPage : ContentPage
     {
-        InitializeComponent();
-        _apiService = apiService;
-    }
+        private readonly ApiService _apiService;
 
-    async void OnLoginButtonClicked(object sender, EventArgs e)
-    {
-        var username = UsernameEntry.Text?.Trim();
-        var password = PasswordEntry.Text ?? string.Empty;
-
-        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        public LoginPage(ApiService apiService)
         {
-            ErrorLabel.Text = "Будь ласка, заповніть усі поля.";
-            ErrorLabel.IsVisible = true;
-            return;
+            InitializeComponent();
+            _apiService = apiService;
         }
 
-        if (password.Length < 8)
+        // Обробник натискання кнопки логіну
+        private async void OnLoginButtonClicked(object sender, EventArgs e)
         {
-            ErrorLabel.Text = "Пароль має містити щонайменше 8 символів.";
-            ErrorLabel.IsVisible = true;
-            return;
-        }
-
-        ErrorLabel.Text = string.Empty;
-        ErrorLabel.IsVisible = false;
-        LoadingIndicator.IsVisible = true;
-        LoadingIndicator.IsRunning = true;
-
-        try
-        {
-            var response = await _apiService.LoginUserAsync(new { username, passwordHash = password });
-
-            if (response != null && response.UserId > 0)
+            try
             {
-                Preferences.Set("userId", response.UserId);
-                await Shell.Current.GoToAsync("//MainApp");
+                var username = UsernameEntry?.Text?.Trim();
+                var password = PasswordEntry?.Text;
+
+                if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+                {
+                    await DisplayAlert("Помилка", "Введіть логін і пароль.", "OK");
+                    return;
+                }
+
+                var payload = new { username = username, password = password };
+                var result = await _apiService.LoginUserAsync(payload);
+
+                Debug.WriteLine($"Login result: {System.Text.Json.JsonSerializer.Serialize(result)}");
+
+                if (result != null && result.UserId > 0)
+                {
+                    // Зберігаємо UserId у Preferences як int
+                    Preferences.Set("UserId", result.UserId);
+                    Debug.WriteLine($"Saved UserId = {result.UserId} into Preferences");
+
+                    // Перехід до головної сторінки (очищує стек)
+                    await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
+                }
+                else
+                {
+                    await DisplayAlert("Помилка", result?.Message ?? "Не вдалося увійти.", "OK");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ErrorLabel.Text = "Неправильний логін або пароль.";
-                ErrorLabel.IsVisible = true;
+                Debug.WriteLine($"Login exception: {ex.Message}");
+                await DisplayAlert("Помилка", $"Помилка під час логіну: {ex.Message}", "OK");
             }
         }
-        catch (Exception ex)
-        {
-            ErrorLabel.Text = $"Не вдалося підключитися до сервера: {ex.Message}";
-            ErrorLabel.IsVisible = true;
-        }
-        finally
-        {
-            LoadingIndicator.IsRunning = false;
-            LoadingIndicator.IsVisible = false;
-        }
-    }
 
-    async void OnForgotPasswordClicked(object sender, EventArgs e)
-    {
-        // TODO: навігація на відновлення, якщо буде
-    }
-
-    async void OnGoToRegisterButtonClicked(object sender, EventArgs e)
-    {
-        try
+        // Обробник - забули пароль
+        private async void OnForgotPasswordClicked(object sender, EventArgs e)
         {
-            if (SignUpButton is not null)
-                SignUpButton.IsEnabled = false;
+            // Тимчасова поведінка: показати повідомлення
+            await DisplayAlert("Відновлення пароля", "Інструкції щодо відновлення пароля будуть надіслані на вашу електронну пошту.", "OK");
 
-            // Швидка навігація без анімації, щоб не зависало
-            await Shell.Current.GoToAsync(nameof(RegisterPage), animate: false);
+            // Якщо є окрема сторінка відновлення - навігація:
+            // await Shell.Current.GoToAsync(nameof(ForgotPasswordPage));
         }
-        finally
+
+        // Обробник переходу на сторінку реєстрації
+        private async void OnGoToRegisterButtonClicked(object sender, EventArgs e)
         {
-            if (SignUpButton is not null)
-                SignUpButton.IsEnabled = true;
+            try
+            {
+                // Якщо маршрут зареєстрований в AppShell, використовуємо його ім'я
+                await Shell.Current.GoToAsync(nameof(RegisterPage));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Navigation to RegisterPage failed: {ex.Message}");
+                // Запасний варіант: модальна навігація або Push
+                try
+                {
+                    await Navigation.PushAsync(new RegisterPage(_apiService));
+                }
+                catch
+                {
+                    // якщо й це не працює — нічого не робимо
+                }
+            }
         }
     }
 }

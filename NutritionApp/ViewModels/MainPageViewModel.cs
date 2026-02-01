@@ -6,10 +6,10 @@ using System.Windows.Input;
 using NutritionApp.Models;
 using NutritionApp.Services;
 using NutritionApp.Views;
+using Microsoft.Maui.Storage;
 
 namespace NutritionApp.ViewModels
 {
-    // Повертаємо реалізацію INotifyPropertyChanged
     public class MainPageViewModel : INotifyPropertyChanged
     {
         private readonly ApiService _apiService;
@@ -46,12 +46,17 @@ namespace NutritionApp.ViewModels
             try
             {
                 IsLoading = true;
+                bool hasKey = Preferences.ContainsKey("UserId");
                 int userId = Preferences.Get("UserId", 0);
-                Debug.WriteLine($"Loading profile for userId: {userId}");
+                Debug.WriteLine($"Preferences contains UserId key: {hasKey}; value read: {userId}");
                 if (userId > 0)
                 {
                     UserProfile = await _apiService.GetUserProfileAsync(userId);
                     Debug.WriteLine($"Profile loaded: Bju.Calories = {UserProfile?.Bju?.Calories}");
+                }
+                else
+                {
+                    Debug.WriteLine("UserId is 0 — profile will not be loaded.");
                 }
             }
             finally
@@ -69,7 +74,6 @@ namespace NutritionApp.ViewModels
             });
         }
 
-        // Повертаємо реалізацію INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
