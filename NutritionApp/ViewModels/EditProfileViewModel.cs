@@ -1,12 +1,11 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Microsoft.Maui.Storage;
 using NutritionApp.Models;
 using NutritionApp.Services;
-using Microsoft.Maui.Controls;
 
 namespace NutritionApp.ViewModels
 {
@@ -45,12 +44,16 @@ namespace NutritionApp.ViewModels
             {
                 IsLoading = true;
                 int userId = Preferences.Get("UserId", 0);
-                Debug.WriteLine($"EditProfile: loading profile for userId={userId}");
+                Debug.WriteLine($"EditProfile: Loading profile for userId: {userId}");
                 if (userId > 0)
                 {
                     UserProfile = await _apiService.GetUserProfileAsync(userId);
-                    Debug.WriteLine($"EditProfile loaded: username={UserProfile?.Username}, avatarId={UserProfile?.AvatarId}");
+                    Debug.WriteLine($"EditProfile: Loaded - Height={UserProfile?.Height}, Weight={UserProfile?.Weight}, Age={UserProfile?.Age}");
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"EditProfile: Load exception: {ex.Message}");
             }
             finally
             {
@@ -64,24 +67,43 @@ namespace NutritionApp.ViewModels
             try
             {
                 IsLoading = true;
-                Debug.WriteLine($"EditProfile: saving profile for userId={UserProfile.Id}");
-                var updatedProfile = await _apiService.UpdateUserProfileAsync(UserProfile.Id, UserProfile);
+
+                int userId = Preferences.Get("UserId", 0);
+                if (userId <= 0)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Помилка", "Не вдалося ідентифікувати користувача.", "OK");
+                    return;
+                }
+
+                // Створюємо payload з правильними назвами полів для сервера (PascalCase)
+                var payload = new
+                {
+                    Height = UserProfile.Height,
+                    Weight = UserProfile.Weight,
+                    Age = UserProfile.Age,
+                    Goal = UserProfile.Goal ?? string.Empty,
+                    ActivityLevel = UserProfile.ActivityLevel ?? string.Empty,
+                    AvatarId = UserProfile.AvatarId,
+                    Gender = UserProfile.Gender ?? "male"
+                };
+
+                Debug.WriteLine($"EditProfile: Saving profile for userId: {userId}, payload: Height={payload.Height}, Weight={payload.Weight}");
+
+                var updatedProfile = await _apiService.UpdateUserProfileAsync(userId, payload);
                 if (updatedProfile != null)
                 {
                     UserProfile = updatedProfile;
-                    Debug.WriteLine("EditProfile: profile updated successfully");
                     await Application.Current.MainPage.DisplayAlert("Успіх", "Профіль оновлено!", "OK");
                     await Shell.Current.GoToAsync("..");
                 }
                 else
                 {
-                    Debug.WriteLine("EditProfile: update returned null");
                     await Application.Current.MainPage.DisplayAlert("Помилка", "Не вдалося оновити профіль.", "OK");
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"EditProfile: exception while saving - {ex.Message}");
+                Debug.WriteLine($"EditProfile: Save exception: {ex.Message}");
                 await Application.Current.MainPage.DisplayAlert("Помилка", $"Помилка: {ex.Message}", "OK");
             }
             finally

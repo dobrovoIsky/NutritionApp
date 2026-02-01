@@ -30,7 +30,8 @@ namespace NutritionApp.Views
                     return;
                 }
 
-                var payload = new { username = username, password = password };
+                // ВИПРАВЛЕНО: Username і PasswordHash (не password!)
+                var payload = new { Username = username, PasswordHash = password };
                 var result = await _apiService.LoginUserAsync(payload);
 
                 Debug.WriteLine($"Login result: {System.Text.Json.JsonSerializer.Serialize(result)}");
@@ -59,32 +60,25 @@ namespace NutritionApp.Views
         // Обробник - забули пароль
         private async void OnForgotPasswordClicked(object sender, EventArgs e)
         {
-            // Тимчасова поведінка: показати повідомлення
             await DisplayAlert("Відновлення пароля", "Інструкції щодо відновлення пароля будуть надіслані на вашу електронну пошту.", "OK");
-
-            // Якщо є окрема сторінка відновлення - навігація:
-            // await Shell.Current.GoToAsync(nameof(ForgotPasswordPage));
         }
 
-        // Обробник переходу на сторінку реєстрації
+        // Обробник перех??ду на сторінку реєстрації
         private async void OnGoToRegisterButtonClicked(object sender, EventArgs e)
         {
             try
             {
-                // Якщо маршрут зареєстрований в AppShell, використовуємо його ім'я
                 await Shell.Current.GoToAsync(nameof(RegisterPage));
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Navigation to RegisterPage failed: {ex.Message}");
-                // Запасний варіант: модальна навігація або Push
                 try
                 {
                     await Navigation.PushAsync(new RegisterPage(_apiService));
                 }
                 catch
                 {
-                    // якщо й це не працює — нічого не робимо
                 }
             }
         }

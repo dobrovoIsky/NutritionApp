@@ -1,192 +1,224 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NutritionApp.Models;
 using System.Diagnostics;
-using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using NutritionApp.Models;
 
-namespace NutritionApp.Services
+namespace NutritionApp.Services;
+
+public class ApiService
 {
-    public class ApiService
+    private readonly HttpClient _httpClient;
+    private readonly JsonSerializerOptions _jsonOptions;
+
+    public ApiService()
     {
-        private readonly HttpClient _httpClient;
+        _httpClient = new HttpClient();
+        _httpClient.BaseAddress = new Uri("https://bjuapiserver20260127151810.azurewebsites.net");
 
-        public ApiService()
+        _jsonOptions = new JsonSerializerOptions
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("https://bjuapiserver20260127151810.azurewebsites.net");
+            PropertyNameCaseInsensitive = true
+        };
+    }
+
+    public async Task<AuthResponse> RegisterUserAsync(object payload)
+    {
+        try
+        {
+            Debug.WriteLine($"Register payload: {JsonSerializer.Serialize(payload)}");
+            var response = await _httpClient.PostAsJsonAsync("/api/Auth/register", payload);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                Debug.WriteLine($"Register response: {json}");
+                return JsonSerializer.Deserialize<AuthResponse>(json, _jsonOptions);
+            }
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine($"Register error: {errorContent}");
+            return new AuthResponse { Message = errorContent, UserId = 0 };
         }
-
-        public async Task<AuthResponse> RegisterUserAsync(object payload)
+        catch (Exception ex)
         {
-            try
-            {
-                Debug.WriteLine($"Register payload: {System.Text.Json.JsonSerializer.Serialize(payload)}");
-                var response = await _httpClient.PostAsJsonAsync("/api/Auth/register", payload);
-                if (response.IsSuccessStatusCode)
-                    return await response.Content.ReadFromJsonAsync<AuthResponse>();
-                var errorContent = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine($"Register error: {errorContent}");
-                return new AuthResponse { Message = errorContent, UserId = 0 };
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Register exception: {ex.Message}");
-                return new AuthResponse { Message = $"Error: {ex.Message}", UserId = 0 };
-            }
+            Debug.WriteLine($"Register exception: {ex.Message}");
+            return new AuthResponse { Message = $"Error: {ex.Message}", UserId = 0 };
         }
+    }
 
-        public async Task<AuthResponse> LoginUserAsync(object payload)
+    public async Task<AuthResponse> LoginUserAsync(object payload)
+    {
+        try
         {
-            try
+            Debug.WriteLine($"Login payload: {JsonSerializer.Serialize(payload)}");
+            var response = await _httpClient.PostAsJsonAsync("/api/Auth/login", payload);
+            if (response.IsSuccessStatusCode)
             {
-                Debug.WriteLine($"Login payload: {System.Text.Json.JsonSerializer.Serialize(payload)}");
-                var response = await _httpClient.PostAsJsonAsync("/api/Auth/login", payload);
-                if (response.IsSuccessStatusCode)
-                    return await response.Content.ReadFromJsonAsync<AuthResponse>();
-                var errorContent = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine($"Login error: {errorContent}");
-                return new AuthResponse { Message = errorContent, UserId = 0 };
+                var json = await response.Content.ReadAsStringAsync();
+                Debug.WriteLine($"Login response: {json}");
+                return JsonSerializer.Deserialize<AuthResponse>(json, _jsonOptions);
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Login exception: {ex.Message}");
-                return new AuthResponse { Message = $"Error: {ex.Message}", UserId = 0 };
-            }
+            var errorContent = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine($"Login error: {errorContent}");
+            return new AuthResponse { Message = errorContent, UserId = 0 };
         }
-
-        public async Task<UserProfile> GetUserProfileAsync(int userId)
+        catch (Exception ex)
         {
-            try
-            {
-                Debug.WriteLine($"Get profile for userId: {userId}");
-                return await _httpClient.GetFromJsonAsync<UserProfile>($"/api/Profile/{userId}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Get profile exception: {ex.Message}");
-                return new UserProfile();
-            }
+            Debug.WriteLine($"Login exception: {ex.Message}");
+            return new AuthResponse { Message = $"Error: {ex.Message}", UserId = 0 };
         }
+    }
 
-        public async Task<UserProfile> UpdateUserProfileAsync(int userId, object payload)
+    public async Task<UserProfile> GetUserProfileAsync(int userId)
+    {
+        try
         {
-            try
-            {
-                Debug.WriteLine($"Update profile payload: {System.Text.Json.JsonSerializer.Serialize(payload)}");
-                var response = await _httpClient.PutAsJsonAsync($"/api/Profile/{userId}", payload);
-                if (response.IsSuccessStatusCode)
-                    return await response.Content.ReadFromJsonAsync<UserProfile>();
-                Debug.WriteLine($"Update profile error: {await response.Content.ReadAsStringAsync()}");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Update profile exception: {ex.Message}");
-                return null;
-            }
+            Debug.WriteLine($"Get profile for userId: {userId}");
+            var json = await _httpClient.GetStringAsync($"/api/Profile/{userId}");
+            Debug.WriteLine($"Profile response: {json}");
+            var profile = JsonSerializer.Deserialize<UserProfile>(json, _jsonOptions);
+            Debug.WriteLine($"Deserialized profile: Id={profile?.Id}, Height={profile?.Height}, Weight={profile?.Weight}, Bju.Calories={profile?.Bju?.Calories}");
+            return profile ?? new UserProfile();
         }
-
-        // Відповідь бекенду: { "mealPlan": "<текст>" }
-        public class MealPlanResponse
+        catch (Exception ex)
         {
-            [JsonPropertyName("mealPlan")]
-            public string MealPlan { get; set; }
-
-            // Сумісна властивість Plan, яку очікує інший код
-            [JsonIgnore]
-            public string Plan
-            {
-                get => MealPlan;
-                set => MealPlan = value;
-            }
+            Debug.WriteLine($"Get profile exception: {ex.Message}");
+            return new UserProfile();
         }
+    }
 
-        public async Task<MealPlanResponse> GenerateMealPlanAsync(int userId)
+    public async Task<UserProfile> UpdateUserProfileAsync(int userId, object payload)
+    {
+        try
         {
-            try
+            Debug.WriteLine($"Update profile for userId: {userId}, payload: {JsonSerializer.Serialize(payload)}");
+            var response = await _httpClient.PutAsJsonAsync($"/api/Profile/{userId}", payload);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine($"Update profile response status: {response.StatusCode}, content: {responseContent}");
+
+            if (response.IsSuccessStatusCode)
             {
-                Debug.WriteLine($"Generate meal plan for userId: {userId}");
-                var response = await _httpClient.PostAsJsonAsync("/api/Nutrition/generate-custom-plan", new { userId });
-                response.EnsureSuccessStatusCode();
-                var payload = await response.Content.ReadFromJsonAsync<MealPlanResponse>();
-                if (payload == null || string.IsNullOrWhiteSpace(payload.MealPlan))
-                    throw new Exception("Порожня відповідь від сервера");
-                return payload;
+                var profile = JsonSerializer.Deserialize<UserProfile>(responseContent, _jsonOptions);
+                Debug.WriteLine($"Updated profile: Id={profile?.Id}, Height={profile?.Height}, Weight={profile?.Weight}");
+                return profile;
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Generate meal plan exception: {ex.Message}");
-                throw;
-            }
+            Debug.WriteLine($"Update profile error: {responseContent}");
+            return null;
         }
-
-        public async Task<List<Models.MealPlan>> GetMealPlanHistoryAsync(int userId)
+        catch (Exception ex)
         {
-            try
-            {
-                Debug.WriteLine($"Get meal plan history for userId: {userId}");
-                return await _httpClient.GetFromJsonAsync<List<Models.MealPlan>>($"/api/nutrition/history/{userId}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Get meal plan history exception: {ex.Message}");
-                return new List<Models.MealPlan>();
-            }
+            Debug.WriteLine($"Update profile exception: {ex.Message}");
+            return null;
         }
+    }
 
-        public async Task<WorkoutPlan> GenerateWorkoutAsync(int userId, string goal, string intensity, int duration)
+    // Відповідь бекенду: { "mealPlan": "<текст>" }
+    public class MealPlanResponse
+    {
+        [JsonPropertyName("mealPlan")]
+        public string MealPlan { get; set; }
+
+        // Для сумісності з MealPlanViewModel
+        public string Plan => MealPlan;
+    }
+
+    public async Task<MealPlanResponse> GenerateMealPlanAsync(int userId)
+    {
+        try
         {
-            var payload = new { UserId = userId, Goal = goal, Intensity = intensity, DurationMinutes = duration };
-            try
-            {
-                Debug.WriteLine($"Generate workout payload: {System.Text.Json.JsonSerializer.Serialize(payload)}");
-                var response = await _httpClient.PostAsJsonAsync("/api/Workouts/generate", payload);
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<WorkoutPlan>();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Generate workout exception: {ex.Message}");
-                throw;
-            }
+            Debug.WriteLine($"Generate meal plan for userId: {userId}");
+            var response = await _httpClient.PostAsJsonAsync("/api/Nutrition/generate-custom-plan", new { userId });
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine($"Meal plan response: {json}");
+            var payload = JsonSerializer.Deserialize<MealPlanResponse>(json, _jsonOptions);
+            if (payload == null || string.IsNullOrWhiteSpace(payload.MealPlan))
+                throw new Exception("Порожня відповідь від сервера");
+            return payload;
         }
-
-        public async Task<List<WorkoutPlan>> GetUserWorkoutsAsync(int userId)
+        catch (Exception ex)
         {
-            try
-            {
-                Debug.WriteLine($"Get workouts for userId: {userId}");
-                var response = await _httpClient.GetAsync($"/api/Workouts/history/{userId}");
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<List<WorkoutPlan>>() ?? new List<WorkoutPlan>();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Get workouts exception: {ex.Message}");
-                return new List<WorkoutPlan>();
-            }
+            Debug.WriteLine($"Generate meal plan exception: {ex.Message}");
+            throw;
         }
+    }
 
-        // Виклик AI напряму (prompt рядком)
-        public class AIMealPlanResponse { public string Result { get; set; } }
-        public async Task<string> GenerateAiMealPlanAsync(string prompt)
+    public async Task<List<Models.MealPlan>> GetMealPlanHistoryAsync(int userId)
+    {
+        try
         {
-            try
-            {
-                Debug.WriteLine($"Generate AI meal plan prompt: {prompt}");
-                var response = await _httpClient.PostAsJsonAsync("/api/ai/mealplan", prompt);
-                response.EnsureSuccessStatusCode();
-                var payload = await response.Content.ReadFromJsonAsync<AIMealPlanResponse>();
-                return payload?.Result ?? string.Empty;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Generate AI meal plan exception: {ex.Message}");
-                return string.Empty;
-            }
+            Debug.WriteLine($"Get meal plan history for userId: {userId}");
+            var json = await _httpClient.GetStringAsync($"/api/nutrition/history/{userId}");
+            Debug.WriteLine($"Meal plan history response: {json}");
+            return JsonSerializer.Deserialize<List<Models.MealPlan>>(json, _jsonOptions) ?? new List<Models.MealPlan>();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Get meal plan history exception: {ex.Message}");
+            return new List<Models.MealPlan>();
+        }
+    }
+
+    // Workout методи
+    public async Task<WorkoutPlan> GenerateWorkoutAsync(int userId, string goal, string intensity, int duration)
+    {
+        var payload = new { UserId = userId, Goal = goal, Intensity = intensity, DurationMinutes = duration };
+        try
+        {
+            Debug.WriteLine($"Generate workout payload: {JsonSerializer.Serialize(payload)}");
+            var response = await _httpClient.PostAsJsonAsync("/api/Workouts/generate", payload);
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine($"Workout response: {json}");
+            return JsonSerializer.Deserialize<WorkoutPlan>(json, _jsonOptions);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Generate workout exception: {ex.Message}");
+            throw;
+        }
+    }
+
+    public async Task<List<WorkoutPlan>> GetUserWorkoutsAsync(int userId)
+    {
+        try
+        {
+            Debug.WriteLine($"Get workouts for userId: {userId}");
+            var response = await _httpClient.GetAsync($"/api/Workouts/history/{userId}");
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine($"Workouts history response: {json}");
+            return JsonSerializer.Deserialize<List<WorkoutPlan>>(json, _jsonOptions) ?? new List<WorkoutPlan>();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Get workouts exception: {ex.Message}");
+            return new List<WorkoutPlan>();
+        }
+    }
+
+    // Виклик AI напряму
+    public class AIMealPlanResponse
+    {
+        [JsonPropertyName("result")]
+        public string Result { get; set; }
+    }
+
+    public async Task<string> GenerateAiMealPlanAsync(string prompt)
+    {
+        try
+        {
+            Debug.WriteLine($"Generate AI meal plan prompt: {prompt}");
+            var response = await _httpClient.PostAsJsonAsync("/api/ai/mealplan", prompt);
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine($"AI meal plan response: {json}");
+            var payload = JsonSerializer.Deserialize<AIMealPlanResponse>(json, _jsonOptions);
+            return payload?.Result ?? string.Empty;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Generate AI meal plan exception: {ex.Message}");
+            return string.Empty;
         }
     }
 }
