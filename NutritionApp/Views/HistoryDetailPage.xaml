@@ -2,8 +2,79 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NutritionApp.Views.HistoryDetailPage"
-             Title="Деталі плану">
-    <ScrollView Padding="20">
-        <Label x:Name="PlanTextLabel" />
-    </ScrollView>
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBackground}">
+
+    <Grid RowDefinitions="160,*" Padding="0">
+
+        <!-- Верхній блок з градієнтом -->
+        <Grid Row="0" Padding="0,16,0,16">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4F7DFF" Offset="0.0" />
+                    <GradientStop Color="#E27D5F" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <!-- Кнопка назад -->
+            <Border WidthRequest="40" 
+                    HeightRequest="40"
+                    StrokeShape="RoundRectangle 20"
+                    BackgroundColor="#FFFFFF33"
+                    Stroke="Transparent"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Start"
+                    Margin="16,16,0,0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackClicked"/>
+                </Border.GestureRecognizers>
+                <Label Text="‹" 
+                       FontSize="28" 
+                       TextColor="White"
+                       VerticalOptions="Center" 
+                       HorizontalOptions="Center"/>
+            </Border>
+
+            <VerticalStackLayout Spacing="8"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Label Text="Деталі плану"
+                       FontAttributes="Bold"
+                       FontSize="22"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label x:Name="DateLabel"
+                       FontSize="14"
+                       TextColor="#FFEFF2"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Контент -->
+        <Border Grid.Row="1"
+                BackgroundColor="{StaticResource CardBackground}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                Padding="16"
+                Margin="16,-32,16,16"
+                StrokeShape="RoundRectangle 24">
+
+            <ScrollView>
+                <VerticalStackLayout x:Name="MealsContainer" Spacing="16">
+
+                    <!-- Summary -->
+                    <Label x:Name="SummaryLabel" 
+                           FontSize="15"
+                           TextColor="{StaticResource TextSecondary}"
+                           HorizontalTextAlignment="Center"
+                           IsVisible="False"/>
+
+                    <!-- Контейнер для карточок прийомів їжі -->
+                    <!-- Буде заповнюватись динамічно -->
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+
+    </Grid>
 </ContentPage>

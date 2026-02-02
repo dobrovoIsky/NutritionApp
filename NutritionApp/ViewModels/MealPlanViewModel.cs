@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using NutritionApp.Services;
@@ -9,19 +10,60 @@ namespace NutritionApp.ViewModels
     {
         private readonly ApiService _apiService;
 
-        private string _mealPlanText;
-        public string MealPlanText
+        private string _summary;
+        public string Summary
         {
-            get => _mealPlanText;
-            set { _mealPlanText = value; OnPropertyChanged(); }
+            get => _summary;
+            set { _summary = value; OnPropertyChanged(); }
+        }
+
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set { _errorMessage = value; OnPropertyChanged(); }
         }
 
         private bool _isLoading;
         public bool IsLoading
         {
             get => _isLoading;
-            set { _isLoading = value; OnPropertyChanged(); }
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ShowInitialMessage));
+            }
         }
+
+        private bool _hasData;
+        public bool HasData
+        {
+            get => _hasData;
+            set
+            {
+                _hasData = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ShowInitialMessage));
+            }
+        }
+
+        private bool _hasError;
+        public bool HasError
+        {
+            get => _hasError;
+            set
+            {
+                _hasError = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ShowInitialMessage));
+            }
+        }
+
+        // Властивість для показу початкового повідомлення
+        public bool ShowInitialMessage => !IsLoading && !HasData && !HasError;
+
+        public ObservableCollection<ApiService.MealItem> Meals { get; } = new();
 
         public ICommand GeneratePlanCommand { get; }
 
@@ -29,7 +71,8 @@ namespace NutritionApp.ViewModels
         {
             _apiService = apiService;
             GeneratePlanCommand = new Command(async () => await GeneratePlanAsync());
-            MealPlanText = "Натисніть кнопку, щоб згенерувати план харчування на основі ваших даних.";
+            HasData = false;
+            HasError = false;
         }
 
         private async Task GeneratePlanAsync()
@@ -38,22 +81,43 @@ namespace NutritionApp.ViewModels
             try
             {
                 IsLoading = true;
-                MealPlanText = "";
+                HasError = false;
+                HasData = false;
+                ErrorMessage = "";
+                Summary = "";
+                Meals.Clear();
+
                 int userId = Preferences.Get("UserId", 0);
                 if (userId > 0)
                 {
                     var result = await _apiService.GenerateMealPlanAsync(userId);
-                    // Виправлено: якщо повертається MealPlan з властивістю Plan
-                    MealPlanText = result?.Plan ?? "Не вдалося отримати план харчування.";
+
+                    if (result != null && result.Meals != null && result.Meals.Count > 0)
+                    {
+                        Summary = result.Summary ?? "Ваш персональний план харчування готовий!";
+                        foreach (var meal in result.Meals)
+                        {
+                            Meals.Add(meal);
+                        }
+                        HasData = true;
+                    }
+                    else
+                    {
+                        ErrorMessage = "Не вдалося отримати план харчування.";
+                        HasError = true;
+                    }
                 }
                 else
                 {
-                    MealPlanText = "Помилка: не вдалося ідентифікувати користувача.";
+                    ErrorMessage = "Помилка: не вдалося ідентифікувати користувача.";
+                    HasError = true;
                 }
             }
             catch (Exception ex)
             {
-                MealPlanText = $"Сталася помилка: {ex.Message}";
+                ErrorMessage = $"Сталася помилка: {ex.Message}";
+                HasError = true;
+                HasData = false;
             }
             finally
             {

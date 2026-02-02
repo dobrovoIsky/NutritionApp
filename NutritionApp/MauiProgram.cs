@@ -2,7 +2,7 @@
 using NutritionApp.Services;
 using NutritionApp.ViewModels;
 using NutritionApp.Views;
-using Microsoft.Maui.Controls;
+using Plugin.LocalNotification;
 
 namespace NutritionApp
 {
@@ -13,6 +13,7 @@ namespace NutritionApp
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseLocalNotification()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -23,12 +24,13 @@ namespace NutritionApp
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
-            // Сервіси й сторінки
+            // Сервіси
+            builder.Services.AddSingleton<WaterReminderService>();
             builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddSingleton<ApiService>();
 
             builder.Services.AddSingleton<LoginPage>();
-            builder.Services.AddSingleton<RegisterPage>();   // стало Singleton
+            builder.Services.AddSingleton<RegisterPage>();
             builder.Services.AddSingleton<MainPage>();
 
             builder.Services.AddSingleton<MainPageViewModel>();
@@ -42,6 +44,7 @@ namespace NutritionApp
             builder.Services.AddTransient<HistoryPage>();
             builder.Services.AddTransient<HistoryViewModel>();
             builder.Services.AddTransient<HistoryDetailPage>();
+            builder.Services.AddTransient<WorkoutPage>();
 
             return builder.Build();
         }

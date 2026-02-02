@@ -1,36 +1,235 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:NutritionApp.Converters"
              x:Class="NutritionApp.Views.MealPlanPage"
-             Title="Раціон"
+             Shell.NavBarIsVisible="False"
              BackgroundColor="{StaticResource PageBackground}">
-    <Grid RowDefinitions="Auto, *">
-        <VerticalStackLayout Grid.Row="0" Padding="20" Spacing="10">
 
-            <Border StrokeShape="RoundRectangle 8"
-                    BackgroundColor="{StaticResource Primary}"
-                    Padding="14,10">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GeneratePlanCommand}" />
-                </Border.GestureRecognizers>
-                <HorizontalStackLayout Spacing="10" 
-                                       HorizontalOptions="Center" 
-                                       VerticalOptions="Center">
-                    <Image Source="ai1.png" 
-                           WidthRequest="22" 
-                           HeightRequest="22" />
-                    <Label Text="Згенерувати новий план"
-                           VerticalOptions="Center"
-                           TextColor="White" 
-                           FontFamily="OpenSansSemibold"/>
-                </HorizontalStackLayout>
-            </Border>
+    <!-- Resources ПЕРЕД контентом -->
+    <ContentPage.Resources>
+        <converters:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
+    </ContentPage.Resources>
 
-            <ActivityIndicator IsVisible="{Binding IsLoading}" IsRunning="{Binding IsLoading}" HorizontalOptions="Center" />
-        </VerticalStackLayout>
+    <!-- Контент сторінки -->
+    <Grid RowDefinitions="180,*" Padding="0">
 
-        <ScrollView Grid.Row="1" Padding="20,0,20,20">
-            <Label Text="{Binding MealPlanText}" TextColor="{StaticResource PrimaryDarkText}" />
-        </ScrollView>
+        <!-- Верхній блок з градієнтом -->
+        <Grid Row="0" Padding="0,16,0,16">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4F7DFF" Offset="0.0" />
+                    <GradientStop Color="#E27D5F" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <VerticalStackLayout Spacing="10"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Label Text="🍽️" FontSize="40" HorizontalOptions="Center"/>
+                <Label Text="План харчування"
+                       FontAttributes="Bold"
+                       FontSize="24"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label Text="Персоналізований раціон від AI"
+                       FontSize="14"
+                       TextColor="#FFEFF2"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Контент -->
+        <Border Grid.Row="1"
+                BackgroundColor="{StaticResource CardBackground}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                Padding="16"
+                Margin="16,-32,16,16"
+                StrokeShape="RoundRectangle 24">
+
+            <Grid RowDefinitions="Auto,*">
+
+                <!-- Кнопка генерації (без фото) -->
+                <Border Grid.Row="0"
+        StrokeShape="RoundRectangle 14"
+        Stroke="Transparent"
+        BackgroundColor="{StaticResource Primary}"
+        Padding="16,14"
+        Margin="0,0,0,16">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GeneratePlanCommand}" />
+                    </Border.GestureRecognizers>
+                    <Label Text="✨ Згенерувати новий план"
+           HorizontalOptions="Center"
+           VerticalOptions="Center"
+           TextColor="Black" 
+           FontAttributes="Bold"
+           FontSize="16"/>
+                </Border>
+
+                <!-- Скролюваний контент -->
+                <ScrollView Grid.Row="1">
+                    <VerticalStackLayout Spacing="16">
+
+                        <!-- Індикатор завантаження -->
+                        <VerticalStackLayout IsVisible="{Binding IsLoading}" 
+                                             Spacing="12"
+                                             HorizontalOptions="Center"
+                                             Margin="0,40,0,0">
+                            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                                               Color="{StaticResource Primary}"
+                                               HeightRequest="50"
+                                               WidthRequest="50"/>
+                            <Label Text="🤖 AI генерує твій план..."
+                                   FontSize="16"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="Це може зайняти до 30 секунд"
+                                   FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+
+                        <!-- Повідомлення про помилку -->
+                        <Border IsVisible="{Binding HasError}"
+                                BackgroundColor="#FEF2F2"
+                                Stroke="#FECACA"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                Padding="16">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="❌ Помилка"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="#DC2626"/>
+                                <Label Text="{Binding ErrorMessage}"
+                                       FontSize="14"
+                                       TextColor="#991B1B"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Summary -->
+                        <Label Text="{Binding Summary}"
+                               IsVisible="{Binding HasData}"
+                               FontSize="15"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"
+                               Margin="0,0,0,8"/>
+
+                        <!-- Прийоми їжі -->
+                        <CollectionView ItemsSource="{Binding Meals}"
+                                        IsVisible="{Binding HasData}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Stroke="{StaticResource BorderColor}"
+                                            BackgroundColor="{StaticResource CardBackground}"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 16"
+                                            Padding="16"
+                                            Margin="0,0,0,12">
+                                        <VerticalStackLayout Spacing="12">
+
+                                            <!-- Заголовок прийому їжі -->
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <HorizontalStackLayout Spacing="8">
+                                                    <Label Text="🍴" FontSize="18"/>
+                                                    <Label Text="{Binding Name}"
+                                                           FontSize="17"
+                                                           FontAttributes="Bold"
+                                                           TextColor="{StaticResource TextPrimary}"/>
+                                                </HorizontalStackLayout>
+                                                <Border Grid.Column="1"
+                                                        BackgroundColor="#EFF6FF"
+                                                        StrokeShape="RoundRectangle 10"
+                                                        Stroke="Transparent"
+                                                        Padding="8,4">
+                                                    <Label Text="{Binding Time}"
+                                                           FontSize="13"
+                                                           TextColor="{StaticResource Primary}"
+                                                           FontAttributes="Bold"/>
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- Список продуктів -->
+                                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Foods}"
+                                                                 Spacing="6">
+                                                <BindableLayout.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border BackgroundColor="{StaticResource PageBackground}"
+                                                                StrokeShape="RoundRectangle 10"
+                                                                Stroke="Transparent"
+                                                                Padding="12">
+                                                            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
+                                                                <Label Text="{Binding Name}"
+                                                                       FontSize="15"
+                                                                       FontAttributes="Bold"
+                                                                       TextColor="{StaticResource TextPrimary}"/>
+                                                                <Label Grid.Column="1"
+                                                                       Text="{Binding Weight}"
+                                                                       FontSize="13"
+                                                                       TextColor="{StaticResource TextSecondary}"/>
+
+                                                                <HorizontalStackLayout Grid.Row="1" 
+                                                                                       Grid.ColumnSpan="2"
+                                                                                       Spacing="12"
+                                                                                       Margin="0,4,0,0">
+                                                                    <Label Text="{Binding Calories, StringFormat='🔥 {0} ккал'}"
+                                                                           FontSize="12" 
+                                                                           TextColor="#EA580C"/>
+                                                                    <Label Text="{Binding Protein, StringFormat='Б: {0}'}"
+                                                                           FontSize="12" 
+                                                                           TextColor="#16A34A"/>
+                                                                    <Label Text="{Binding Fat, StringFormat='Ж: {0}'}"
+                                                                           FontSize="12" 
+                                                                           TextColor="#CA8A04"/>
+                                                                    <Label Text="{Binding Carbs, StringFormat='В: {0}'}"
+                                                                           FontSize="12" 
+                                                                           TextColor="#2563EB"/>
+                                                                </HorizontalStackLayout>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </BindableLayout.ItemTemplate>
+                                            </VerticalStackLayout>
+
+                                            <!-- Загальні калорії прийому -->
+                                            <Border BackgroundColor="#FFF7ED"
+                                                    StrokeShape="RoundRectangle 8"
+                                                    Stroke="Transparent"
+                                                    Padding="10,6"
+                                                    HorizontalOptions="End">
+                                                <Label Text="{Binding TotalCalories, StringFormat='Всього: {0} ккал'}"
+                                                       FontSize="13" 
+                                                       TextColor="#EA580C" 
+                                                       FontAttributes="Bold"/>
+                                            </Border>
+
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <!-- Початкове повідомлення (коли немає даних і не завантажується) -->
+                        <VerticalStackLayout IsVisible="{Binding ShowInitialMessage}"
+                                             Spacing="16"
+                                             HorizontalOptions="Center"
+                                             Margin="0,40,0,0">
+                            <Label Text="🥗" FontSize="60" HorizontalOptions="Center"/>
+                            <Label Text="Натисніть кнопку, щоб згенерувати план харчування."
+                                   FontSize="16"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+
+            </Grid>
+        </Border>
+
     </Grid>
 </ContentPage>

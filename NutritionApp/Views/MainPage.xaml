@@ -4,44 +4,267 @@
              xmlns:viewModels="clr-namespace:NutritionApp.ViewModels"
              x:DataType="viewModels:MainPageViewModel"
              x:Class="NutritionApp.Views.MainPage"
-             Title="Головна">
-    <ScrollView Padding="20">
-        <VerticalStackLayout Spacing="15">
-            <Label Text="{Binding UserProfile.Username, StringFormat='Вітаємо, {0}!'}" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center"/>
-            <ActivityIndicator IsVisible="{Binding IsLoading}" IsRunning="{Binding IsLoading}" HorizontalOptions="Center" />
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBackground}">
 
-            <Frame>
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Ваша добова норма" FontSize="18" FontAttributes="Bold"/>
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="5">
-                        <Label Grid.Row="0" Grid.Column="0" Text="Калорії, ккал" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding UserProfile.Bju.Calories}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
-                        <Label Grid.Row="1" Grid.Column="0" Text="Білки, г" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding UserProfile.Bju.Proteins}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
-                        <Label Grid.Row="2" Grid.Column="0" Text="Жири, г" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding UserProfile.Bju.Fats}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
-                        <Label Grid.Row="3" Grid.Column="0" Text="Вуглеводи, г" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding UserProfile.Bju.Carbs}" HorizontalTextAlignment="End" FontAttributes="Bold"/>
-                    </Grid>
-                </VerticalStackLayout>
-            </Frame>
+    <Grid RowDefinitions="200,*" Padding="0">
 
-            <Frame>
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Ваші показники" FontSize="18" FontAttributes="Bold"/>
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="5">
-                        <Label Grid.Row="0" Grid.Column="0" Text="Вага, кг" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding UserProfile.Weight}"/>
-                        <Label Grid.Row="1" Grid.Column="0" Text="Зріст, см" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding UserProfile.Height}"/>
-                        <Label Grid.Row="2" Grid.Column="0" Text="Вік" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding UserProfile.Age}"/>
-                        <Label Grid.Row="3" Grid.Column="0" Text="Мета" TextColor="{StaticResource SecondaryText}"/>
-                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding UserProfile.Goal}"/>
+        <!-- Верхній блок з градієнтом -->
+        <Grid Row="0" Padding="0,16,0,16">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4F7DFF" Offset="0.0" />
+                    <GradientStop Color="#E27D5F" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <VerticalStackLayout Spacing="10"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Image Source="logo.png"
+                       HeightRequest="70"
+                       WidthRequest="70"
+                       Aspect="AspectFit"
+                       HorizontalOptions="Center"/>
+                <Label Text="{Binding UserProfile.Username, StringFormat='Вітаємо, {0}!'}"
+                       FontAttributes="Bold"
+                       FontSize="24"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label Text="Твоя персональна норма харчування"
+                       FontSize="14"
+                       TextColor="#FFEFF2"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Індикатор завантаження -->
+            <ActivityIndicator IsVisible="{Binding IsLoading}" 
+                               IsRunning="{Binding IsLoading}" 
+                               Color="White"
+                               VerticalOptions="End"
+                               HorizontalOptions="Center"
+                               Margin="0,0,0,10"/>
+        </Grid>
+
+        <!-- Контент -->
+        <Border Grid.Row="1"
+                BackgroundColor="{StaticResource CardBackground}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                Padding="20"
+                Margin="16,-32,16,16"
+                StrokeShape="RoundRectangle 24">
+
+            <ScrollView>
+                <VerticalStackLayout Spacing="20">
+
+                    <!-- Добова норма БЖУ -->
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="🔥 Твоя добова норма"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"/>
+
+                        <!-- Калорії - великий блок -->
+                        <Border Stroke="{StaticResource BorderColor}"
+                                BackgroundColor="#FFF7ED"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 16"
+                                Padding="16">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border WidthRequest="44" HeightRequest="44"
+                                        StrokeShape="RoundRectangle 22"
+                                        BackgroundColor="#FFEDD5"
+                                        Stroke="Transparent">
+                                    <Label Text="🔥" FontSize="20" 
+                                           VerticalOptions="Center" 
+                                           HorizontalOptions="Center"/>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" VerticalOptions="Center">
+                                    <Label Text="Калорії"
+                                           FontSize="14"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label Text="{Binding UserProfile.Bju.Calories, StringFormat='{0} ккал'}"
+                                           FontSize="22"
+                                           FontAttributes="Bold"
+                                           TextColor="#EA580C"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+
+                        <!-- БЖУ в сітці -->
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                            <!-- Білки -->
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="#F0FDF4"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                    <Label Text="🥩" FontSize="20" HorizontalOptions="Center"/>
+                                    <Label Text="Білки"
+                                           FontSize="12"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           HorizontalOptions="Center"/>
+                                    <Label Text="{Binding UserProfile.Bju.Proteins, StringFormat='{0} г'}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="#16A34A"
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Жири -->
+                            <Border Grid.Column="1"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="#FFFBEB"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                    <Label Text="🧈" FontSize="20" HorizontalOptions="Center"/>
+                                    <Label Text="Жири"
+                                           FontSize="12"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           HorizontalOptions="Center"/>
+                                    <Label Text="{Binding UserProfile.Bju.Fats, StringFormat='{0} г'}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="#CA8A04"
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Вуглеводи -->
+                            <Border Grid.Column="2"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="#EFF6FF"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                    <Label Text="🍞" FontSize="20" HorizontalOptions="Center"/>
+                                    <Label Text="Вуглеводи"
+                                           FontSize="11"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           HorizontalOptions="Center"/>
+                                    <Label Text="{Binding UserProfile.Bju.Carbs, StringFormat='{0} г'}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="#2563EB"
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Показники користувача -->
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="📊 Твої показники"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"/>
+
+                        <Grid ColumnDefinitions="*,*" RowSpacing="10" ColumnSpacing="10">
+                            <!-- Вага -->
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="⚖️ Вага"
+                                           FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label Text="{Binding UserProfile.Weight, StringFormat='{0} кг'}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Зріст -->
+                            <Border Grid.Column="1"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="📏 Зріст"
+                                           FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label Text="{Binding UserProfile.Height, StringFormat='{0} см'}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Вік -->
+                            <Border Grid.Row="1"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="🎂 Вік"
+                                           FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label Text="{Binding UserProfile.Age, StringFormat='{0} років'}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <!-- Мета -->
+                            <Border Grid.Row="1" Grid.Column="1"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="🎯 Мета"
+                                           FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label Text="{Binding UserProfile.Goal}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           LineBreakMode="TailTruncation"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Кнопки дій -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Text="✏️ Редагувати"
+                                Command="{Binding GoToEditProfileCommand}"
+                                HeightRequest="50"
+                                CornerRadius="14"
+                                BackgroundColor="{StaticResource Primary}"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                FontSize="15"/>
+
+                        <Button Grid.Column="1"
+                                Text="🍽️ План харчування"
+                                Command="{Binding GoToMealPlanCommand}"
+                                HeightRequest="50"
+                                CornerRadius="14"
+                                BackgroundColor="{StaticResource Accent}"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                FontSize="15"/>
                     </Grid>
-                    <Button Text="Редагувати показники" Command="{Binding GoToEditProfileCommand}" Margin="0,10,0,0"/>
+
                 </VerticalStackLayout>
-            </Frame>
-        </VerticalStackLayout>
-    </ScrollView>
+            </ScrollView>
+        </Border>
+
+    </Grid>
 </ContentPage>

@@ -42,25 +42,28 @@ namespace NutritionApp.Views
                     return;
                 }
 
-                double? height = ParseNullableDouble(HeightEntry.Text);
-                double? weight = ParseNullableDouble(WeightEntry.Text);
-                int? age = ParseNullableInt(AgeEntry.Text);
+                double height = ParseDouble(HeightEntry.Text);
+                double weight = ParseDouble(WeightEntry.Text);
+                int age = ParseInt(AgeEntry.Text);
 
-                var goal = GoalPicker.SelectedItem as string;
-                var activity = ActivityPicker.SelectedItem as string;
-                var gender = GenderPicker.SelectedItem as string;
+                var goal = GoalPicker.SelectedItem as string ?? "maintain weight";
+                var activity = ActivityPicker.SelectedItem as string ?? "moderately active";
+                var gender = GenderPicker.SelectedItem as string ?? "male";
 
+                // ¬»ѕ–ј¬Ћ≈Ќќ: ≤мена пол≥в в≥дпов≥дають UserRegDTO на сервер≥
                 var payload = new
                 {
-                    username = username,
-                    password = password,
-                    height = height,
-                    weight = weight,
-                    age = age,
-                    goal = goal,
-                    activityLevel = activity,
-                    gender = gender
+                    Username = username,
+                    PasswordHash = password,  // ? «м≥нено з "password" на "PasswordHash"
+                    Height = height,
+                    Weight = weight,
+                    Age = age,
+                    Goal = goal,
+                    ActivityLevel = activity,
+                    Gender = gender
                 };
+
+                Debug.WriteLine($"Register payload: {System.Text.Json.JsonSerializer.Serialize(payload)}");
 
                 var result = await _apiService.RegisterUserAsync(payload);
                 Debug.WriteLine($"Register result: {System.Text.Json.JsonSerializer.Serialize(result)}");
@@ -106,20 +109,20 @@ namespace NutritionApp.Views
             ErrorLabel.IsVisible = true;
         }
 
-        private double? ParseNullableDouble(string s)
+        private double ParseDouble(string s)
         {
-            if (string.IsNullOrWhiteSpace(s)) return null;
-            if (double.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var v)) return v;
+            if (string.IsNullOrWhiteSpace(s)) return 0;
+            if (double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var v)) return v;
             if (double.TryParse(s, out v)) return v;
-            return null;
+            return 0;
         }
 
-        private int? ParseNullableInt(string s)
+        private int ParseInt(string s)
         {
-            if (string.IsNullOrWhiteSpace(s)) return null;
-            if (int.TryParse(s, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var v)) return v;
+            if (string.IsNullOrWhiteSpace(s)) return 0;
+            if (int.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var v)) return v;
             if (int.TryParse(s, out v)) return v;
-            return null;
+            return 0;
         }
     }
 }

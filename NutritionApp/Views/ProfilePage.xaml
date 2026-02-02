@@ -19,7 +19,7 @@
             <VerticalStackLayout Spacing="14"
                                  VerticalOptions="Center"
                                  HorizontalOptions="Center">
-                <!-- Аватар у кругу зверху -->
+                <!-- Аватар у кругу зверху - тепер натискається -->
                 <Border HeightRequest="96"
                         WidthRequest="96"
                         Stroke="#FFFFFF33"
@@ -27,12 +27,21 @@
                         StrokeShape="RoundRectangle 52"
                         BackgroundColor="#FFFFFF22"
                         HorizontalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnAvatarTapped"/>
+                    </Border.GestureRecognizers>
                     <Image x:Name="AvatarImage"
                            Source="{Binding SelectedAvatar.ImageSource}"
                            HeightRequest="90"
                            WidthRequest="90"
                            Aspect="AspectFill"/>
                 </Border>
+
+                <!-- Підказка -->
+                <Label Text="(натисни для зміни аватара)"
+                       FontSize="11"
+                       TextColor="#FFFFFFAA"
+                       HorizontalOptions="Center"/>
 
                 <Label x:Name="UsernameLabel"
                        Text="{Binding UserProfile.Username, StringFormat='Вітаємо, {0}!'}"
@@ -59,43 +68,6 @@
 
             <ScrollView>
                 <VerticalStackLayout Spacing="18">
-
-                    <!-- Вибір аватара нижче -->
-                    <Border Stroke="{StaticResource BorderColor}"
-                            BackgroundColor="{StaticResource CardBackground}"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 16"
-                            Padding="16">
-                        <VerticalStackLayout Spacing="10">
-                            <Label Text="Обери аватар"
-                                   FontSize="16"
-                                   FontAttributes="Bold"
-                                   TextColor="{StaticResource TextPrimary}"
-                                   HorizontalOptions="Center"/>
-                            <CollectionView ItemsSource="{Binding AvatarOptions}"
-                                            SelectionMode="Single"
-                                            SelectedItem="{Binding SelectedAvatar}"
-                                            HorizontalOptions="Center">
-                                <CollectionView.ItemsLayout>
-                                    <GridItemsLayout Orientation="Horizontal" Span="4"/>
-                                </CollectionView.ItemsLayout>
-                                <CollectionView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border HeightRequest="60"
-                                                WidthRequest="60"
-                                                Stroke="White"
-                                                StrokeThickness="2"
-                                                BackgroundColor="Transparent"
-                                                HorizontalOptions="Center">
-                                            <Image Source="{Binding ImageSource}"
-                                                   HeightRequest="50"
-                                                   WidthRequest="50"/>
-                                        </Border>
-                                    </DataTemplate>
-                                </CollectionView.ItemTemplate>
-                            </CollectionView>
-                        </VerticalStackLayout>
-                    </Border>
 
                     <!-- Кнопки дій -->
                     <Grid ColumnDefinitions="*,*"
@@ -139,8 +111,7 @@
                                     <Label Text="Height"
                                            FontSize="13"
                                            TextColor="{StaticResource TextSecondary}"/>
-                                    <Label x:Name="HeightValue"
-                                           Text="—"
+                                    <Label Text="{Binding UserProfile.Height, StringFormat='{0} см'}"
                                            FontSize="18"
                                            FontAttributes="Bold"
                                            TextColor="{StaticResource TextPrimary}"/>
@@ -157,8 +128,7 @@
                                     <Label Text="Weight"
                                            FontSize="13"
                                            TextColor="{StaticResource TextSecondary}"/>
-                                    <Label x:Name="WeightValue"
-                                           Text="—"
+                                    <Label Text="{Binding UserProfile.Weight, StringFormat='{0} кг'}"
                                            FontSize="18"
                                            FontAttributes="Bold"
                                            TextColor="{StaticResource TextPrimary}"/>
@@ -175,8 +145,7 @@
                                     <Label Text="Age"
                                            FontSize="13"
                                            TextColor="{StaticResource TextSecondary}"/>
-                                    <Label x:Name="AgeValue"
-                                           Text="—"
+                                    <Label Text="{Binding UserProfile.Age, StringFormat='{0} років'}"
                                            FontSize="18"
                                            FontAttributes="Bold"
                                            TextColor="{StaticResource TextPrimary}"/>
@@ -193,11 +162,11 @@
                                     <Label Text="Activity"
                                            FontSize="13"
                                            TextColor="{StaticResource TextSecondary}"/>
-                                    <Label x:Name="ActivityValue"
-                                           Text="—"
-                                           FontSize="18"
+                                    <Label Text="{Binding UserProfile.ActivityLevel}"
+                                           FontSize="16"
                                            FontAttributes="Bold"
-                                           TextColor="{StaticResource TextPrimary}"/>
+                                           TextColor="{StaticResource TextPrimary}"
+                                           LineBreakMode="TailTruncation"/>
                                 </VerticalStackLayout>
                             </Border>
 
@@ -211,8 +180,7 @@
                                     <Label Text="Goal"
                                            FontSize="13"
                                            TextColor="{StaticResource TextSecondary}"/>
-                                    <Label x:Name="GoalValue"
-                                           Text="—"
+                                    <Label Text="{Binding UserProfile.Goal}"
                                            FontSize="18"
                                            FontAttributes="Bold"
                                            TextColor="{StaticResource TextPrimary}"/>
@@ -221,14 +189,91 @@
                         </Grid>
                     </VerticalStackLayout>
 
+                    <!-- Налаштування -->
+                    <Label Text="Налаштування"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           Margin="0,8,0,0"/>
+
+                    <!-- Нагадування про воду -->
+                    <Border Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="12">
+                            <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                                <Border WidthRequest="40" 
+                                        HeightRequest="40"
+                                        StrokeShape="RoundRectangle 20"
+                                        BackgroundColor="#E0F2FE"
+                                        Stroke="Transparent">
+                                    <Label Text="💧" 
+                                           FontSize="18" 
+                                           VerticalOptions="Center" 
+                                           HorizontalOptions="Center"/>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" VerticalOptions="Center">
+                                    <Label Text="Нагадування про воду"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="Регулярні сповіщення пити воду"
+                                           FontSize="12"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                </VerticalStackLayout>
+                                <Switch x:Name="WaterReminderSwitch"
+                                        Grid.Column="2"
+                                        Toggled="OnWaterReminderToggled"
+                                        VerticalOptions="Center"/>
+                            </Grid>
+
+                            <!-- Вибір інтервалу (показується тільки коли включено) -->
+                            <Border x:Name="IntervalPickerContainer"
+                                    IsVisible="False"
+                                    Stroke="{StaticResource BorderColor}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 10"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    Padding="4,0">
+                                <Picker x:Name="IntervalPicker"
+                                        Title="Інтервал нагадувань"
+                                        SelectedIndexChanged="OnIntervalChanged"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        TitleColor="{StaticResource TextSecondary}">
+                                    <Picker.ItemsSource>
+                                        <x:Array Type="{x:Type x:String}">
+                                            <x:String>Кожні 30 хвилин</x:String>
+                                            <x:String>Кожні 45 хвилин</x:String>
+                                            <x:String>Кожні 60 хвилин</x:String>
+                                            <x:String>Кожні 90 хвилин</x:String>
+                                            <x:String>Кожні 2 години</x:String>
+                                        </x:Array>
+                                    </Picker.ItemsSource>
+                                </Picker>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Border>
+
                     <!-- Перемикач теми -->
                     <Border Stroke="{StaticResource BorderColor}"
                             BackgroundColor="{StaticResource CardBackground}"
                             StrokeThickness="1"
                             StrokeShape="RoundRectangle 14"
                             Padding="14">
-                        <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
-                            <VerticalStackLayout Spacing="2">
+                        <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                            <Border WidthRequest="40" 
+                                    HeightRequest="40"
+                                    StrokeShape="RoundRectangle 20"
+                                    BackgroundColor="#FEF3C7"
+                                    Stroke="Transparent">
+                                <Label Text="🌙" 
+                                       FontSize="18" 
+                                       VerticalOptions="Center" 
+                                       HorizontalOptions="Center"/>
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" VerticalOptions="Center">
                                 <Label Text="Темна тема"
                                        FontSize="15"
                                        FontAttributes="Bold"
@@ -238,7 +283,7 @@
                                        TextColor="{StaticResource TextSecondary}"/>
                             </VerticalStackLayout>
                             <Switch x:Name="ThemeSwitch"
-                                    Grid.Column="1"
+                                    Grid.Column="2"
                                     Toggled="OnThemeToggled"
                                     VerticalOptions="Center"/>
                         </Grid>
@@ -247,6 +292,75 @@
                 </VerticalStackLayout>
             </ScrollView>
         </Border>
+
+        <!-- Popup для вибору аватара -->
+        <Grid x:Name="AvatarPopup" 
+              Grid.RowSpan="2"
+              IsVisible="False"
+              BackgroundColor="#80000000"
+              ZIndex="100">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnClosePopup"/>
+            </Grid.GestureRecognizers>
+
+            <Border VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    BackgroundColor="{StaticResource CardBackground}"
+                    Stroke="{StaticResource BorderColor}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 24"
+                    Padding="24"
+                    WidthRequest="300">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer/>
+                </Border.GestureRecognizers>
+
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Обери аватар"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalOptions="Center"/>
+
+                    <CollectionView ItemsSource="{Binding AvatarOptions}"
+                                    SelectionMode="Single"
+                                    SelectedItem="{Binding SelectedAvatar}"
+                                    SelectionChanged="OnAvatarSelected"
+                                    HorizontalOptions="Center"
+                                    HeightRequest="160">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" 
+                                             Span="4"
+                                             HorizontalItemSpacing="8"
+                                             VerticalItemSpacing="8"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border HeightRequest="60"
+                                        WidthRequest="60"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeThickness="2"
+                                        StrokeShape="RoundRectangle 30"
+                                        BackgroundColor="#FFFFFF11"
+                                        HorizontalOptions="Center">
+                                    <Image Source="{Binding ImageSource}"
+                                           HeightRequest="50"
+                                           WidthRequest="50"
+                                           Aspect="AspectFill"/>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Button Text="Закрити"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"
+                            CornerRadius="12"
+                            HeightRequest="44"
+                            Clicked="OnClosePopup"/>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
 
     </Grid>
 </ContentPage>

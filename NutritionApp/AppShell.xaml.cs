@@ -14,6 +14,7 @@ namespace NutritionApp
             Routing.RegisterRoute(nameof(HistoryPage), typeof(HistoryPage));
             Routing.RegisterRoute(nameof(HistoryDetailPage), typeof(HistoryDetailPage));
             Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage)); // Додайте цей рядок
+            Routing.RegisterRoute(nameof(WorkoutPage), typeof(WorkoutPage));
         }
     }
 }

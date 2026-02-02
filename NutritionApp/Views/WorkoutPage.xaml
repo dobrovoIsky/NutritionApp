@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutritionApp.Views.WorkoutPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBackground}">
+
+    <Grid RowDefinitions="180,*" Padding="0">
+
+        <!-- Верхній блок з градієнтом -->
+        <Grid Row="0" Padding="0,16,0,16">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4F7DFF" Offset="0.0" />
+                    <GradientStop Color="#E27D5F" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <VerticalStackLayout Spacing="10"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Label Text="План тренування" 
+                       FontSize="40" 
+                       HorizontalOptions="Center"/>
+                <Label Text="Тренування"
+                       FontAttributes="Bold"
+                       FontSize="24"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label Text="Персоналізоване тренування на сьогодні"
+                       FontSize="14"
+                       TextColor="#FFEFF2"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Контент -->
+        <Border Grid.Row="1"
+                BackgroundColor="{StaticResource CardBackground}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                Padding="16"
+                Margin="16,-32,16,16"
+                StrokeShape="RoundRectangle 24">
+
+            <ScrollView>
+                <VerticalStackLayout Spacing="16">
+
+                    <!-- Вибір типу тренування -->
+                    <Label Text="Обери тип тренування"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"/>
+
+                    <!-- 3 карточки вибору типу -->
+                    <Grid RowDefinitions="Auto,Auto" 
+                          ColumnDefinitions="*,*" 
+                          RowSpacing="12" 
+                          ColumnSpacing="12">
+
+                        <!-- Кардіо -->
+                        <Border x:Name="CardioCard"
+                                Stroke="{StaticResource BorderColor}"
+                                BackgroundColor="{StaticResource CardBackground}"
+                                StrokeThickness="2"
+                                StrokeShape="RoundRectangle 16"
+                                Padding="16"
+                                HeightRequest="120">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCardioTapped"/>
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="8" 
+                                                 VerticalOptions="Center" 
+                                                 HorizontalOptions="Center">
+                                <Label Text="🏃" FontSize="32" HorizontalOptions="Center"/>
+                                <Label Text="Кардіо"
+                                       FontSize="15"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Біг, велосипед, скакалка"
+                                       FontSize="11"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Силове в залі -->
+                        <Border x:Name="GymCard"
+                                Grid.Column="1"
+                                Stroke="{StaticResource BorderColor}"
+                                BackgroundColor="{StaticResource CardBackground}"
+                                StrokeThickness="2"
+                                StrokeShape="RoundRectangle 16"
+                                Padding="16"
+                                HeightRequest="120">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnGymTapped"/>
+                            </Border.GestureRecognizers>
+                            <VerticalStackLayout Spacing="8" 
+                                                 VerticalOptions="Center" 
+                                                 HorizontalOptions="Center">
+                                <Label Text="🏋️" FontSize="32" HorizontalOptions="Center"/>
+                                <Label Text="Силове в залі"
+                                       FontSize="15"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Тренажери, штанга"
+                                       FontSize="11"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Тренування вдома -->
+                        <Border x:Name="HomeCard"
+                                Grid.Row="1"
+                                Grid.ColumnSpan="2"
+                                Stroke="{StaticResource BorderColor}"
+                                BackgroundColor="{StaticResource CardBackground}"
+                                StrokeThickness="2"
+                                StrokeShape="RoundRectangle 16"
+                                Padding="16"
+                                HeightRequest="100">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnHomeTapped"/>
+                            </Border.GestureRecognizers>
+                            <HorizontalStackLayout Spacing="16" 
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center">
+                                <Label Text="🏠" FontSize="32" VerticalOptions="Center"/>
+                                <VerticalStackLayout VerticalOptions="Center">
+                                    <Label Text="Тренування вдома"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="Без обладнання, власна вага"
+                                           FontSize="11"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                </VerticalStackLayout>
+                            </HorizontalStackLayout>
+                        </Border>
+                    </Grid>
+
+                    <!-- Тривалість -->
+                    <Border Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBackground}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 14"
+                            Padding="14">
+                        <VerticalStackLayout Spacing="12">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                <Border WidthRequest="44" HeightRequest="44"
+                                        StrokeShape="RoundRectangle 22"
+                                        BackgroundColor="#D1FAE5"
+                                        Stroke="Transparent">
+                                    <Label Text="⏱️" FontSize="20" 
+                                           VerticalOptions="Center" 
+                                           HorizontalOptions="Center"/>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                    <Label Text="Тривалість тренування"
+                                           FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}"/>
+                                    <Label x:Name="DurationLabel"
+                                           Text="45 хвилин"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                            <Slider x:Name="DurationSlider"
+                                    Minimum="15"
+                                    Maximum="90"
+                                    Value="45"
+                                    ValueChanged="OnDurationChanged"
+                                    MinimumTrackColor="{StaticResource Primary}"
+                                    MaximumTrackColor="{StaticResource BorderColor}"
+                                    ThumbColor="{StaticResource Primary}"/>
+                            <Grid ColumnDefinitions="*,*,*">
+                                <Label Text="15 хв" 
+                                       FontSize="11" 
+                                       TextColor="{StaticResource TextSecondary}"
+                                       HorizontalOptions="Start"/>
+                                <Label Grid.Column="1"
+                                       Text="45 хв" 
+                                       FontSize="11" 
+                                       TextColor="{StaticResource TextSecondary}"
+                                       HorizontalOptions="Center"/>
+                                <Label Grid.Column="2"
+                                       Text="90 хв" 
+                                       FontSize="11" 
+                                       TextColor="{StaticResource TextSecondary}"
+                                       HorizontalOptions="End"/>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Кнопка генерації -->
+                    <Border x:Name="GenerateButton"
+                            StrokeShape="RoundRectangle 14"
+                            Stroke="Transparent"
+                            BackgroundColor="{StaticResource Primary}"
+                            Padding="16,14"
+                            Margin="0,8,0,0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnGenerateClicked"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="Згенерувати тренування"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               TextColor="White" 
+                               FontAttributes="Bold"
+                               FontSize="16"/>
+                    </Border>
+
+                    <!-- Індикатор завантаження -->
+                    <VerticalStackLayout x:Name="LoadingContainer"
+                                         IsVisible="False" 
+                                         Spacing="12"
+                                         HorizontalOptions="Center"
+                                         Margin="0,20,0,0">
+                        <ActivityIndicator IsRunning="True" 
+                                           Color="{StaticResource Primary}"
+                                           HeightRequest="50"
+                                           WidthRequest="50"/>
+                        <Label Text="AI створює твоє тренування..."
+                               FontSize="16"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalOptions="Center"/>
+                        <Label Text="Це може зайняти до 30 секунд"
+                               FontSize="13"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+
+                    <!-- Результат тренування -->
+                    <VerticalStackLayout x:Name="ResultContainer" 
+                                         IsVisible="False" 
+                                         Spacing="16">
+
+                        <!-- Summary -->
+                        <Label x:Name="SummaryLabel"
+                               FontSize="15"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalTextAlignment="Center"/>
+
+                        <!-- Інфо-блоки -->
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="#FEF3C7"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="10">
+                                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                    <Label x:Name="TypeIcon" 
+                                           Text="🏃" 
+                                           FontSize="20" 
+                                           HorizontalOptions="Center"/>
+                                    <Label x:Name="TypeLabel"
+                                           Text="Кардіо"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#92400E"
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Column="1"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="#DBEAFE"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="10">
+                                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                    <Label Text="⏱️" FontSize="20" HorizontalOptions="Center"/>
+                                    <Label x:Name="DurationResultLabel"
+                                           Text="45 хв"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#1E40AF"
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Column="2"
+                                    Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="#D1FAE5"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    Padding="10">
+                                <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                                    <Label Text="🔥" FontSize="20" HorizontalOptions="Center"/>
+                                    <Label x:Name="CaloriesLabel"
+                                           Text="~300 ккал"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#065F46"
+                                           HorizontalOptions="Center"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+
+                        <!-- Розминка -->
+                        <Border x:Name="WarmupContainer"
+                                Stroke="{StaticResource BorderColor}"
+                                BackgroundColor="#FEF3C7"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="🔥" FontSize="18"/>
+                                    <Label Text="Розминка"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="#92400E"/>
+                                    <Label x:Name="WarmupDurationLabel"
+                                           Text="5 хв"
+                                           FontSize="14"
+                                           TextColor="#B45309"
+                                           VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+                                <Label x:Name="WarmupExercisesLabel"
+                                       FontSize="14"
+                                       TextColor="#78350F"
+                                       LineHeight="1.4"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Вправи -->
+                        <Label Text="Основна частина"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"/>
+
+                        <VerticalStackLayout x:Name="ExercisesContainer" Spacing="10">
+                            <!-- Вправи будуть додані динамічно -->
+                        </VerticalStackLayout>
+
+                        <!-- Заминка -->
+                        <Border x:Name="CooldownContainer"
+                                Stroke="{StaticResource BorderColor}"
+                                BackgroundColor="#DBEAFE"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 14"
+                                Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="🧘" FontSize="18"/>
+                                    <Label Text="Заминка"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="#1E40AF"/>
+                                    <Label x:Name="CooldownDurationLabel"
+                                           Text="5 хв"
+                                           FontSize="14"
+                                           TextColor="#3B82F6"
+                                           VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+                                <Label x:Name="CooldownExercisesLabel"
+                                       FontSize="14"
+                                       TextColor="#1E3A8A"
+                                       LineHeight="1.4"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+
+                    <!-- Початкове повідомлення -->
+                    <VerticalStackLayout x:Name="InitialMessage"
+                                         Spacing="16"
+                                         HorizontalOptions="Center"
+                                         Margin="0,20,0,0">
+                        <Label Text="👆" FontSize="40" HorizontalOptions="Center"/>
+                        <Label Text="Обери тип тренування вище"
+                               FontSize="16"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+
+    </Grid>
+</ContentPage>

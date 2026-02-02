@@ -2,54 +2,303 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NutritionApp.Views.RegisterPage"
-             Title="Реєстрація">
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBackground}">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="30">
-            <Label Text="Реєстрація" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center"/>
+    <Grid RowDefinitions="180,*" Padding="0">
 
-            <Entry x:Name="UsernameEntry" Placeholder="Ім'я користувача"/>
-            <Entry x:Name="PasswordEntry" Placeholder="Пароль" IsPassword="True"/>
-            <Entry x:Name="ConfirmPasswordEntry" Placeholder="Підтвердіть пароль" IsPassword="True"/>
-            <Entry x:Name="HeightEntry" Placeholder="Зріст (см)" Keyboard="Numeric"/>
-            <Entry x:Name="WeightEntry" Placeholder="Вага (кг)" Keyboard="Numeric"/>
-            <Entry x:Name="AgeEntry" Placeholder="Вік" Keyboard="Numeric"/>
+        <!-- Верхній блок з градієнтом -->
+        <Grid Row="0" Padding="0,16,0,16">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4F7DFF" Offset="0.0" />
+                    <GradientStop Color="#E27D5F" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
 
-            <Picker x:Name="GoalPicker" Title="Ціль">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>lose weight</x:String>
-                        <x:String>maintain weight</x:String>
-                        <x:String>gain muscle</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
+            <VerticalStackLayout Spacing="10"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Image Source="logo.png"
+                       HeightRequest="70"
+                       WidthRequest="70"
+                       Aspect="AspectFit"
+                       HorizontalOptions="Center"/>
+                <Label Text="Створи акаунт"
+                       FontAttributes="Bold"
+                       FontSize="24"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label Text="Заповни дані для реєстрації"
+                       FontSize="14"
+                       TextColor="#FFEFF2"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
 
-            <Picker x:Name="ActivityPicker" Title="Рівень активності">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>sedentary</x:String>
-                        <x:String>lightly active</x:String>
-                        <x:String>moderately active</x:String>
-                        <x:String>very active</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
+        <!-- Контент -->
+        <Border Grid.Row="1"
+                BackgroundColor="{StaticResource CardBackground}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                Padding="20"
+                Margin="16,-32,16,16"
+                StrokeShape="RoundRectangle 24">
 
-            <Picker x:Name="GenderPicker" Title="Стать">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>male</x:String>
-                        <x:String>female</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
+            <ScrollView>
+                <VerticalStackLayout Spacing="16">
 
-            <Label x:Name="ErrorLabel" TextColor="Red" IsVisible="False"/>
-            <ActivityIndicator x:Name="LoadingIndicator" IsVisible="False"/>
+                    <!-- Обліковий запис -->
+                    <Label Text="🔐 Обліковий запис"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"/>
 
-            <Button Text="Зареєструватися" Clicked="OnRegisterButtonClicked"/>
-            <Button Text="Повернутися до входу" Clicked="OnGoToLoginButtonClicked"/>
-        </VerticalStackLayout>
-    </ScrollView>
+                    <Grid ColumnDefinitions="*" RowSpacing="12">
+                        <!-- Username -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Ім'я користувача"
+                                   FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    Padding="12,8">
+                                <Entry x:Name="UsernameEntry"
+                                       Placeholder="Введіть ім'я"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       PlaceholderColor="{StaticResource TextSecondary}"
+                                       BackgroundColor="Transparent"/>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <!-- Password -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Пароль"
+                                   FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    Padding="12,8">
+                                <Entry x:Name="PasswordEntry"
+                                       Placeholder="Мін. 8 символів"
+                                       IsPassword="True"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       PlaceholderColor="{StaticResource TextSecondary}"
+                                       BackgroundColor="Transparent"/>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Confirm Password -->
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Підтвердіть"
+                                   FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    Padding="12,8">
+                                <Entry x:Name="ConfirmPasswordEntry"
+                                       Placeholder="Повторіть"
+                                       IsPassword="True"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       PlaceholderColor="{StaticResource TextSecondary}"
+                                       BackgroundColor="Transparent"/>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Фізичні показники -->
+                    <Label Text="📊 Фізичні показники"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           Margin="0,8,0,0"/>
+
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                        <!-- Зріст -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Зріст (см)"
+                                   FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    Padding="12,8">
+                                <Entry x:Name="HeightEntry"
+                                       Placeholder="175"
+                                       Keyboard="Numeric"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       PlaceholderColor="{StaticResource TextSecondary}"
+                                       BackgroundColor="Transparent"/>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Вага -->
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Вага (кг)"
+                                   FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    Padding="12,8">
+                                <Entry x:Name="WeightEntry"
+                                       Placeholder="70"
+                                       Keyboard="Numeric"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       PlaceholderColor="{StaticResource TextSecondary}"
+                                       BackgroundColor="Transparent"/>
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <!-- Вік -->
+                        <VerticalStackLayout Grid.Column="2" Spacing="6">
+                            <Label Text="Вік"
+                                   FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="{StaticResource PageBackground}"
+                                    Padding="12,8">
+                                <Entry x:Name="AgeEntry"
+                                       Placeholder="25"
+                                       Keyboard="Numeric"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       PlaceholderColor="{StaticResource TextSecondary}"
+                                       BackgroundColor="Transparent"/>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Налаштування -->
+                    <Label Text="⚙️ Налаштування"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           Margin="0,8,0,0"/>
+
+                    <!-- Ціль -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Твоя мета"
+                               FontSize="13"
+                               TextColor="{StaticResource TextSecondary}"/>
+                        <Border Stroke="{StaticResource BorderColor}"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource PageBackground}"
+                                Padding="4,0">
+                            <Picker x:Name="GoalPicker"
+                                    Title="Обери мету"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    TitleColor="{StaticResource TextSecondary}">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>lose weight</x:String>
+                                        <x:String>maintain weight</x:String>
+                                        <x:String>gain muscle</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Активність -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Рівень активності"
+                               FontSize="13"
+                               TextColor="{StaticResource TextSecondary}"/>
+                        <Border Stroke="{StaticResource BorderColor}"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource PageBackground}"
+                                Padding="4,0">
+                            <Picker x:Name="ActivityPicker"
+                                    Title="Обери рівень"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    TitleColor="{StaticResource TextSecondary}">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>sedentary</x:String>
+                                        <x:String>lightly active</x:String>
+                                        <x:String>moderately active</x:String>
+                                        <x:String>very active</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Стать -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Стать"
+                               FontSize="13"
+                               TextColor="{StaticResource TextSecondary}"/>
+                        <Border Stroke="{StaticResource BorderColor}"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource PageBackground}"
+                                Padding="4,0">
+                            <Picker x:Name="GenderPicker"
+                                    Title="Обери стать"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    TitleColor="{StaticResource TextSecondary}">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>male</x:String>
+                                        <x:String>female</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Помилка -->
+                    <Label x:Name="ErrorLabel" 
+                           TextColor="{StaticResource Error}" 
+                           IsVisible="False"
+                           FontSize="13"
+                           HorizontalOptions="Center"/>
+
+                    <!-- Індикатор завантаження -->
+                    <ActivityIndicator x:Name="LoadingIndicator" 
+                                       IsVisible="False"
+                                       Color="{StaticResource Primary}"
+                                       HorizontalOptions="Center"/>
+
+                    <!-- Кнопки -->
+                    <Button Text="Зареєструватися"
+                            Clicked="OnRegisterButtonClicked"
+                            HeightRequest="50"
+                            CornerRadius="14"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            Margin="0,8,0,0"/>
+
+                    <Button Text="← Повернутися до входу"
+                            Clicked="OnGoToLoginButtonClicked"
+                            HeightRequest="44"
+                            CornerRadius="14"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource Primary}"
+                            BorderColor="{StaticResource Primary}"
+                            BorderWidth="1.2"
+                            FontSize="14"/>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+
+    </Grid>
 </ContentPage>

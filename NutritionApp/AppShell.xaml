@@ -3,7 +3,6 @@
     x:Class="NutritionApp.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    
     xmlns:local="clr-namespace:NutritionApp.Views"
     Shell.FlyoutBehavior="Disabled">
 
@@ -28,20 +27,21 @@
         <ShellContent
             Title="Історія"
             Route="HistoryPage"
-            Icon="history.png" ContentTemplate="{DataTemplate local:HistoryPage}" />
+            Icon="history.png" 
+            ContentTemplate="{DataTemplate local:HistoryPage}" />
 
         <ShellContent
-             Title="Профіль"
-             ContentTemplate="{DataTemplate local:ProfilePage}"
-                 Icon="user.png" Route="ProfilePage" />
+            Title="Тренування"
+            Route="WorkoutPage"
+            Icon="workout_icon.png"
+            ContentTemplate="{DataTemplate local:WorkoutPage}" />
 
-        <Tab Title="Тренування" Icon="fitness.png">
-            <ShellContent ContentTemplate="{DataTemplate local:WorkoutPage}" />
-        </Tab>
+        <ShellContent
+            Title="Профіль"
+            Route="ProfilePage"
+            Icon="user.png" 
+            ContentTemplate="{DataTemplate local:ProfilePage}" />
 
     </TabBar>
-        
-    
-   
 
 </Shell>

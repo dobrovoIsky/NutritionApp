@@ -111,28 +111,73 @@ public class ApiService
         }
     }
 
-    // Відповідь бекенду: { "mealPlan": "<текст>" }
-    public class MealPlanResponse
-    {
-        [JsonPropertyName("mealPlan")]
-        public string MealPlan { get; set; }
+    // ===== МОДЕЛІ ДЛЯ MEAL PLAN JSON =====
 
-        // Для сумісності з MealPlanViewModel
-        public string Plan => MealPlan;
+    public class MealPlanJsonResponse
+    {
+        [JsonPropertyName("summary")]
+        public string Summary { get; set; }
+
+        [JsonPropertyName("meals")]
+        public List<MealItem> Meals { get; set; }
     }
 
-    public async Task<MealPlanResponse> GenerateMealPlanAsync(int userId)
+    public class MealItem
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("time")]
+        public string Time { get; set; }
+
+        [JsonPropertyName("foods")]
+        public List<FoodItem> Foods { get; set; }
+
+        [JsonPropertyName("totalCalories")]
+        public int TotalCalories { get; set; }
+    }
+
+    public class FoodItem
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("weight")]
+        public string Weight { get; set; }
+
+        [JsonPropertyName("calories")]
+        public int Calories { get; set; }
+
+        [JsonPropertyName("protein")]
+        public double Protein { get; set; }
+
+        [JsonPropertyName("fat")]
+        public double Fat { get; set; }
+
+        [JsonPropertyName("carbs")]
+        public double Carbs { get; set; }
+    }
+
+    // ===== ГЕНЕРАЦІЯ ПЛАНУ ХАРЧУВАННЯ =====
+
+    public async Task<MealPlanJsonResponse> GenerateMealPlanAsync(int userId)
     {
         try
         {
             Debug.WriteLine($"Generate meal plan for userId: {userId}");
             var response = await _httpClient.PostAsJsonAsync("/api/Nutrition/generate-custom-plan", new { userId });
-            response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
-            Debug.WriteLine($"Meal plan response: {json}");
-            var payload = JsonSerializer.Deserialize<MealPlanResponse>(json, _jsonOptions);
-            if (payload == null || string.IsNullOrWhiteSpace(payload.MealPlan))
+            Debug.WriteLine($"Meal plan raw response: {json}");
+
+            response.EnsureSuccessStatusCode();
+
+            json = CleanJsonResponse(json);
+
+            var payload = JsonSerializer.Deserialize<MealPlanJsonResponse>(json, _jsonOptions);
+
+            if (payload == null || payload.Meals == null || payload.Meals.Count == 0)
                 throw new Exception("Порожня відповідь від сервера");
+
             return payload;
         }
         catch (Exception ex)
@@ -141,6 +186,32 @@ public class ApiService
             throw;
         }
     }
+
+    private string CleanJsonResponse(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+            return json;
+
+        json = json.Trim();
+
+        if (json.StartsWith("```json", StringComparison.OrdinalIgnoreCase))
+        {
+            json = json.Substring(7);
+        }
+        else if (json.StartsWith("```"))
+        {
+            json = json.Substring(3);
+        }
+
+        if (json.EndsWith("```"))
+        {
+            json = json.Substring(0, json.Length - 3);
+        }
+
+        return json.Trim();
+    }
+
+    // ===== ІСТОРІЯ ПЛАНІВ ХАРЧУВАННЯ =====
 
     public async Task<List<Models.MealPlan>> GetMealPlanHistoryAsync(int userId)
     {
@@ -158,7 +229,55 @@ public class ApiService
         }
     }
 
-    // Workout методи
+    // ===== МОДЕЛІ ДЛЯ WORKOUT JSON =====
+
+    public class WorkoutJsonResponse
+    {
+        [JsonPropertyName("summary")]
+        public string Summary { get; set; }
+
+        [JsonPropertyName("warmup")]
+        public WarmupCooldown Warmup { get; set; }
+
+        [JsonPropertyName("workout")]
+        public List<ExerciseItem> Workout { get; set; }
+
+        [JsonPropertyName("cooldown")]
+        public WarmupCooldown Cooldown { get; set; }
+
+        [JsonPropertyName("totalCalories")]
+        public int TotalCalories { get; set; }
+    }
+
+    public class WarmupCooldown
+    {
+        [JsonPropertyName("duration")]
+        public int Duration { get; set; }
+
+        [JsonPropertyName("exercises")]
+        public List<string> Exercises { get; set; }
+    }
+
+    public class ExerciseItem
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("sets")]
+        public int Sets { get; set; }
+
+        [JsonPropertyName("reps")]
+        public string Reps { get; set; }
+
+        [JsonPropertyName("rest")]
+        public string Rest { get; set; }
+
+        [JsonPropertyName("tips")]
+        public string Tips { get; set; }
+    }
+
+    // ===== WORKOUT МЕТОДИ =====
+
     public async Task<WorkoutPlan> GenerateWorkoutAsync(int userId, string goal, string intensity, int duration)
     {
         var payload = new { UserId = userId, Goal = goal, Intensity = intensity, DurationMinutes = duration };
@@ -196,7 +315,8 @@ public class ApiService
         }
     }
 
-    // Виклик AI напряму
+    // ===== AI ВИКЛИК НАПРЯМУ =====
+
     public class AIMealPlanResponse
     {
         [JsonPropertyName("result")]

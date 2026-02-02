@@ -2,25 +2,140 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:NutritionApp.ViewModels"
-             xmlns:models="clr-namespace:NutritionApp.Models"  x:DataType="viewModels:HistoryViewModel"
+             xmlns:models="clr-namespace:NutritionApp.Models"
+             x:DataType="viewModels:HistoryViewModel"
              x:Class="NutritionApp.Views.HistoryPage"
-             Title="Історія">
-    <Grid RowDefinitions="Auto, *">
-        <ActivityIndicator Grid.Row="0" IsVisible="{Binding IsLoading}" IsRunning="{Binding IsLoading}" HorizontalOptions="Center" Margin="10"/>
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBackground}">
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding MealPlans}" SelectionMode="Single">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:MealPlan">
-                    <Frame Padding="15" Margin="20,5" CornerRadius="8">
-                        <Frame.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:HistoryViewModel}}, Path=ViewPlanDetailsCommand}"
-                                                  CommandParameter="{Binding .}"/>
-                        </Frame.GestureRecognizers>
+    <Grid RowDefinitions="180,*" Padding="0">
 
-                        <Label Text="{Binding Date, StringFormat='Раціон від {0:dd.MM.yyyy HH:mm}'}" FontSize="16"/>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+        <!-- Верхній блок з градієнтом -->
+        <Grid Row="0" Padding="0,16,0,16">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4F7DFF" Offset="0.0" />
+                    <GradientStop Color="#E27D5F" Offset="1.0" />
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <VerticalStackLayout Spacing="10"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Label Text="📋" FontSize="40" HorizontalOptions="Center"/>
+                <Label Text="Історія раціонів"
+                       FontAttributes="Bold"
+                       FontSize="24"
+                       TextColor="White"
+                       HorizontalOptions="Center"/>
+                <Label Text="Твої збережені плани харчування"
+                       FontSize="14"
+                       TextColor="#FFEFF2"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Контент -->
+        <Border Grid.Row="1"
+                BackgroundColor="{StaticResource CardBackground}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                Padding="16"
+                Margin="16,-32,16,16"
+                StrokeShape="RoundRectangle 24">
+
+            <Grid RowDefinitions="Auto,*">
+
+                <!-- Індикатор завантаження -->
+                <ActivityIndicator Grid.Row="0" 
+                                   IsVisible="{Binding IsLoading}" 
+                                   IsRunning="{Binding IsLoading}" 
+                                   Color="{StaticResource Primary}"
+                                   HorizontalOptions="Center" 
+                                   Margin="0,20,0,10"/>
+
+                <!-- Список історії -->
+                <CollectionView Grid.Row="1" 
+                                ItemsSource="{Binding MealPlans}" 
+                                SelectionMode="None">
+
+                    <!-- Порожній стан -->
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Spacing="16"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="Center"
+                                             Margin="0,60,0,0">
+                            <Label Text="📭" FontSize="60" HorizontalOptions="Center"/>
+                            <Label Text="Історія порожня"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="Згенеруй свій перший план харчування!"
+                                   FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:MealPlan">
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 16"
+                                    Padding="16"
+                                    Margin="0,0,0,12">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:HistoryViewModel}}, Path=ViewPlanDetailsCommand}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+
+                                    <!-- Іконка -->
+                                    <Border WidthRequest="50" 
+                                            HeightRequest="50"
+                                            StrokeShape="RoundRectangle 25"
+                                            BackgroundColor="#EFF6FF"
+                                            Stroke="Transparent"
+                                            VerticalOptions="Center">
+                                        <Label Text="🍽️" 
+                                               FontSize="22" 
+                                               VerticalOptions="Center" 
+                                               HorizontalOptions="Center"/>
+                                    </Border>
+
+                                    <!-- Інформація -->
+                                    <VerticalStackLayout Grid.Column="1" 
+                                                         Margin="14,0,0,0"
+                                                         VerticalOptions="Center"
+                                                         Spacing="4">
+                                        <Label Text="План харчування"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimary}"/>
+                                        <Label Text="{Binding Date, StringFormat='{0:dd MMMM yyyy, HH:mm}'}"
+                                               FontSize="13"
+                                               TextColor="{StaticResource TextSecondary}"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Стрілка -->
+                                    <Label Grid.Column="2"
+                                           Text="›"
+                                           FontSize="28"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           VerticalOptions="Center"
+                                           Margin="0,0,4,0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </Grid>
+        </Border>
+
     </Grid>
 </ContentPage>
