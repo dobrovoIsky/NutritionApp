@@ -62,6 +62,8 @@
 		
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.6" />
 		
+		<PackageReference Include="Plugin.Firebase.Auth.Google" Version="3.1.2" />
+		
 		<PackageReference Include="Plugin.LocalNotification" Version="11.1.4" />
 	</ItemGroup>
 	<ItemGroup>

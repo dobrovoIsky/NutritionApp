@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using NutritionApp.Models;
 using NutritionApp.Services;
@@ -21,23 +20,34 @@ namespace NutritionApp.ViewModels
             set { _isLoading = value; OnPropertyChanged(); }
         }
 
+        // Прапорець чи дані вже завантажені
+        private bool _isDataLoaded = false;
+
         public ICommand LoadHistoryCommand { get; }
         public ICommand ViewPlanDetailsCommand { get; }
+        public ICommand RefreshCommand { get; }
 
         public HistoryViewModel(ApiService apiService)
         {
             _apiService = apiService;
-            LoadHistoryCommand = new Command(async () => await LoadHistoryAsync());
+            LoadHistoryCommand = new Command(async () => await LoadHistoryAsync(forceRefresh: false));
+            RefreshCommand = new Command(async () => await LoadHistoryAsync(forceRefresh: true));
             ViewPlanDetailsCommand = new Command<MealPlan>(async (plan) => await GoToDetails(plan));
         }
 
-        async Task LoadHistoryAsync()
+        public async Task LoadHistoryAsync(bool forceRefresh = false)
         {
+            // Якщо дані вже завантажені і не примусове оновлення - пропускаємо
+            if (_isDataLoaded && !forceRefresh && MealPlans.Count > 0)
+                return;
+
             if (IsLoading) return;
+
             try
             {
                 IsLoading = true;
                 MealPlans.Clear();
+
                 int userId = Preferences.Get("UserId", 0);
                 if (userId > 0)
                 {
@@ -46,6 +56,7 @@ namespace NutritionApp.ViewModels
                     {
                         MealPlans.Add(plan);
                     }
+                    _isDataLoaded = true;
                 }
             }
             finally
@@ -54,10 +65,16 @@ namespace NutritionApp.ViewModels
             }
         }
 
+        // Скидання при логауті
+        public void Reset()
+        {
+            _isDataLoaded = false;
+            MealPlans.Clear();
+        }
+
         async Task GoToDetails(MealPlan plan)
         {
             if (plan == null) return;
-            // Передаємо текст плану на сторінку деталей
             await Shell.Current.GoToAsync(nameof(HistoryDetailPage), new Dictionary<string, object>
             {
                 { "PlanText", plan.Plan }

@@ -1,15 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-	<application android:allowBackup="true"
-                 android:icon="@mipmap/appicon"
-                 android:roundIcon="@mipmap/appicon_round"
-                 android:supportsRtl="true">
+	<application
+        android:allowBackup="true"
+        android:icon="@mipmap/appicon"
+        android:roundIcon="@mipmap/appicon_round"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true">
+
+		<!-- Deep Link для Google Auth callback -->
+		<activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+			<intent-filter android:autoVerify="true">
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<!-- Deep link: nutritionapp://auth/callback -->
+				<data android:scheme="nutritionapp"
+                      android:host="auth"
+                      android:pathPrefix="/callback" />
+			</intent-filter>
+		</activity>
+
 	</application>
 
+	<!-- Permissions -->
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
 
-	<!-- Дозволи для сповіщень -->
+	<!-- Notifications -->
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />

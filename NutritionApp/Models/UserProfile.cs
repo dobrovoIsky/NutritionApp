@@ -10,6 +10,9 @@ namespace NutritionApp.Models
         [JsonPropertyName("username")]
         public string Username { get; set; }
 
+        [JsonPropertyName("email")]
+        public string Email { get; set; }  // <-- ДОДАЙ ЦЕ
+
         [JsonPropertyName("height")]
         public double Height { get; set; }
 

@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using NutritionApp.Models;
 using NutritionApp.Services;
@@ -27,16 +26,25 @@ namespace NutritionApp.ViewModels
             set { _isLoading = value; OnPropertyChanged(); }
         }
 
+        // Кешування - завантажуємо тільки раз
+        private bool _isDataLoaded = false;
+        private int _lastUserId = 0;
+
+        // Аватари
         public ObservableCollection<AvatarOption> AvatarOptions { get; } = new()
         {
-            new AvatarOption { Id = 1, Name = "Аватар 1", ImageSource = "avatar1.png" },
-            new AvatarOption { Id = 2, Name = "Аватар 2", ImageSource = "avatar2.png" },
-            new AvatarOption { Id = 3, Name = "Аватар 3", ImageSource = "avatar3.png" },
-            new AvatarOption { Id = 4, Name = "Аватар 4", ImageSource = "avatar4.png" }
+            new AvatarOption { Id = 1, ImageSource = "avatar1.png" },
+            new AvatarOption { Id = 2, ImageSource = "avatar2.png" },
+            new AvatarOption { Id = 3, ImageSource = "avatar3.png" },
+            new AvatarOption { Id = 4, ImageSource = "avatar4.png" },
+            new AvatarOption { Id = 5, ImageSource = "avatar5.png" },
+            new AvatarOption { Id = 6, ImageSource = "avatar6.png" },
+            new AvatarOption { Id = 7, ImageSource = "avatar7.png" },
+            new AvatarOption { Id = 8, ImageSource = "avatar8.png" }
         };
 
         private AvatarOption _selectedAvatar;
-        private bool _isAvatarChanging = false; // Флаг для уникнення зациклення
+        private bool _isAvatarChanging = false;
 
         public AvatarOption SelectedAvatar
         {
@@ -47,9 +55,7 @@ namespace NutritionApp.ViewModels
                 {
                     _selectedAvatar = value;
                     OnPropertyChanged();
-
-                    // Зберігаємо тільки якщо профіль завантажено і це не початкове встановлення
-                    if (!_isAvatarChanging && UserProfile != null && UserProfile.Id > 0)
+                    if (!_isAvatarChanging && value != null)
                     {
                         _ = SaveAvatarAsync();
                     }
@@ -57,25 +63,34 @@ namespace NutritionApp.ViewModels
             }
         }
 
+        public ICommand LoadUserProfileCommand { get; }
+
         public ProfileViewModel(ApiService apiService)
         {
             _apiService = apiService;
-            LoadUserProfileCommand = new Command(async () => await LoadUserProfileAsync());
+            LoadUserProfileCommand = new Command(async () => await LoadUserProfileAsync(forceRefresh: false));
         }
 
-        public ICommand LoadUserProfileCommand { get; }
-
-        public async Task LoadUserProfileAsync()
+        public async Task LoadUserProfileAsync(bool forceRefresh = false)
         {
+            int userId = Preferences.Get("UserId", 0);
+
+            // Якщо той самий користувач і дані вже є - пропускаємо
+            if (!forceRefresh && _isDataLoaded && _lastUserId == userId && UserProfile != null)
+                return;
+
             if (IsLoading) return;
+
             try
             {
                 IsLoading = true;
-                int userId = Preferences.Get("UserId", 0);
                 Debug.WriteLine($"ProfileViewModel: Loading profile for userId: {userId}");
+
                 if (userId > 0)
                 {
                     UserProfile = await _apiService.GetUserProfileAsync(userId);
+                    _lastUserId = userId;
+                    _isDataLoaded = true;
                     Debug.WriteLine($"ProfileViewModel: Loaded - Height={UserProfile?.Height}, Weight={UserProfile?.Weight}");
                 }
             }
@@ -84,7 +99,7 @@ namespace NutritionApp.ViewModels
                 IsLoading = false;
             }
 
-            // Встановлюємо вибраний аватар після завантаження (без збереження)
+            // Встановлюємо аватар
             if (UserProfile != null)
             {
                 _isAvatarChanging = true;
@@ -101,7 +116,6 @@ namespace NutritionApp.ViewModels
             {
                 Debug.WriteLine($"ProfileViewModel: Saving avatar {SelectedAvatar.Id} for user {UserProfile.Id}");
 
-                // ВАЖЛИВО: Відправляємо ВСІ поля профілю, не тільки avatarId!
                 var payload = new
                 {
                     Height = UserProfile.Height,
@@ -109,7 +123,7 @@ namespace NutritionApp.ViewModels
                     Age = UserProfile.Age,
                     Goal = UserProfile.Goal ?? string.Empty,
                     ActivityLevel = UserProfile.ActivityLevel ?? string.Empty,
-                    AvatarId = SelectedAvatar.Id,  // Новий аватар
+                    AvatarId = SelectedAvatar.Id,
                     Gender = UserProfile.Gender ?? "male"
                 };
 
@@ -120,15 +134,19 @@ namespace NutritionApp.ViewModels
                     UserProfile = updatedProfile;
                     Debug.WriteLine($"ProfileViewModel: Avatar saved successfully");
                 }
-                else
-                {
-                    Debug.WriteLine($"ProfileViewModel: Failed to save avatar");
-                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"ProfileViewModel: SaveAvatarAsync exception: {ex.Message}");
             }
+        }
+
+        // Скидання при логауті
+        public void Reset()
+        {
+            _isDataLoaded = false;
+            _lastUserId = 0;
+            UserProfile = null;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -141,7 +159,6 @@ namespace NutritionApp.ViewModels
     public class AvatarOption
     {
         public int Id { get; set; }
-        public string Name { get; set; }
         public string ImageSource { get; set; }
     }
 }

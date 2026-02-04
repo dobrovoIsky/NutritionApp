@@ -120,11 +120,19 @@ public partial class ProfilePage : ContentPage
         }
     }
 
-    private void OnLogoutButtonClicked(object sender, EventArgs e)
+    private async void OnLogoutButtonClicked(object sender, EventArgs e)
     {
+        // Зупиняємо нагадування
         _waterReminderService.StopReminders();
+
+        // Скидаємо ViewModel
+        _viewModel.Reset();
+
+        // Очищаємо Preferences
         Preferences.Clear();
-        Shell.Current.GoToAsync("//LoginPage");
+
+        // Переходимо на логін
+        await Shell.Current.GoToAsync("//LoginPage");
     }
 
     private async void OnEditProfileClicked(object sender, EventArgs e)

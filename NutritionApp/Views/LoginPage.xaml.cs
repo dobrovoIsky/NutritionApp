@@ -1,86 +1,127 @@
-using System;
 using System.Diagnostics;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Storage;
 using NutritionApp.Services;
 
-namespace NutritionApp.Views
+namespace NutritionApp.Views;
+
+public partial class LoginPage : ContentPage
 {
-    public partial class LoginPage : ContentPage
+    private readonly ApiService _apiService;
+
+    public LoginPage(ApiService apiService)
     {
-        private readonly ApiService _apiService;
+        InitializeComponent();
+        _apiService = apiService;
+    }
 
-        public LoginPage(ApiService apiService)
+    private async void OnLoginButtonClicked(object sender, EventArgs e)
+    {
+        ErrorLabel.IsVisible = false;
+        LoadingIndicator.IsVisible = true;
+        LoadingIndicator.IsRunning = true;
+
+        try
         {
-            InitializeComponent();
-            _apiService = apiService;
-        }
+            var username = UsernameEntry.Text?.Trim();
+            var password = PasswordEntry.Text;
 
-        // Обробник натискання кнопки логіну
-        private async void OnLoginButtonClicked(object sender, EventArgs e)
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                ShowError("Введіть ім'я ??ористувача та пароль.");
+                return;
+            }
+
+            var payload = new
+            {
+                Username = username,
+                PasswordHash = password
+            };
+
+            var result = await _apiService.LoginUserAsync(payload);
+            Debug.WriteLine($"Login result: UserId={result?.UserId}, Message={result?.Message}");
+
+            if (result != null && result.UserId > 0)
+            {
+                Preferences.Set("UserId", result.UserId);
+                await Shell.Current.GoToAsync("//MainApp");
+            }
+            else
+            {
+                ShowError(result?.Message ?? "Неправильний логін або пароль.");
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Помилка: {ex.Message}");
+        }
+        finally
+        {
+            LoadingIndicator.IsRunning = LoadingIndicator.IsVisible = false;
+        }
+    }
+
+    private async void OnGoogleSignInClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            LoadingIndicator.IsVisible = true;
+            LoadingIndicator.IsRunning = true;
+
+            await _apiService.OpenGoogleAuthAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Помилка: {ex.Message}");
+        }
+        finally
+        {
+            LoadingIndicator.IsVisible = false;
+            LoadingIndicator.IsRunning = false;
+        }
+    }
+
+    private async void OnForgotPasswordClicked(object sender, EventArgs e)
+    {
+        string email = await DisplayPromptAsync(
+            "Відновлення паролю",
+            "Введіть ваш email:",
+            "Відправити",
+            "Скасувати",
+            "email@example.com",
+            keyboard: Keyboard.Email);
+
+        if (!string.IsNullOrWhiteSpace(email))
         {
             try
             {
-                var username = UsernameEntry?.Text?.Trim();
-                var password = PasswordEntry?.Text;
+                LoadingIndicator.IsVisible = true;
+                LoadingIndicator.IsRunning = true;
 
-                if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-                {
-                    await DisplayAlert("Помилка", "Введіть логін і пароль.", "OK");
-                    return;
-                }
+                await _apiService.ForgotPasswordAsync(email);
 
-                // ВИПРАВЛЕНО: Username і PasswordHash (не password!)
-                var payload = new { Username = username, PasswordHash = password };
-                var result = await _apiService.LoginUserAsync(payload);
-
-                Debug.WriteLine($"Login result: {System.Text.Json.JsonSerializer.Serialize(result)}");
-
-                if (result != null && result.UserId > 0)
-                {
-                    // Зберігаємо UserId у Preferences як int
-                    Preferences.Set("UserId", result.UserId);
-                    Debug.WriteLine($"Saved UserId = {result.UserId} into Preferences");
-
-                    // Перехід до головної сторінки (очищує стек)
-                    await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
-                }
-                else
-                {
-                    await DisplayAlert("Помилка", result?.Message ?? "Не вдалося увійти.", "OK");
-                }
+                await DisplayAlert("Готово",
+                    "Якщо email існує, ви отримаєте лист з інструкціями.",
+                    "OK");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Login exception: {ex.Message}");
-                await DisplayAlert("Помилка", $"Помилка під час логіну: {ex.Message}", "OK");
+                await DisplayAlert("Помилка", ex.Message, "OK");
             }
-        }
-
-        // Обробник - забули пароль
-        private async void OnForgotPasswordClicked(object sender, EventArgs e)
-        {
-            await DisplayAlert("Відновлення пароля", "Інструкції щодо відновлення пароля будуть надіслані на вашу електронну пошту.", "OK");
-        }
-
-        // Обробник перех??ду на сторінку реєстрації
-        private async void OnGoToRegisterButtonClicked(object sender, EventArgs e)
-        {
-            try
+            finally
             {
-                await Shell.Current.GoToAsync(nameof(RegisterPage));
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Navigation to RegisterPage failed: {ex.Message}");
-                try
-                {
-                    await Navigation.PushAsync(new RegisterPage(_apiService));
-                }
-                catch
-                {
-                }
+                LoadingIndicator.IsVisible = false;
+                LoadingIndicator.IsRunning = false;
             }
         }
+    }
+
+    private async void OnGoToRegisterClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(RegisterPage));
+    }
+
+    private void ShowError(string message)
+    {
+        ErrorLabel.Text = message;
+        ErrorLabel.IsVisible = true;
     }
 }

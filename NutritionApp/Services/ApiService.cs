@@ -11,16 +11,23 @@ public class ApiService
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
 
+    private const string GOOGLE_CLIENT_ID = "51820459176-b6fadepnveqmnrrdncuejb7h2balavk0.apps.googleusercontent.com";
+    private const string SERVER_URL = "https://bjuapiserver20260127151810.azurewebsites.net";
+    private const string REDIRECT_URI = SERVER_URL + "/api/auth/google-callback";
+
     public ApiService()
     {
         _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri("https://bjuapiserver20260127151810.azurewebsites.net");
+        _httpClient.BaseAddress = new Uri(SERVER_URL);
+        _httpClient.Timeout = TimeSpan.FromSeconds(120);
 
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
     }
+
+    // ===== AUTH =====
 
     public async Task<AuthResponse> RegisterUserAsync(object payload)
     {
@@ -68,6 +75,45 @@ public class ApiService
         }
     }
 
+    // ===== GOOGLE AUTH =====
+
+    public async Task OpenGoogleAuthAsync()
+    {
+        var state = Guid.NewGuid().ToString("N");
+        Preferences.Set("google_auth_state", state);
+
+        var authUrl =
+            $"https://accounts.google.com/o/oauth2/v2/auth?" +
+            $"client_id={GOOGLE_CLIENT_ID}" +
+            $"&redirect_uri={Uri.EscapeDataString(REDIRECT_URI)}" +
+            $"&response_type=code" +
+            $"&scope=openid%20email%20profile" +
+            $"&state={state}" +
+            $"&access_type=offline" +
+            $"&prompt=select_account";
+
+        Debug.WriteLine($"Opening Google auth URL: {authUrl}");
+        await Browser.Default.OpenAsync(authUrl, BrowserLaunchMode.SystemPreferred);
+    }
+
+    // ===== FORGOT PASSWORD =====
+
+    public async Task<bool> ForgotPasswordAsync(string email)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("/api/Auth/forgot-password", new { Email = email });
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Forgot password exception: {ex.Message}");
+            return false;
+        }
+    }
+
+    // ===== PROFILE =====
+
     public async Task<UserProfile> GetUserProfileAsync(int userId)
     {
         try
@@ -76,7 +122,6 @@ public class ApiService
             var json = await _httpClient.GetStringAsync($"/api/Profile/{userId}");
             Debug.WriteLine($"Profile response: {json}");
             var profile = JsonSerializer.Deserialize<UserProfile>(json, _jsonOptions);
-            Debug.WriteLine($"Deserialized profile: Id={profile?.Id}, Height={profile?.Height}, Weight={profile?.Weight}, Bju.Calories={profile?.Bju?.Calories}");
             return profile ?? new UserProfile();
         }
         catch (Exception ex)
@@ -90,18 +135,14 @@ public class ApiService
     {
         try
         {
-            Debug.WriteLine($"Update profile for userId: {userId}, payload: {JsonSerializer.Serialize(payload)}");
+            Debug.WriteLine($"Update profile for userId: {userId}");
             var response = await _httpClient.PutAsJsonAsync($"/api/Profile/{userId}", payload);
             var responseContent = await response.Content.ReadAsStringAsync();
-            Debug.WriteLine($"Update profile response status: {response.StatusCode}, content: {responseContent}");
 
             if (response.IsSuccessStatusCode)
             {
-                var profile = JsonSerializer.Deserialize<UserProfile>(responseContent, _jsonOptions);
-                Debug.WriteLine($"Updated profile: Id={profile?.Id}, Height={profile?.Height}, Weight={profile?.Weight}");
-                return profile;
+                return JsonSerializer.Deserialize<UserProfile>(responseContent, _jsonOptions);
             }
-            Debug.WriteLine($"Update profile error: {responseContent}");
             return null;
         }
         catch (Exception ex)
@@ -111,7 +152,7 @@ public class ApiService
         }
     }
 
-    // ===== МОДЕЛІ ДЛЯ MEAL PLAN JSON =====
+    // ===== MEAL PLAN =====
 
     public class MealPlanJsonResponse
     {
@@ -158,8 +199,6 @@ public class ApiService
         public double Carbs { get; set; }
     }
 
-    // ===== ГЕНЕРАЦІЯ ПЛАНУ ХАРЧУВАННЯ =====
-
     public async Task<MealPlanJsonResponse> GenerateMealPlanAsync(int userId)
     {
         try
@@ -170,7 +209,6 @@ public class ApiService
             Debug.WriteLine($"Meal plan raw response: {json}");
 
             response.EnsureSuccessStatusCode();
-
             json = CleanJsonResponse(json);
 
             var payload = JsonSerializer.Deserialize<MealPlanJsonResponse>(json, _jsonOptions);
@@ -187,39 +225,11 @@ public class ApiService
         }
     }
 
-    private string CleanJsonResponse(string json)
-    {
-        if (string.IsNullOrWhiteSpace(json))
-            return json;
-
-        json = json.Trim();
-
-        if (json.StartsWith("```json", StringComparison.OrdinalIgnoreCase))
-        {
-            json = json.Substring(7);
-        }
-        else if (json.StartsWith("```"))
-        {
-            json = json.Substring(3);
-        }
-
-        if (json.EndsWith("```"))
-        {
-            json = json.Substring(0, json.Length - 3);
-        }
-
-        return json.Trim();
-    }
-
-    // ===== ІСТОРІЯ ПЛАНІВ ХАРЧУВАННЯ =====
-
     public async Task<List<Models.MealPlan>> GetMealPlanHistoryAsync(int userId)
     {
         try
         {
-            Debug.WriteLine($"Get meal plan history for userId: {userId}");
             var json = await _httpClient.GetStringAsync($"/api/nutrition/history/{userId}");
-            Debug.WriteLine($"Meal plan history response: {json}");
             return JsonSerializer.Deserialize<List<Models.MealPlan>>(json, _jsonOptions) ?? new List<Models.MealPlan>();
         }
         catch (Exception ex)
@@ -229,7 +239,7 @@ public class ApiService
         }
     }
 
-    // ===== МОДЕЛІ ДЛЯ WORKOUT JSON =====
+    // ===== WORKOUT =====
 
     public class WorkoutJsonResponse
     {
@@ -276,8 +286,6 @@ public class ApiService
         public string Tips { get; set; }
     }
 
-    // ===== WORKOUT МЕТОДИ =====
-
     public async Task<WorkoutPlan> GenerateWorkoutAsync(int userId, string goal, string intensity, int duration)
     {
         var payload = new { UserId = userId, Goal = goal, Intensity = intensity, DurationMinutes = duration };
@@ -301,11 +309,9 @@ public class ApiService
     {
         try
         {
-            Debug.WriteLine($"Get workouts for userId: {userId}");
             var response = await _httpClient.GetAsync($"/api/Workouts/history/{userId}");
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
-            Debug.WriteLine($"Workouts history response: {json}");
             return JsonSerializer.Deserialize<List<WorkoutPlan>>(json, _jsonOptions) ?? new List<WorkoutPlan>();
         }
         catch (Exception ex)
@@ -315,30 +321,21 @@ public class ApiService
         }
     }
 
-    // ===== AI ВИКЛИК НАПРЯМУ =====
+    // ===== HELPERS =====
 
-    public class AIMealPlanResponse
+    private string CleanJsonResponse(string json)
     {
-        [JsonPropertyName("result")]
-        public string Result { get; set; }
-    }
+        if (string.IsNullOrWhiteSpace(json)) return json;
 
-    public async Task<string> GenerateAiMealPlanAsync(string prompt)
-    {
-        try
-        {
-            Debug.WriteLine($"Generate AI meal plan prompt: {prompt}");
-            var response = await _httpClient.PostAsJsonAsync("/api/ai/mealplan", prompt);
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            Debug.WriteLine($"AI meal plan response: {json}");
-            var payload = JsonSerializer.Deserialize<AIMealPlanResponse>(json, _jsonOptions);
-            return payload?.Result ?? string.Empty;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Generate AI meal plan exception: {ex.Message}");
-            return string.Empty;
-        }
+        json = json.Trim();
+        if (json.StartsWith("```json", StringComparison.OrdinalIgnoreCase))
+            json = json.Substring(7);
+        else if (json.StartsWith("```"))
+            json = json.Substring(3);
+
+        if (json.EndsWith("```"))
+            json = json.Substring(0, json.Length - 3);
+
+        return json.Trim();
     }
 }
