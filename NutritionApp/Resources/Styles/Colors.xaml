@@ -1,29 +1,36 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <?xaml-comp compile="true" ?>
-<ResourceDictionary 
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+<ResourceDictionary   
+   xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
+   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">  
 
-    <Color x:Key="Primary">#4F7DFF</Color>
-    <Color x:Key="Accent">#E27D5F</Color>
+   <Color x:Key="Primary">#CCFF00</Color>  
+   <Color x:Key="Accent">#CCFF00</Color>  
 
-    <Color x:Key="TextPrimary">#111827</Color>
-    <Color x:Key="TextSecondary">#6B7280</Color>
+   <Color x:Key="TextPrimary">#FFFFFF</Color>  
+   <Color x:Key="TextSecondary">#8E8E93</Color>  
 
-    <Color x:Key="PageBackground">#F6F7FB</Color>
-    <Color x:Key="CardBackground">#FFFFFF</Color>
-    <Color x:Key="BorderColor">#E4E7EE</Color>
+   <Color x:Key="PageBackground">#000000</Color>  
+   <Color x:Key="CardBackground">#151515</Color>
+   <Color x:Key="BorderColor">#252525</Color>  
 
-    <Color x:Key="Success">#22C55E</Color>
-    <Color x:Key="Error">#EF4444</Color>
+   <Color x:Key="Success">#CCFF00</Color>  
+   <Color x:Key="Error">#FF3B30</Color>     
 
-    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
-    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Accent}"/>
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
-    <SolidColorBrush x:Key="PageBackgroundBrush" Color="{StaticResource PageBackground}"/>
-    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackground}"/>
-    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
-    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource Success}"/>
-    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource Error}"/>
+   <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>  
+   <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Accent}"/>  
+   <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>  
+   <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>  
+   <SolidColorBrush x:Key="PageBackgroundBrush" Color="{StaticResource PageBackground}"/>  
+   <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackground}"/>  
+   <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>  
+   <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource Success}"/>  
+   <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource Error}"/>  
+
+   <!-- Blurred/gradient page background -->
+   <RadialGradientBrush x:Key="PageBackgroundGradient" Center="0.5,0.15" Radius="0.85">
+       <GradientStop Color="#0D1A00" Offset="0.0" />
+       <GradientStop Color="#050A00" Offset="0.4" />
+       <GradientStop Color="#000000" Offset="1.0" />
+   </RadialGradientBrush>  
 </ResourceDictionary>

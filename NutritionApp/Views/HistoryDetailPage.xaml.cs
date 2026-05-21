@@ -18,9 +18,12 @@ public partial class HistoryDetailPage : ContentPage
         }
     }
 
-    public HistoryDetailPage()
+    private readonly Services.ApiService _apiService;
+
+    public HistoryDetailPage(Services.ApiService apiService)
     {
         InitializeComponent();
+        _apiService = apiService;
     }
 
     private void DisplayPlan(string planJson)
@@ -29,7 +32,7 @@ public partial class HistoryDetailPage : ContentPage
 
         if (string.IsNullOrWhiteSpace(planJson))
         {
-            AddErrorMessage("ÕÂÏ‡∫ ‰‡ÌËı ‰Îˇ ‚≥‰Ó·‡ÊÂÌÌˇ.");
+            AddErrorMessage("–ù–µ–º–∞—î –¥–∞–Ω–∏—Ö –¥–ª—è –≤—ñ–¥–æ–±—Ä–∞–∂–µ–Ω–Ω—è.");
             return;
         }
 
@@ -50,7 +53,7 @@ public partial class HistoryDetailPage : ContentPage
                     SummaryLabel.IsVisible = true;
                 }
 
-                // ƒÓ‰‡∫ÏÓ Í‡ÚÓ˜ÍË ‰Îˇ ÍÓÊÌÓ„Ó ÔËÈÓÏÛ øÊ≥
+                // –î–æ–¥–∞—î–º–æ –∫–∞—Ä—Ç–æ—á–∫–∏ –¥–ª—è –∫–æ–∂–Ω–æ–≥–æ –ø—Ä–∏–π–æ–º—É —ó–∂—ñ
                 foreach (var meal in plan.Meals)
                 {
                     MealsContainer.Children.Add(CreateMealCard(meal));
@@ -58,7 +61,7 @@ public partial class HistoryDetailPage : ContentPage
             }
             else
             {
-                // œÓÍ‡ÁÛ∫ÏÓ ˇÍ ÚÂÍÒÚ
+                // –ü–æ–∫–∞–∑—É—î–º–æ —è–∫ —Ç–µ–∫—Å—Ç
                 AddTextLabel(planJson);
             }
         }
@@ -81,7 +84,7 @@ public partial class HistoryDetailPage : ContentPage
 
         var mainStack = new VerticalStackLayout { Spacing = 12 };
 
-        // «‡„ÓÎÓ‚ÓÍ
+        // –ó–∞–≥–æ–ª–æ–≤–æ–∫
         var headerGrid = new Grid
         {
             ColumnDefinitions = new ColumnDefinitionCollection
@@ -119,7 +122,7 @@ public partial class HistoryDetailPage : ContentPage
         headerGrid.Add(timeBorder, 1, 0);
         mainStack.Add(headerGrid);
 
-        // œÓ‰ÛÍÚË
+        // –ü—Ä–æ–¥—É–∫—Ç–∏
         if (meal.Foods != null)
         {
             foreach (var food in meal.Foods)
@@ -128,7 +131,7 @@ public partial class HistoryDetailPage : ContentPage
             }
         }
 
-        // «‡„‡Î¸Ì≥ Í‡ÎÓ≥ø
+        // –ó–∞–≥–∞–ª—å–Ω—ñ –∫–∞–ª–æ—Ä—ñ—ó
         if (meal.TotalCalories > 0)
         {
             var totalBorder = new Border
@@ -141,7 +144,7 @@ public partial class HistoryDetailPage : ContentPage
             };
             var totalLabel = new Label
             {
-                Text = $"¬Ò¸Ó„Ó: {meal.TotalCalories} ÍÍ‡Î",
+                Text = $"–í—Å—å–æ–≥–æ: {meal.TotalCalories} –∫–∫–∞–ª",
                 FontSize = 13,
                 TextColor = Color.FromArgb("#EA580C"),
                 FontAttributes = FontAttributes.Bold
@@ -174,11 +177,12 @@ public partial class HistoryDetailPage : ContentPage
             ColumnDefinitions = new ColumnDefinitionCollection
             {
                 new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Auto },
                 new ColumnDefinition { Width = GridLength.Auto }
             }
         };
 
-        // Õ‡Á‚‡ ÔÓ‰ÛÍÚÛ
+        // –ù–∞–∑–≤–∞ –ø—Ä–æ–¥—É–∫—Ç—É
         var nameLabel = new Label
         {
             Text = food.Name,
@@ -188,28 +192,85 @@ public partial class HistoryDetailPage : ContentPage
         };
         grid.Add(nameLabel, 0, 0);
 
-        // ¬‡„‡
+        // –í–∞–≥–∞
         var weightLabel = new Label
         {
             Text = food.Weight ?? "",
             FontSize = 13,
-            TextColor = (Color)Application.Current.Resources["TextSecondary"]
+            TextColor = (Color)Application.Current.Resources["TextSecondary"],
+            VerticalOptions = LayoutOptions.Center,
+            Margin = new Thickness(0, 0, 10, 0)
         };
         grid.Add(weightLabel, 1, 0);
 
-        // ¡∆”
+        // –ö–Ω–æ–ø–∫–∞ "+"
+        var addBtn = new Label
+        {
+            Text = "+",
+            FontSize = 24,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = (Color)Application.Current.Resources["Primary"],
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.End
+        };
+        var tapGesture = new TapGestureRecognizer();
+        tapGesture.Tapped += async (s, e) => await LogFoodFromHistoryAsync(food);
+        addBtn.GestureRecognizers.Add(tapGesture);
+        
+        // –ö–Ω–æ–ø–∫—É —Å—Ç–∞–≤–∏–º–æ —Ç–∞–∫ —â–æ–± –∑–∞–π–º–∞–ª–∞ 2 —Ä—è–¥–∫–∏ –ø–æ –≤–∏—Å–æ—Ç—ñ (RowSpan = 2)
+        Grid.SetRowSpan(addBtn, 2);
+        grid.Add(addBtn, 2, 0);
+
+        // –ë–ñ–£
         var bjuStack = new HorizontalStackLayout { Spacing = 12 };
-        bjuStack.Add(new Label { Text = $"{food.Calories} ÍÍ‡Î", FontSize = 12, TextColor = Color.FromArgb("#EA580C") });
-        bjuStack.Add(new Label { Text = $"¡: {food.Protein}", FontSize = 12, TextColor = Color.FromArgb("#16A34A") });
-        bjuStack.Add(new Label { Text = $"∆: {food.Fat}", FontSize = 12, TextColor = Color.FromArgb("#CA8A04") });
-        bjuStack.Add(new Label { Text = $"¬: {food.Carbs}", FontSize = 12, TextColor = Color.FromArgb("#2563EB") });
+        bjuStack.Add(new Label { Text = $"{food.Calories} –∫–∫–∞–ª", FontSize = 12, TextColor = Color.FromArgb("#EA580C") });
+        bjuStack.Add(new Label { Text = $"–ë: {food.Protein}", FontSize = 12, TextColor = Color.FromArgb("#16A34A") });
+        bjuStack.Add(new Label { Text = $"–ñ: {food.Fat}", FontSize = 12, TextColor = Color.FromArgb("#CA8A04") });
+        bjuStack.Add(new Label { Text = $"–í: {food.Carbs}", FontSize = 12, TextColor = Color.FromArgb("#2563EB") });
 
         Grid.SetRow(bjuStack, 1);
-        Grid.SetColumnSpan(bjuStack, 2);
+        Grid.SetColumnSpan(bjuStack, 2); // –ë–ñ–£ –∑–∞–π–º–∞—î –ø–µ—Ä—à—ñ –¥–≤—ñ –∫–æ–ª–æ–Ω–∫–∏
         grid.Add(bjuStack);
 
         border.Content = grid;
         return border;
+    }
+
+    private async Task LogFoodFromHistoryAsync(FoodData food)
+    {
+        if (_apiService == null) return;
+        
+        int userId = Preferences.Get("UserId", 0);
+        if (userId == 0) return;
+
+        double weightNum = 0;
+        if (!string.IsNullOrEmpty(food.Weight))
+        {
+            var cleanedWeight = new string(food.Weight.Where(c => char.IsDigit(c) || c == '.' || c == ',').ToArray());
+            double.TryParse(cleanedWeight.Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out weightNum);
+        }
+
+        var entry = new Models.FoodEntry
+        {
+            UserId = userId,
+            Name = food.Name,
+            Calories = food.Calories,
+            Protein = food.Protein,
+            Fat = food.Fat,
+            Carbs = food.Carbs,
+            Weight = weightNum,
+            LoggedAt = DateTime.UtcNow
+        };
+
+        var saved = await _apiService.LogFoodAsync(entry);
+        if (saved != null)
+        {
+            await Application.Current.MainPage.DisplayAlert("–£—Å–ø—ñ—Ö", $"{food.Name} –¥–æ–¥–∞–Ω–æ –¥–æ —Å—å–æ–≥–æ–¥–Ω—ñ—à–Ω—å–æ–≥–æ –º–µ–Ω—é!", "–û–ö");
+        }
+        else
+        {
+            await Application.Current.MainPage.DisplayAlert("–ü–æ–º–∏–ª–∫–∞", "–ù–µ –≤–¥–∞–ª–æ—Å—è –∑–±–µ—Ä–µ–≥—Ç–∏ –ø—Ä–æ–¥—É–∫—Ç.", "–û–ö");
+        }
     }
 
     private void AddErrorMessage(string message)
@@ -260,7 +321,7 @@ public partial class HistoryDetailPage : ContentPage
         await Shell.Current.GoToAsync("..");
     }
 
-    //  Î‡ÒË ‰Îˇ Ô‡ÒËÌ„Û JSON
+    // –ö–ª–∞—Å–∏ –¥–ª—è –ø–∞—Ä—Å–∏–Ω–≥—É JSON
     private class MealPlanData
     {
         public string Summary { get; set; }

@@ -15,11 +15,6 @@ public partial class ProfilePage : ContentPage
         _waterReminderService = waterReminderService;
         BindingContext = _viewModel;
 
-        if (Application.Current.Resources.TryGetValue("PageBackgroundColor", out var colorValue) && colorValue is Color color)
-        {
-            ThemeSwitch.IsToggled = color != Colors.White;
-        }
-
         LoadWaterReminderSettings();
     }
 
@@ -61,11 +56,8 @@ public partial class ProfilePage : ContentPage
             var hasPermission = await _waterReminderService.RequestPermissionAsync();
             if (hasPermission)
             {
-                // Запускаємо у фоні - UI не блокується!
                 _waterReminderService.StartRemindersInBackground();
-
-                await DisplayAlert("Нагадування",
-                    "Нагадування про воду увімкнено!\nСповіщення з 8:00 до 22:00.", "OK");
+                await DisplayAlert("Enabled", "Water reminders enabled!", "OK");
             }
             else
             {
@@ -74,9 +66,7 @@ public partial class ProfilePage : ContentPage
                 WaterReminderSwitch.Toggled += OnWaterReminderToggled;
                 _waterReminderService.IsEnabled = false;
                 IntervalPickerContainer.IsVisible = false;
-
-                await DisplayAlert("Дозвіл потрібен",
-                    "Для нагадувань потрібен дозвіл на сповіщення.", "OK");
+                await DisplayAlert("No Permission", "Notification permission required.", "OK");
             }
         }
         else
@@ -101,42 +91,21 @@ public partial class ProfilePage : ContentPage
 
         if (_waterReminderService.IsEnabled)
         {
-            // Перезапускаємо у фоні
             _waterReminderService.RestartRemindersInBackground();
-        }
-    }
-
-    private void OnThemeToggled(object sender, ToggledEventArgs e)
-    {
-        Color customGray = Color.FromArgb("#EAEAEA");
-
-        if (e.Value)
-        {
-            Application.Current.Resources["PageBackgroundColor"] = customGray;
-        }
-        else
-        {
-            Application.Current.Resources["PageBackgroundColor"] = Colors.White;
         }
     }
 
     private async void OnLogoutButtonClicked(object sender, EventArgs e)
     {
-        // Зупиняємо нагадування
         _waterReminderService.StopReminders();
-
-        // Скидаємо ViewModel
         _viewModel.Reset();
-
-        // Очищаємо Preferences
+        ApiService.ClearMemoryCache();
         Preferences.Clear();
-
-        // Переходимо на логін
         await Shell.Current.GoToAsync("//LoginPage");
     }
 
     private async void OnEditProfileClicked(object sender, EventArgs e)
-    {
+    {           
         await Shell.Current.GoToAsync(nameof(EditProfilePage));
     }
 

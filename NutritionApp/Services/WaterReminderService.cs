@@ -28,6 +28,18 @@ namespace NutritionApp.Services
             set => Preferences.Set(REMINDER_INTERVAL_KEY, value);
         }
 
+        public TimeSpan StartTime
+        {
+            get => new TimeSpan(Preferences.Get("WaterReminderStart", new TimeSpan(8, 0, 0).Ticks));
+            set => Preferences.Set("WaterReminderStart", value.Ticks);
+        }
+
+        public TimeSpan EndTime
+        {
+            get => new TimeSpan(Preferences.Get("WaterReminderEnd", new TimeSpan(22, 0, 0).Ticks));
+            set => Preferences.Set("WaterReminderEnd", value.Ticks);
+        }
+
         // Фактичний інтервал (тестовий або реальний)
         private int ActualInterval => TEST_MODE ? TEST_INTERVAL_MINUTES : IntervalMinutes;
 
@@ -69,9 +81,9 @@ namespace NutritionApp.Services
 
             var now = DateTime.Now;
 
-            // Сповіщення з 8:00 до 22:00
-            var startHour = 8;
-            var endHour = 22;
+            // Сповіщення в заданий діапазон
+            var startHour = StartTime.Hours;
+            var endHour = EndTime.Hours;
 
             var notificationId = BASE_NOTIFICATION_ID;
             var messages = new[]

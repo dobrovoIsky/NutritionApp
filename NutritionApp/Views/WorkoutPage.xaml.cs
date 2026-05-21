@@ -9,11 +9,40 @@ public partial class WorkoutPage : ContentPage
     private readonly ApiService _apiService;
     private string _selectedType = "";
     private int _selectedDuration = 45;
+    private List<string> _selectedEquipment = new();
 
     public WorkoutPage(ApiService apiService)
     {
         InitializeComponent();
         _apiService = apiService;
+        
+        LoadSavedEquipment();
+        UpdateEquipmentButtonText();
+    }
+
+    private void LoadSavedEquipment()
+    {
+        try
+        {
+            var json = Preferences.Get("FavoriteEquipment", "");
+            if (!string.IsNullOrEmpty(json))
+            {
+                _selectedEquipment = System.Text.Json.JsonSerializer.Deserialize<List<string>>(json) ?? new();
+            }
+        }
+        catch { }
+    }
+
+    private void UpdateEquipmentButtonText()
+    {
+        if (_selectedEquipment.Count > 0)
+        {
+            EquipmentButtonLabel.Text = $"Obladnannia ({_selectedEquipment.Count})";
+        }
+        else
+        {
+            EquipmentButtonLabel.Text = "Obrati obladnannia";
+        }
     }
 
     private void SelectCard(Border selectedCard)
@@ -26,41 +55,55 @@ public partial class WorkoutPage : ContentPage
         HomeCard.BackgroundColor = (Color)Application.Current.Resources["CardBackground"];
 
         selectedCard.Stroke = (Color)Application.Current.Resources["Primary"];
-        selectedCard.BackgroundColor = Color.FromArgb("#EFF6FF");
+        selectedCard.BackgroundColor = Color.FromArgb("#1A1A1A");
 
         InitialMessage.IsVisible = false;
+        
+        EquipmentContainer.IsVisible = (_selectedType == "gym");
     }
 
     private void OnCardioTapped(object sender, TappedEventArgs e)
     {
-        SelectCard(CardioCard);
         _selectedType = "cardio";
+        SelectCard(CardioCard);
     }
 
     private void OnGymTapped(object sender, TappedEventArgs e)
     {
-        SelectCard(GymCard);
         _selectedType = "gym";
+        SelectCard(GymCard);
     }
 
     private void OnHomeTapped(object sender, TappedEventArgs e)
     {
-        SelectCard(HomeCard);
         _selectedType = "home";
+        SelectCard(HomeCard);
+    }
+
+    private async void OnEquipmentClicked(object sender, TappedEventArgs e)
+    {
+        var page = new EquipmentSelectionPage(_selectedEquipment, OnEquipmentSelected);
+        await Shell.Current.Navigation.PushAsync(page);
+    }
+
+    private void OnEquipmentSelected(List<string> selectedEquipment)
+    {
+        _selectedEquipment = selectedEquipment ?? new();
+        UpdateEquipmentButtonText();
     }
 
     private void OnDurationChanged(object sender, ValueChangedEventArgs e)
     {
         _selectedDuration = (int)Math.Round(e.NewValue / 5) * 5;
         DurationSlider.Value = _selectedDuration;
-        DurationLabel.Text = $"{_selectedDuration} хвилин";
+        DurationLabel.Text = $"{_selectedDuration} khv";
     }
 
-    private async void OnGenerateClicked(object sender, TappedEventArgs e)
+    private async void OnGenerateClicked(object sender, EventArgs e)
     {
         if (string.IsNullOrEmpty(_selectedType))
         {
-            await DisplayAlert("Увага", "Спочатку обери тип тренування!", "OK");
+            await DisplayAlert("Uvaga", "Spochatku oberit typ!", "OK");
             return;
         }
 
@@ -74,23 +117,26 @@ public partial class WorkoutPage : ContentPage
             int userId = Preferences.Get("UserId", 0);
             if (userId <= 0)
             {
-                await DisplayAlert("Помилка", "Не вдалося ідентифікувати користувача.", "OK");
+                await DisplayAlert("Pomylka", "Ne znaideno korystuvacha.", "OK");
                 return;
             }
 
             var goal = _selectedType switch
             {
-                "cardio" => "кардіо тренування",
-                "gym" => "силове тренування в залі",
-                "home" => "тренування вдома без обладнання",
-                _ => "загальне тренування"
+                "cardio" => "kardio trenuvannia",
+                "gym" => "sylove trenuvannia v zali",
+                "home" => "trenuvannia vdoma",
+                _ => "zahalne trenuvannia"
             };
+
+            var equipment = _selectedType == "gym" ? _selectedEquipment : null;
 
             var plan = await _apiService.GenerateWorkoutAsync(
                 userId,
                 goal,
                 "medium",
-                _selectedDuration);
+                _selectedDuration,
+                equipment);
 
             if (plan != null && !string.IsNullOrEmpty(plan.PlanText))
             {
@@ -98,12 +144,12 @@ public partial class WorkoutPage : ContentPage
             }
             else
             {
-                await DisplayAlert("Помилка", "Не вдалося згенерувати тренування.", "OK");
+                await DisplayAlert("Pomylka", "Ne vdalosya zgeneruvaty.", "OK");
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Помилка", $"Сталася помилка: {ex.Message}", "OK");
+            await DisplayAlert("Pomylka", $"Stalasya pomylka: {ex.Message}", "OK");
         }
         finally
         {
@@ -129,34 +175,31 @@ public partial class WorkoutPage : ContentPage
                 return;
             }
 
-            // Оновлюємо UI
             TypeIcon.Text = _selectedType switch
             {
-                "cardio" => "??",
-                "gym" => "???",
-                "home" => "??",
-                _ => "??"
+                "cardio" => "R",
+                "gym" => "G",
+                "home" => "H",
+                _ => "T"
             };
             TypeLabel.Text = _selectedType switch
             {
-                "cardio" => "Кардіо",
-                "gym" => "Силове",
-                "home" => "Вдома",
-                _ => "Тренування"
+                "cardio" => "Kardio",
+                "gym" => "Zal",
+                "home" => "Vdoma",
+                _ => "Trenuvannia"
             };
-            DurationResultLabel.Text = $"{_selectedDuration} хв";
-            CaloriesLabel.Text = $"~{workout.TotalCalories} ккал";
+            DurationResultLabel.Text = $"{_selectedDuration} khv";
+            CaloriesLabel.Text = $"~{workout.TotalCalories} kkal";
             SummaryLabel.Text = workout.Summary;
 
-            // Розминка
             if (workout.Warmup != null)
             {
-                WarmupDurationLabel.Text = $"{workout.Warmup.Duration} хв";
-                WarmupExercisesLabel.Text = string.Join("\n", workout.Warmup.Exercises?.Select(ex => $"• {ex}") ?? Array.Empty<string>());
+                WarmupDurationLabel.Text = $"{workout.Warmup.Duration} khv";
+                WarmupExercisesLabel.Text = string.Join("\n", workout.Warmup.Exercises?.Select(ex => $"* {ex}") ?? Array.Empty<string>());
                 WarmupContainer.IsVisible = true;
             }
 
-            // Вправи
             ExercisesContainer.Children.Clear();
             if (workout.Workout != null)
             {
@@ -167,11 +210,10 @@ public partial class WorkoutPage : ContentPage
                 }
             }
 
-            // Заминка
             if (workout.Cooldown != null)
             {
-                CooldownDurationLabel.Text = $"{workout.Cooldown.Duration} хв";
-                CooldownExercisesLabel.Text = string.Join("\n", workout.Cooldown.Exercises?.Select(ex => $"• {ex}") ?? Array.Empty<string>());
+                CooldownDurationLabel.Text = $"{workout.Cooldown.Duration} khv";
+                CooldownExercisesLabel.Text = string.Join("\n", workout.Cooldown.Exercises?.Select(ex => $"* {ex}") ?? Array.Empty<string>());
                 CooldownContainer.IsVisible = true;
             }
 
@@ -204,7 +246,6 @@ public partial class WorkoutPage : ContentPage
             ColumnSpacing = 12
         };
 
-        // Номер вправи
         var numberBorder = new Border
         {
             WidthRequest = 36,
@@ -225,7 +266,6 @@ public partial class WorkoutPage : ContentPage
         numberBorder.Content = numberLabel;
         grid.Add(numberBorder, 0, 0);
 
-        // Інформація про вправу
         var infoStack = new VerticalStackLayout { Spacing = 4 };
 
         infoStack.Add(new Label
@@ -246,7 +286,7 @@ public partial class WorkoutPage : ContentPage
         });
         detailsStack.Add(new Label
         {
-            Text = $"Відпочинок: {exercise.Rest}",
+            Text = $"Rest: {exercise.Rest}",
             FontSize = 12,
             TextColor = (Color)Application.Current.Resources["TextSecondary"]
         });
@@ -256,7 +296,7 @@ public partial class WorkoutPage : ContentPage
         {
             infoStack.Add(new Label
             {
-                Text = $"?? {exercise.Tips}",
+                Text = $"Tip: {exercise.Tips}",
                 FontSize = 12,
                 TextColor = (Color)Application.Current.Resources["TextSecondary"],
                 LineBreakMode = LineBreakMode.WordWrap

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutritionApp.Views.WorkoutDetailPage"
+             Shell.NavBarIsVisible="False"
+             Background="{DynamicResource PageBackgroundGradient}">
+
+    <Grid RowDefinitions="160,*" Padding="0">
+        <!-- Header -->
+        <Grid Row="0" Padding="0,16,0,16">
+
+
+            <!-- Back Button -->
+            <Border WidthRequest="40" 
+                    HeightRequest="40"
+                    StrokeShape="RoundRectangle 20"
+                    BackgroundColor="#FFFFFF33"
+                    Stroke="Transparent"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Start"
+                    Margin="16,16,0,0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackClicked"/>
+                </Border.GestureRecognizers>
+                <Label Text="вЂ№" FontSize="28" TextColor="White" VerticalOptions="Center" HorizontalOptions="Center"/>
+            </Border>
+
+            <VerticalStackLayout Spacing="8" VerticalOptions="Center" HorizontalOptions="Center">
+                <Label Text="Р”РµС‚Р°Р»С– С‚СЂРµРЅСѓРІР°РЅРЅСЏ" FontAttributes="Bold" FontSize="22" TextColor="White" HorizontalOptions="Center"/>
+                <Label x:Name="GoalLabel" FontSize="14" TextColor="#FFEFF2" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Content -->
+        <Border Grid.Row="1" BackgroundColor="{DynamicResource CardBackground}" Stroke="{DynamicResource BorderColor}" StrokeThickness="1" 
+                Padding="16" Margin="16,-32,16,16" StrokeShape="RoundRectangle 24">
+            <ScrollView>
+                <VerticalStackLayout x:Name="ContentContainer" Spacing="16">
+                    <!-- Dynamic Content -->
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+    </Grid>
+</ContentPage>
+

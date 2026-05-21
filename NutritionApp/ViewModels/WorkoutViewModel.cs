@@ -47,9 +47,9 @@ namespace NutritionApp.ViewModels
         public ICommand GenerateCommand { get; }
         public ICommand LoadHistoryCommand { get; }
 
-        public WorkoutViewModel()
+        public WorkoutViewModel(ApiService apiService)
         {
-            _apiService = new ApiService();
+            _apiService = apiService;
             GenerateCommand = new Command(async () => await GenerateAsync());
             LoadHistoryCommand = new Command(async () => await LoadHistoryAsync());
         }

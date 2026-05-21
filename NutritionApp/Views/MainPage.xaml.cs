@@ -16,7 +16,13 @@ public partial class MainPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        await _viewModel.StartPedometerAsync();
         await _viewModel.LoadUserProfileAsync();
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _viewModel.StopPedometer();
+    }
 }

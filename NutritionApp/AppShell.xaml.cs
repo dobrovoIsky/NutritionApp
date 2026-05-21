@@ -1,4 +1,4 @@
-﻿using NutritionApp.Views;
+using NutritionApp.Views;
 
 namespace NutritionApp
 {
@@ -8,13 +8,11 @@ namespace NutritionApp
         {
             InitializeComponent();
             Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
-            Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
             Routing.RegisterRoute(nameof(EditProfilePage), typeof(EditProfilePage));
-            Routing.RegisterRoute(nameof(MealPlanPage), typeof(MealPlanPage));
-            Routing.RegisterRoute(nameof(HistoryPage), typeof(HistoryPage));
             Routing.RegisterRoute(nameof(HistoryDetailPage), typeof(HistoryDetailPage));
-            Routing.RegisterRoute(nameof(ProfilePage), typeof(ProfilePage)); // Додайте цей рядок
-            Routing.RegisterRoute(nameof(WorkoutPage), typeof(WorkoutPage));
+            Routing.RegisterRoute(nameof(WorkoutDetailPage), typeof(WorkoutDetailPage));
+            Routing.RegisterRoute(nameof(AddFoodPage), typeof(AddFoodPage));
+            Routing.RegisterRoute(nameof(MyRationPage), typeof(MyRationPage));
         }
     }
 }

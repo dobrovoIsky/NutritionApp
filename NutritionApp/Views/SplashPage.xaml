@@ -3,15 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NutritionApp.Views.SplashPage"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="{StaticResource PageBackground}">
+             Background="{StaticResource PageBackgroundGradient}">
 
     <Grid>
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#4F7DFF" Offset="0.0" />
-                <GradientStop Color="#E27D5F" Offset="1.0" />
-            </LinearGradientBrush>
-        </Grid.Background>
+
 
         <VerticalStackLayout Spacing="18"
                              VerticalOptions="Center"

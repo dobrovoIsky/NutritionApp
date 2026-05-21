@@ -4,18 +4,13 @@
              x:Class="NutritionApp.Views.EditProfilePage"
              Title="Редагувати профіль"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="{StaticResource PageBackground}">
+             Background="{StaticResource PageBackgroundGradient}">
 
     <Grid RowDefinitions="120,*" Padding="0">
 
         <!-- Верхній блок з градієнтом -->
         <Grid Row="0" Padding="0,16,0,16">
-            <Grid.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#4F7DFF" Offset="0.0" />
-                    <GradientStop Color="#E27D5F" Offset="1.0" />
-                </LinearGradientBrush>
-            </Grid.Background>
+
 
             <VerticalStackLayout VerticalOptions="Center"
                                  HorizontalOptions="Center">

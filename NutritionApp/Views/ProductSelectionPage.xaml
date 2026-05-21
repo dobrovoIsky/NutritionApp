@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:NutritionApp.ViewModels"
+             x:Class="NutritionApp.Views.ProductSelectionPage"
+             x:Name="ThisPage"
+             Shell.NavBarIsVisible="False"
+             Background="{StaticResource PageBackgroundGradient}">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="0">
+
+        <!-- Заголовок -->
+        <Grid Grid.Row="0" Padding="16,16,16,12">
+
+
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- Кнопка назад -->
+                <Border BackgroundColor="#4DFFFFFF"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="#80FFFFFF"
+                        Padding="10"
+                        HeightRequest="44"
+                        WidthRequest="44">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBackClicked"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="←" FontSize="20" TextColor="White" 
+                           VerticalOptions="Center" HorizontalOptions="Center"/>
+                </Border>
+
+                <!-- Заголовок -->
+                <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center" Margin="16,0">
+                    <Label Text="🛒 Наявні продукти"
+                           FontAttributes="Bold"
+                           FontSize="20"
+                           TextColor="White"/>
+                    <Label Text="{Binding SelectedCount, StringFormat='Обрано: {0}'}"
+                           FontSize="14"
+                           TextColor="#FFEFF2"/>
+                </VerticalStackLayout>
+
+                <!-- Очистити все -->
+                <Border Grid.Column="2"
+                        BackgroundColor="#4DFFFFFF"
+                        StrokeShape="RoundRectangle 12"
+                        Stroke="#80FFFFFF"
+                        Padding="12,10">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ClearAllCommand}"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="Очистити" FontSize="14" TextColor="White"/>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Пошук та категорії -->
+        <VerticalStackLayout Grid.Row="1" Spacing="12" Padding="16,12">
+            
+            <!-- Пошук -->
+            <Border BackgroundColor="{StaticResource CardBackground}"
+                    StrokeShape="RoundRectangle 14"
+                    Stroke="{StaticResource BorderColor}"
+                    Padding="14,4">
+                <Grid ColumnDefinitions="Auto,*">
+                    <Label Text="🔍" FontSize="18" VerticalOptions="Center" Margin="0,0,10,0"/>
+                    <Entry Grid.Column="1"
+                           Placeholder="Пошук продуктів..."
+                           Text="{Binding SearchText}"
+                           FontSize="16"
+                           TextColor="{StaticResource TextPrimary}"
+                           PlaceholderColor="{StaticResource TextSecondary}"/>
+                </Grid>
+            </Border>
+
+            <!-- Категорії (горизонтальний скрол) -->
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Categories}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeShape="RoundRectangle 16"
+                                    Stroke="{StaticResource BorderColor}"
+                                    Padding="14,8">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.SelectCategoryCommand}"
+                                                          CommandParameter="{Binding}"/>
+                                </Border.GestureRecognizers>
+                                <Label Text="{Binding}" 
+                                       FontSize="14" 
+                                       TextColor="{StaticResource TextPrimary}"/>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </HorizontalStackLayout>
+            </ScrollView>
+        </VerticalStackLayout>
+
+        <!-- Список продуктів -->
+        <CollectionView Grid.Row="2" 
+                        ItemsSource="{Binding FilteredProducts}"
+                        Margin="16,0"
+                        SelectionMode="None"
+                        RemainingItemsThreshold="5"
+                        RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border BackgroundColor="{StaticResource CardBackground}"
+                            StrokeShape="RoundRectangle 14"
+                            Stroke="{StaticResource BorderColor}"
+                            Padding="14">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.ToggleProductCommand}"
+                                                  CommandParameter="{Binding}"/>
+                        </Border.GestureRecognizers>
+                        
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <!-- Емодзі -->
+                            <Label Text="{Binding Emoji}" 
+                                   FontSize="24" 
+                                   VerticalOptions="Center"
+                                   Margin="0,0,12,0"/>
+                            
+                            <!-- Назва та категорія -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="{Binding Name}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}"/>
+                                <Label Text="{Binding Category}"
+                                       FontSize="12"
+                                       TextColor="{StaticResource TextSecondary}"/>
+                            </VerticalStackLayout>
+                            
+                            <!-- Чекбокс -->
+                            <Frame Grid.Column="2"
+                                   BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}"
+                                   CornerRadius="8"
+                                   BorderColor="{StaticResource BorderColor}"
+                                   WidthRequest="32"
+                                   HeightRequest="32"
+                                   Padding="0"
+                                   HasShadow="False"
+                                   VerticalOptions="Center">
+                                <Label Text="✓" 
+                                       FontSize="18" 
+                                       TextColor="White"
+                                       IsVisible="{Binding IsSelected}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Spacing="12" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,60">
+                    <Label Text="🔍" FontSize="48" HorizontalOptions="Center"/>
+                    <Label Text="Продуктів не знайдено" 
+                           FontSize="16" 
+                           TextColor="{StaticResource TextSecondary}"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <!-- Нижня панель з кнопками -->
+        <Grid Grid.Row="3" 
+              ColumnDefinitions="*,2*" 
+              ColumnSpacing="12"
+              Padding="16"
+              BackgroundColor="{StaticResource CardBackground}">
+            
+            <!-- Додати свій продукт -->
+            <Border BackgroundColor="{StaticResource PageBackground}"
+                    StrokeShape="RoundRectangle 14"
+                    Stroke="{StaticResource BorderColor}"
+                    Padding="14">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding AddCustomProductCommand}"/>
+                </Border.GestureRecognizers>
+                <Label Text="+ Свій" 
+                       FontSize="15"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Border>
+            
+            <!-- Підтвердити -->
+            <Border Grid.Column="1"
+                    StrokeShape="RoundRectangle 14"
+                    Stroke="Transparent"
+                    Padding="14">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#6366F1" Offset="0.0" />
+                        <GradientStop Color="#EC4899" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnConfirmClicked"/>
+                </Border.GestureRecognizers>
+                <Label Text="✓ Підтвердити вибір" 
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Border>
+        </Grid>
+
+    </Grid>
+    
+    <ContentPage.Resources>
+        <local:BoolToColorConverter x:Key="BoolToColorConverter" 
+                                    xmlns:local="clr-namespace:NutritionApp.Converters"/>
+    </ContentPage.Resources>
+</ContentPage>

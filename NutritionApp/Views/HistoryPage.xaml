@@ -5,19 +5,15 @@
              xmlns:models="clr-namespace:NutritionApp.Models"
              x:DataType="viewModels:HistoryViewModel"
              x:Class="NutritionApp.Views.HistoryPage"
+             x:Name="HistoryPageRef"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="{StaticResource PageBackground}">
+             Background="{StaticResource PageBackgroundGradient}">
 
     <Grid RowDefinitions="180,*" Padding="0">
 
         <!-- Верхній блок з градієнтом -->
         <Grid Row="0" Padding="0,16,0,16">
-            <Grid.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#4F7DFF" Offset="0.0" />
-                    <GradientStop Color="#E27D5F" Offset="1.0" />
-                </LinearGradientBrush>
-            </Grid.Background>
+
 
             <VerticalStackLayout Spacing="10"
                                  VerticalOptions="Center"
@@ -43,20 +39,99 @@
                 Padding="16"
                 Margin="16,-32,16,16"
                 StrokeShape="RoundRectangle 24">
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,4" Radius="20" Opacity="0.08" />
+            </Border.Shadow>
 
-            <Grid RowDefinitions="Auto,*">
+            <Grid RowDefinitions="Auto,Auto,*">
 
-                <!-- Індикатор завантаження -->
-                <ActivityIndicator Grid.Row="0" 
-                                   IsVisible="{Binding IsLoading}" 
-                                   IsRunning="{Binding IsLoading}" 
-                                   Color="{StaticResource Primary}"
-                                   HorizontalOptions="Center" 
-                                   Margin="0,20,0,10"/>
+                <!-- Tabs -->
+                <Grid Grid.Row="0" ColumnDefinitions="*,*" Padding="0,0,0,16" ColumnSpacing="12">
+                     <Border StrokeShape="RoundRectangle 12" 
+                             Stroke="Transparent"
+                             Padding="12"
+                             HorizontalOptions="Fill">
+                         <Border.Style>
+                             <Style TargetType="Border">
+                                 <Setter Property="BackgroundColor" Value="Transparent"/>
+                                 <Style.Triggers>
+                                     <DataTrigger TargetType="Border" Binding="{Binding IsMealPlanTab}" Value="True">
+                                         <Setter Property="BackgroundColor" Value="#1E3A8A"/>
+                                     </DataTrigger>
+                                 </Style.Triggers>
+                             </Style>
+                         </Border.Style>
+                         <Border.GestureRecognizers>
+                             <TapGestureRecognizer Command="{Binding SwitchTabCommand}" CommandParameter="MealPlan"/>
+                         </Border.GestureRecognizers>
+                         <Label Text="Раціон" 
+                                HorizontalOptions="Center" 
+                                FontAttributes="Bold">
+                             <Label.Style>
+                                 <Style TargetType="Label">
+                                     <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                                     <Style.Triggers>
+                                         <DataTrigger TargetType="Label" Binding="{Binding IsMealPlanTab}" Value="True">
+                                             <Setter Property="TextColor" Value="{StaticResource Primary}"/>
+                                         </DataTrigger>
+                                     </Style.Triggers>
+                                 </Style>
+                             </Label.Style>
+                         </Label>
+                     </Border>
+                     
+                     <Border Grid.Column="1"
+                             StrokeShape="RoundRectangle 12" 
+                             Stroke="Transparent"
+                             Padding="12"
+                             HorizontalOptions="Fill">
+                         <Border.Style>
+                             <Style TargetType="Border">
+                                 <Setter Property="BackgroundColor" Value="Transparent"/>
+                                 <Style.Triggers>
+                                     <DataTrigger TargetType="Border" Binding="{Binding IsWorkoutTab}" Value="True">
+                                         <Setter Property="BackgroundColor" Value="#4C1D95"/>
+                                     </DataTrigger>
+                                 </Style.Triggers>
+                             </Style>
+                         </Border.Style>
+                         <Border.GestureRecognizers>
+                             <TapGestureRecognizer Command="{Binding SwitchTabCommand}" CommandParameter="Workout"/>
+                         </Border.GestureRecognizers>
+                         <Label Text="Тренування" 
+                                HorizontalOptions="Center" 
+                                FontAttributes="Bold">
+                             <Label.Style>
+                                 <Style TargetType="Label">
+                                     <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                                     <Style.Triggers>
+                                         <DataTrigger TargetType="Label" Binding="{Binding IsWorkoutTab}" Value="True">
+                                             <Setter Property="TextColor" Value="#7C3AED"/>
+                                         </DataTrigger>
+                                     </Style.Triggers>
+                                 </Style>
+                             </Label.Style>
+                         </Label>
+                     </Border>
+                </Grid>
 
-                <!-- Список історії -->
-                <CollectionView Grid.Row="1" 
-                                ItemsSource="{Binding MealPlans}" 
+                <!-- Фільтр вибраних та Індикатор завантаження -->
+                <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,10" IsVisible="{Binding IsMealPlanTab}">
+                    <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                        <Switch IsToggled="{Binding ShowFavoritesOnly}" OnColor="{StaticResource Primary}" />
+                        <Label Text="Тільки вибрані ⭐" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" FontSize="14" />
+                    </HorizontalStackLayout>
+                    <ActivityIndicator Grid.Column="1"
+                                       IsVisible="{Binding IsLoading}" 
+                                       IsRunning="{Binding IsLoading}" 
+                                       Color="{StaticResource Primary}"
+                                       VerticalOptions="Center" />
+                </Grid>
+
+                <!-- Список раціонів -->
+                <CollectionView Grid.Row="2" 
+                                ItemsSource="{Binding FilteredMealPlans}" 
+                                IsVisible="{Binding IsMealPlanTab}"
                                 SelectionMode="None">
 
                     <!-- Порожній стан -->
@@ -66,12 +141,12 @@
                                              VerticalOptions="Center"
                                              Margin="0,60,0,0">
                             <Label Text="📭" FontSize="60" HorizontalOptions="Center"/>
-                            <Label Text="Історія порожня"
+                            <Label Text="Немає раціонів"
                                    FontSize="18"
                                    FontAttributes="Bold"
                                    TextColor="{StaticResource TextPrimary}"
                                    HorizontalOptions="Center"/>
-                            <Label Text="Згенеруй свій перший план харчування!"
+                            <Label Text="Згенеруй новий план або зміни фільтр!"
                                    FontSize="14"
                                    TextColor="{StaticResource TextSecondary}"
                                    HorizontalOptions="Center"
@@ -92,13 +167,13 @@
                                                           CommandParameter="{Binding .}"/>
                                 </Border.GestureRecognizers>
 
-                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
 
                                     <!-- Іконка -->
                                     <Border WidthRequest="50" 
                                             HeightRequest="50"
                                             StrokeShape="RoundRectangle 25"
-                                            BackgroundColor="#EFF6FF"
+                                            BackgroundColor="#1E3A8A"
                                             Stroke="Transparent"
                                             VerticalOptions="Center">
                                         <Label Text="🍽️" 
@@ -119,6 +194,113 @@
                                         <Label Text="{Binding Date, StringFormat='{0:dd MMMM yyyy, HH:mm}'}"
                                                FontSize="13"
                                                TextColor="{StaticResource TextSecondary}"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Зірочка (Вибране) -->
+                                    <Label Grid.Column="2"
+                                           Text="☆"
+                                           FontSize="26"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           VerticalOptions="Center"
+                                           Margin="0,0,10,0">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:HistoryViewModel}}, Path=ToggleFavoriteCommand}"
+                                                                  CommandParameter="{Binding .}"/>
+                                        </Label.GestureRecognizers>
+                                        <Label.Style>
+                                            <Style TargetType="Label">
+                                                <Style.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding IsFavorite}" Value="True">
+                                                        <Setter Property="Text" Value="⭐" />
+                                                        <Setter Property="TextColor" Value="#F59E0B" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Label.Style>
+                                    </Label>
+
+                                    <!-- Стрілка -->
+                                    <Label Grid.Column="3"
+                                           Text="›"
+                                           FontSize="28"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           VerticalOptions="Center"
+                                           Margin="0,0,4,0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Список тренувань -->
+                <CollectionView Grid.Row="2" 
+                                ItemsSource="{Binding Workouts}" 
+                                IsVisible="{Binding IsWorkoutTab}"
+                                SelectionMode="None">
+                    
+                     <!-- Порожній стан -->
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Spacing="16"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="Center"
+                                             Margin="0,60,0,0">
+                            <Label Text="🏋️‍♂️" FontSize="60" HorizontalOptions="Center"/>
+                            <Label Text="Історія тренувань порожня"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="Згенеруй своє перше тренування!"
+                                   FontSize="14"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:WorkoutPlan">
+                            <Border Stroke="{StaticResource BorderColor}"
+                                    BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 16"
+                                    Padding="16"
+                                    Margin="0,0,0,12">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding BindingContext.ViewWorkoutDetailsCommand, Source={x:Reference HistoryPageRef}}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <!-- Іконка -->
+                                    <Border WidthRequest="50" 
+                                            HeightRequest="50"
+                                            StrokeShape="RoundRectangle 25"
+                                            BackgroundColor="#4C1D95"
+                                            Stroke="Transparent"
+                                            VerticalOptions="Center">
+                                        <Label Text="🏃" 
+                                               FontSize="22" 
+                                               VerticalOptions="Center" 
+                                               HorizontalOptions="Center"/>
+                                    </Border>
+
+                                    <!-- Інформація -->
+                                    <VerticalStackLayout Grid.Column="1" 
+                                                         Margin="14,0,0,0"
+                                                         VerticalOptions="Center"
+                                                         Spacing="4">
+                                        <Label Text="{Binding Goal, TargetNullValue='(Без назви)'}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimary}"/>
+                                        <Label Text="{Binding CreatedAt, StringFormat='{0:dd MMMM yyyy, HH:mm}'}"
+                                               FontSize="13"
+                                               TextColor="{StaticResource TextSecondary}"/>
+                                        <HorizontalStackLayout Spacing="10">
+                                            <Label Text="{Binding DurationMinutes, StringFormat='⏱️ {0} хв'}" FontSize="12" TextColor="#4B5563"/>
+                                            <Label Text="{Binding Intensity, StringFormat='⚡ {0}'}" FontSize="12" TextColor="#EA580C"/>
+                                        </HorizontalStackLayout>
                                     </VerticalStackLayout>
 
                                     <!-- Стрілка -->

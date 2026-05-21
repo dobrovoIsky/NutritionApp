@@ -11,6 +11,7 @@ namespace NutritionApp.ViewModels
     public class ProfileViewModel : INotifyPropertyChanged
     {
         private readonly ApiService _apiService;
+        private readonly WaterReminderService _waterService;
 
         private UserProfile _userProfile;
         public UserProfile UserProfile
@@ -36,11 +37,7 @@ namespace NutritionApp.ViewModels
             new AvatarOption { Id = 1, ImageSource = "avatar1.png" },
             new AvatarOption { Id = 2, ImageSource = "avatar2.png" },
             new AvatarOption { Id = 3, ImageSource = "avatar3.png" },
-            new AvatarOption { Id = 4, ImageSource = "avatar4.png" },
-            new AvatarOption { Id = 5, ImageSource = "avatar5.png" },
-            new AvatarOption { Id = 6, ImageSource = "avatar6.png" },
-            new AvatarOption { Id = 7, ImageSource = "avatar7.png" },
-            new AvatarOption { Id = 8, ImageSource = "avatar8.png" }
+            new AvatarOption { Id = 4, ImageSource = "avatar4.png" }
         };
 
         private AvatarOption _selectedAvatar;
@@ -53,7 +50,10 @@ namespace NutritionApp.ViewModels
             {
                 if (_selectedAvatar != value)
                 {
+                    if (_selectedAvatar != null) _selectedAvatar.IsSelected = false;
                     _selectedAvatar = value;
+                    if (_selectedAvatar != null) _selectedAvatar.IsSelected = true;
+                    
                     OnPropertyChanged();
                     if (!_isAvatarChanging && value != null)
                     {
@@ -63,11 +63,40 @@ namespace NutritionApp.ViewModels
             }
         }
 
+        public TimeSpan WaterStartTime
+        {
+            get => _waterService.StartTime;
+            set
+            {
+                if (_waterService.StartTime != value)
+                {
+                    _waterService.StartTime = value;
+                    OnPropertyChanged();
+                    _waterService.RestartRemindersInBackground();
+                }
+            }
+        }
+
+        public TimeSpan WaterEndTime
+        {
+            get => _waterService.EndTime;
+            set
+            {
+                if (_waterService.EndTime != value)
+                {
+                    _waterService.EndTime = value;
+                    OnPropertyChanged();
+                    _waterService.RestartRemindersInBackground();
+                }
+            }
+        }
+
         public ICommand LoadUserProfileCommand { get; }
 
-        public ProfileViewModel(ApiService apiService)
+        public ProfileViewModel(ApiService apiService, WaterReminderService waterService)
         {
             _apiService = apiService;
+            _waterService = waterService;
             LoadUserProfileCommand = new Command(async () => await LoadUserProfileAsync(forceRefresh: false));
         }
 
@@ -156,9 +185,22 @@ namespace NutritionApp.ViewModels
         }
     }
 
-    public class AvatarOption
+    public class AvatarOption : INotifyPropertyChanged
     {
         public int Id { get; set; }
         public string ImageSource { get; set; }
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }
