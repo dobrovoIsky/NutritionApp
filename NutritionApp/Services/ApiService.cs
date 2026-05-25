@@ -27,7 +27,7 @@ public class ApiService
         _cacheService = cacheService;
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = new Uri(SERVER_URL);
-        _httpClient.Timeout = TimeSpan.FromSeconds(15);
+        _httpClient.Timeout = TimeSpan.FromSeconds(60); // Increased from 15s to 60s for AI generation and Render cold starts
 
         _jsonOptions = new JsonSerializerOptions
         {
