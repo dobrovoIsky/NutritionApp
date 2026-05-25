@@ -276,9 +276,17 @@ namespace NutritionApp.ViewModels
                         IsAnalyzingImage = true;
                         
                         using var stream = await photo.OpenReadAsync();
+#if ANDROID || IOS || MACCATALYST || WINDOWS
+                        Microsoft.Maui.Graphics.IImage image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream);
+                        Microsoft.Maui.Graphics.IImage downsizedImage = image.Downsize(800, 800, true);
+                        using var memoryStream = new MemoryStream();
+                        downsizedImage.Save(memoryStream);
+                        var imageBytes = memoryStream.ToArray();
+#else
                         using var memoryStream = new MemoryStream();
                         await stream.CopyToAsync(memoryStream);
                         var imageBytes = memoryStream.ToArray();
+#endif
 
                         var result = await _geminiService.AnalyzeFoodImageAsync(imageBytes);
 
