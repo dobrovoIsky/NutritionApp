@@ -187,6 +187,14 @@ namespace NutritionApp.ViewModels
                 int userId = Preferences.Get("UserId", 0);
                 if (userId == 0) return;
 
+                // Запитуємо у користувача куди додати страву
+                string action = await Application.Current.MainPage.DisplayActionSheet("Куди додати страву?", "Скасувати", null, "Сніданок", "Обід", "Вечеря", "Перекус");
+                
+                if (action == "Скасувати" || string.IsNullOrEmpty(action))
+                {
+                    return; // Користувач скасував
+                }
+
                 // Extract numeric weight if possible
                 double weight = 0;
                 var weightStr = new string(food.Weight?.Where(char.IsDigit).ToArray());
@@ -201,13 +209,14 @@ namespace NutritionApp.ViewModels
                     Fat = food.Fat,
                     Carbs = food.Carbs,
                     Weight = weight > 0 ? weight : 100, // Default 100 if couldn't parse
+                    MealType = action, // Встановлюємо вибраний тип
                     LoggedAt = DateTime.UtcNow
                 };
 
                 var saved = await _apiService.LogFoodAsync(entry);
                 if (saved != null)
                 {
-                    await Application.Current.MainPage.DisplayAlert("Успіх", $"'{food.Name}' додано до трекера!", "ОК");
+                    await Application.Current.MainPage.DisplayAlert("Успіх", $"'{food.Name}' додано в {action.ToLower()}!", "ОК");
                 }
                 else
                 {
