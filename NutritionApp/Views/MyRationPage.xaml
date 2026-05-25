@@ -16,78 +16,98 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,*" Padding="0">
+    <Grid RowDefinitions="Auto,*" Padding="16,20,16,0">
         <!-- Header -->
-        <Grid Row="0" Padding="0,16,0,16">
-            <Grid ColumnDefinitions="Auto,*,Auto" Padding="16,0">
-                <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20"
-                        BackgroundColor="{StaticResource CardBackground}" Stroke="{StaticResource BorderColor}"
-                        HorizontalOptions="Start">
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding GoBackCommand}" />
-                    </Border.GestureRecognizers>
-                    <Label Text="‹" FontSize="28" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" HorizontalOptions="Center"/>
-                </Border>
-                <Label Grid.Column="1" Text="Мій раціон" FontAttributes="Bold" FontSize="24" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" VerticalOptions="Center"/>
-            </Grid>
+        <Grid Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,24">
+            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20"
+                    BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                    HorizontalOptions="Start" VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}" />
+                </Border.GestureRecognizers>
+                <Label Text="‹" FontSize="28" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" HorizontalOptions="Center" Margin="0,-4,0,0"/>
+            </Border>
+            
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="16,0,0,0">
+                <Label Text="Статистика" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                <Label Text="Мій раціон" FontAttributes="Bold" FontSize="32" TextColor="{StaticResource TextPrimary}" />
+            </VerticalStackLayout>
         </Grid>
 
         <!-- Content -->
-        <Border Grid.Row="1"
-                BackgroundColor="{StaticResource CardBackground}"
-                Stroke="{StaticResource BorderColor}"
-                StrokeThickness="1"
-                Padding="16"
-                Margin="16,0,16,16"
-                StrokeShape="RoundRectangle 24">
-
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never" Padding="0,0,0,40">
             <Grid>
-                <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="{StaticResource Primary}" HorizontalOptions="Center" VerticalOptions="Center"/>
+                <ActivityIndicator IsRunning="{Binding IsLoading}" IsVisible="{Binding IsLoading}" Color="{StaticResource Primary}" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,40,0,0"/>
 
                 <CollectionView ItemsSource="{Binding MealGroups}" IsGrouped="True" IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
                     <CollectionView.GroupHeaderTemplate>
                         <DataTemplate x:DataType="viewModels:MealGroup">
-                            <Grid ColumnDefinitions="*,Auto" Padding="0,10,0,10">
+                            <Grid ColumnDefinitions="*,Auto" Padding="0,15,0,15">
                                 <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                                    <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="18" TextColor="{StaticResource TextPrimary}" />
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="20" TextColor="{StaticResource TextPrimary}" />
                                     <Label Text="{Binding TotalCalories, StringFormat='({0} ккал)'}" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
                                 </HorizontalStackLayout>
-                                <Border Grid.Column="1" BackgroundColor="{StaticResource CardBackground}" WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 18" Stroke="{StaticResource Primary}">
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:MyRationViewModel}}, Path=AddFoodCommand}" CommandParameter="{Binding .}"/>
-                                    </Border.GestureRecognizers>
-                                    <Label Text="+" FontSize="24" TextColor="{StaticResource Primary}" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,-2,0,0"/>
-                                </Border>
+                                
+                                <Image Grid.Column="1" Source="plus_my_ration.png" WidthRequest="26" HeightRequest="26" HorizontalOptions="End" VerticalOptions="Center">
+                                    <Image.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnAddFoodTapped" />
+                                    </Image.GestureRecognizers>
+                                </Image>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.GroupHeaderTemplate>
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:FoodEntry">
-                            <Border Stroke="{StaticResource BorderColor}"
-                                    BackgroundColor="{StaticResource CardBackground}"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 12"
-                                    Padding="12"
-                                    Margin="0,0,0,8">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <VerticalStackLayout>
-                                        <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="14" TextColor="{StaticResource TextPrimary}"/>
-                                        <Label Text="{Binding Weight, StringFormat='{0} г'}" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
-                                    </VerticalStackLayout>
-                                    <Label Grid.Column="1" Text="{Binding Calories, StringFormat='{0} ккал'}" FontAttributes="Bold" FontSize="14" TextColor="{StaticResource Primary}" VerticalOptions="Center"/>
-                                </Grid>
-                            </Border>
+                            <SwipeView Margin="0,0,0,12">
+                                <SwipeView.RightItems>
+                                    <SwipeItems Mode="Reveal">
+                                        <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:MyRationViewModel}}, Path=EditFoodCommand}"
+                                                       CommandParameter="{Binding .}">
+                                            <Border BackgroundColor="{StaticResource PageBackground}" StrokeThickness="1" Stroke="{StaticResource BorderColor}" StrokeShape="RoundRectangle 12" WidthRequest="75" Margin="8,0,0,0">
+                                                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="4">
+                                                    <Label Text="✎" FontSize="20" TextColor="{StaticResource Primary}" HorizontalOptions="Center"/>
+                                                    <Label Text="Редаг." FontSize="10" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center"/>
+                                                </VerticalStackLayout>
+                                            </Border>
+                                        </SwipeItemView>
+                                        <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:MyRationViewModel}}, Path=DeleteFoodCommand}"
+                                                       CommandParameter="{Binding .}">
+                                            <Border BackgroundColor="{StaticResource PageBackground}" StrokeThickness="1" Stroke="{StaticResource BorderColor}" StrokeShape="RoundRectangle 12" WidthRequest="75" Margin="8,0,0,0">
+                                                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="4">
+                                                    <Label Text="✕" FontSize="20" TextColor="#F44336" HorizontalOptions="Center"/>
+                                                    <Label Text="Видал." FontSize="10" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center"/>
+                                                </VerticalStackLayout>
+                                            </Border>
+                                        </SwipeItemView>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+                                
+                                <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <VerticalStackLayout Spacing="4">
+                                            <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource TextPrimary}"/>
+                                            <HorizontalStackLayout Spacing="10">
+                                                <Label Text="{Binding Weight, StringFormat='{0} г'}" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
+                                                <Label Text="{Binding Protein, StringFormat='Б:{0}'}" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                                                <Label Text="{Binding Fat, StringFormat='Ж:{0}'}" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                                                <Label Text="{Binding Carbs, StringFormat='В:{0}'}" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="1" Text="{Binding Calories, StringFormat='{0} ккал'}" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Primary}" VerticalOptions="Center"/>
+                                    </Grid>
+                                </Border>
+                            </SwipeView>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
 
                     <CollectionView.GroupFooterTemplate>
                         <DataTemplate>
-                            <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" Margin="0,5,0,15"/>
+                            <BoxView HeightRequest="1" Color="#1E2019" Margin="0,8,0,16"/>
                         </DataTemplate>
                     </CollectionView.GroupFooterTemplate>
                 </CollectionView>
             </Grid>
-        </Border>
+        </ScrollView>
     </Grid>
 </ContentPage>

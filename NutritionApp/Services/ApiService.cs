@@ -27,7 +27,7 @@ public class ApiService
         _cacheService = cacheService;
         _httpClient = new HttpClient();
         _httpClient.BaseAddress = new Uri(SERVER_URL);
-        _httpClient.Timeout = TimeSpan.FromSeconds(100);
+        _httpClient.Timeout = TimeSpan.FromSeconds(15);
 
         _jsonOptions = new JsonSerializerOptions
         {
@@ -158,6 +158,9 @@ public class ApiService
         
         try
         {
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                throw new Exception("Offline");
+
             Debug.WriteLine($"Get profile for userId: {userId}");
             var json = await _httpClient.GetStringAsync($"/api/Profile/{userId}");
             Debug.WriteLine($"Profile response: {json}");
@@ -299,6 +302,9 @@ public class ApiService
         
         try
         {
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                throw new Exception("Offline");
+
             var json = await _httpClient.GetStringAsync($"/api/nutrition/history/{userId}");
             var history = JsonSerializer.Deserialize<List<Models.MealPlan>>(json, _jsonOptions);
             
@@ -422,6 +428,9 @@ public class ApiService
         
         try
         {
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                throw new Exception("Offline");
+
             var response = await _httpClient.GetAsync($"/api/Workouts/history/{userId}");
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
@@ -462,46 +471,111 @@ public class ApiService
         try
         {
             var response = await _httpClient.PostAsJsonAsync("/api/tracker/log", entry);
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<FoodEntry>(json, _jsonOptions);
+            var content = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine($"LogFood response: {response.StatusCode}, Content: {content}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var savedEntry = JsonSerializer.Deserialize<FoodEntry>(content, _jsonOptions);
+                ClearMemoryCache();
+                return savedEntry;
+            }
+            return null;
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"LogFoodAsync exception: {ex.Message}");
+            Debug.WriteLine($"LogFood exception: {ex.Message}");
             return null;
+        }
+    }
+
+    public async Task<FoodEntry> UpdateFoodEntryAsync(int id, FoodEntry entry)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync($"/api/tracker/log/{id}", entry);
+            var content = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                var updatedEntry = JsonSerializer.Deserialize<FoodEntry>(content, _jsonOptions);
+                ClearMemoryCache();
+                return updatedEntry;
+            }
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"UpdateFoodEntry exception: {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<bool> DeleteFoodEntryAsync(int id)
+    {
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"/api/tracker/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                ClearMemoryCache();
+                return true;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"DeleteFoodEntry exception: {ex.Message}");
+            return false;
         }
     }
 
     public async Task<List<FoodEntry>> GetDailyFoodEntriesAsync(int userId, DateTime? date = null)
     {
+        var dateStr = date?.ToString("yyyy-MM-dd");
+        string cacheKey = $"food_entries_{userId}_{dateStr}";
+
         try
         {
-            var dateStr = date?.ToString("yyyy-MM-dd");
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                throw new Exception("Offline");
+
             var url = $"/api/tracker/daily/{userId}" + (dateStr != null ? $"?date={dateStr}" : "");
             var json = await _httpClient.GetStringAsync(url);
-            return JsonSerializer.Deserialize<List<FoodEntry>>(json, _jsonOptions) ?? new List<FoodEntry>();
+            var result = JsonSerializer.Deserialize<List<FoodEntry>>(json, _jsonOptions) ?? new List<FoodEntry>();
+            
+            await _cacheService.SaveAsync(cacheKey, result);
+            return result;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"GetDailyFoodEntriesAsync exception: {ex.Message}");
-            return new List<FoodEntry>();
+            var cached = await _cacheService.GetAsync<List<FoodEntry>>(cacheKey);
+            return cached ?? new List<FoodEntry>();
         }
     }
 
     public async Task<DailySummary> GetDailySummaryAsync(int userId, DateTime? date = null)
     {
+        var dateStr = date?.ToString("yyyy-MM-dd");
+        string cacheKey = $"daily_summary_{userId}_{dateStr}";
+
         try
         {
-            var dateStr = date?.ToString("yyyy-MM-dd");
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                throw new Exception("Offline");
+
             var url = $"/api/tracker/summary/{userId}" + (dateStr != null ? $"?date={dateStr}" : "");
             var json = await _httpClient.GetStringAsync(url);
-            return JsonSerializer.Deserialize<DailySummary>(json, _jsonOptions);
+            var result = JsonSerializer.Deserialize<DailySummary>(json, _jsonOptions) ?? new DailySummary();
+
+            await _cacheService.SaveAsync(cacheKey, result);
+            return result;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"GetDailySummaryAsync exception: {ex.Message}");
-            return new DailySummary();
+            var cached = await _cacheService.GetAsync<DailySummary>(cacheKey);
+            return cached ?? new DailySummary();
         }
     }
 
@@ -521,11 +595,14 @@ public class ApiService
 
     public async Task<List<FoodDatabaseItem>> GetFoodDatabaseItemsAsync()
     {
+        string cacheKey = "food_database_items";
         try
         {
-            string cacheKey = "food_database_items";
             var cached = GetFromMemoryCache<List<FoodDatabaseItem>>(cacheKey);
             if (cached != null) return cached;
+
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                throw new Exception("Offline");
 
             var json = await _httpClient.GetStringAsync("/api/tracker/products");
             var items = JsonSerializer.Deserialize<List<FoodDatabaseItem>>(json, _jsonOptions);
@@ -533,6 +610,7 @@ public class ApiService
             if (items != null)
             {
                 SetMemoryCache(cacheKey, items, TimeSpan.FromHours(24));
+                await _cacheService.SaveAsync(cacheKey, items);
                 return items;
             }
             return new List<FoodDatabaseItem>();
@@ -540,7 +618,8 @@ public class ApiService
         catch (Exception ex)
         {
             Debug.WriteLine($"GetFoodDatabaseItemsAsync exception: {ex.Message}");
-            return new List<FoodDatabaseItem>();
+            var persistentCached = await _cacheService.GetAsync<List<FoodDatabaseItem>>(cacheKey);
+            return persistentCached ?? new List<FoodDatabaseItem>();
         }
     }
 

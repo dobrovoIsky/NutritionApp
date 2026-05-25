@@ -11,8 +11,10 @@
    <Color x:Key="TextSecondary">#8E8E93</Color>  
 
    <Color x:Key="PageBackground">#000000</Color>  
-   <Color x:Key="CardBackground">#151515</Color>
-   <Color x:Key="BorderColor">#252525</Color>  
+   <Color x:Key="CardBackground">#1A1A1A</Color>
+   <Color x:Key="BorderColor">#252525</Color>
+   <Color x:Key="DockBackground">#99151520</Color>
+   <Color x:Key="DockBorder">#33FFFFFF</Color>
 
    <Color x:Key="Success">#CCFF00</Color>  
    <Color x:Key="Error">#FF3B30</Color>     
@@ -23,14 +25,17 @@
    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>  
    <SolidColorBrush x:Key="PageBackgroundBrush" Color="{StaticResource PageBackground}"/>  
    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackground}"/>  
-   <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>  
+   <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
+   <SolidColorBrush x:Key="DockBackgroundBrush" Color="{StaticResource DockBackground}"/>
+   <SolidColorBrush x:Key="DockBorderBrush" Color="{StaticResource DockBorder}"/>
    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource Success}"/>  
    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource Error}"/>  
 
    <!-- Blurred/gradient page background -->
-   <RadialGradientBrush x:Key="PageBackgroundGradient" Center="0.5,0.15" Radius="0.85">
-       <GradientStop Color="#0D1A00" Offset="0.0" />
-       <GradientStop Color="#050A00" Offset="0.4" />
+   <RadialGradientBrush x:Key="PageBackgroundGradient" Center="0.5, 0.2" Radius="1.2">
+       <GradientStop Color="#232813" Offset="0.0" />
+       <GradientStop Color="#101209" Offset="0.4" />
+       <GradientStop Color="#040502" Offset="0.8" />
        <GradientStop Color="#000000" Offset="1.0" />
    </RadialGradientBrush>  
 </ResourceDictionary>

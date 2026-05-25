@@ -4,46 +4,49 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:NutritionApp.Views"
+    xmlns:behaviors="clr-namespace:NutritionApp.Behaviors"
     Shell.FlyoutBehavior="Disabled"
-    Shell.TabBarBackgroundColor="#0F111F"
-    Shell.TabBarTitleColor="#6366F1"
-    Shell.TabBarUnselectedColor="#64748B"
+    Shell.TabBarIsVisible="False"
     Shell.BackgroundColor="#0F111F">
+
+    <Shell.Behaviors>
+        <behaviors:FloatingTabBarShellBehavior />
+    </Shell.Behaviors>
 
     <ShellContent
         Title="Вхід"
         ContentTemplate="{DataTemplate local:LoginPage}"
         Route="LoginPage" />
 
-    <TabBar Route="MainApp">
+    <TabBar Route="MainApp" Shell.TabBarIsVisible="False">
         <ShellContent
             Title="Головна"
             Route="MainPage"
-            Icon="home.png" 
+            Icon="home_silhouette.png" 
             ContentTemplate="{DataTemplate local:MainPage}" />
 
         <ShellContent
             Title="Раціон"
             Route="MealPlanPage"
-            Icon="settings.png" 
+            Icon="restaurant_icon.png" 
             ContentTemplate="{DataTemplate local:MealPlanPage}" />
 
         <ShellContent
             Title="Історія"
             Route="HistoryPage"
-            Icon="history.png" 
+            Icon="history_icon.png" 
             ContentTemplate="{DataTemplate local:HistoryPage}" />
 
         <ShellContent
             Title="Тренування"
             Route="WorkoutPage"
-            Icon="workout_icon.png"
+            Icon="dumbbell_icon.png"
             ContentTemplate="{DataTemplate local:WorkoutPage}" />
 
         <ShellContent
             Title="Профіль"
             Route="ProfilePage"
-            Icon="user.png" 
+            Icon="avatar_icon.png" 
             ContentTemplate="{DataTemplate local:ProfilePage}" />
 
     </TabBar>

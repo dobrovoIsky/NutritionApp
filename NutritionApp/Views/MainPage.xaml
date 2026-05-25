@@ -23,7 +23,7 @@
         </VerticalStackLayout>
 
         <!-- Scrollable Content -->
-        <ScrollView Grid.Row="1" BackgroundColor="Transparent" VerticalScrollBarVisibility="Never">
+        <ScrollView Grid.Row="1" BackgroundColor="Transparent" VerticalScrollBarVisibility="Never" Padding="0,0,0,72">
             <VerticalStackLayout Spacing="16" Padding="0,0,0,20">
 
                 <ActivityIndicator IsVisible="{Binding IsLoading}"
@@ -39,7 +39,7 @@
                                    TextColor="{StaticResource TextPrimary}"
                                    VerticalOptions="Center" />
                             <Border Grid.Column="1" BackgroundColor="{StaticResource Primary}" WidthRequest="28" HeightRequest="28" StrokeShape="RoundRectangle 14" StrokeThickness="0">
-                                <Label Text="⚡" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" TextColor="Black"/>
+                                <Image Source="fire_icon.png" WidthRequest="16" HeightRequest="16" HorizontalOptions="Center" VerticalOptions="Center"/>
                             </Border>
                         </Grid>
 
@@ -69,6 +69,70 @@
                                        IsVisible="{Binding ShowStepsTile}" />
                             </VerticalStackLayout>
                         </Grid>
+
+                        <!-- Weekly Chart -->
+                        <HorizontalStackLayout Spacing="8" 
+                                               HorizontalOptions="Center" 
+                                               BindableLayout.ItemsSource="{Binding WeeklyStats}"
+                                               HeightRequest="110"
+                                               Margin="0,16,0,0">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="viewModels:DailyStatItem">
+                                    <VerticalStackLayout Spacing="6" VerticalOptions="End" WidthRequest="32">
+                                        
+                                        <!-- Value Bubble for Today -->
+                                        <Border IsVisible="{Binding IsToday}"
+                                                BackgroundColor="White"
+                                                StrokeThickness="0"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="4,2"
+                                                HorizontalOptions="Center"
+                                                Margin="0,0,0,-2">
+                                            <Label Text="{Binding Value, StringFormat='{0:F0}'}" 
+                                                   FontSize="9" 
+                                                   FontAttributes="Bold" 
+                                                   TextColor="Black" 
+                                                   HorizontalOptions="Center"/>
+                                        </Border>
+                                        
+                                        <!-- Empty space if not today to keep alignment -->
+                                        <BoxView IsVisible="{Binding IsToday, Converter={StaticResource InvertedBoolConverter}}"
+                                                 HeightRequest="15" Color="Transparent"/>
+
+                                        <!-- Vertical Progress Bar -->
+                                        <Grid HeightRequest="70" WidthRequest="18" VerticalOptions="End" HorizontalOptions="Center">
+                                            <!-- Track background (gray/olive) -->
+                                            <Border Background="#1E2019" StrokeThickness="0" StrokeShape="RoundRectangle 9" />
+                                            <!-- Fill foreground (green) -->
+                                            <Border HeightRequest="{Binding BarHeight}" 
+                                                    VerticalOptions="End" 
+                                                    StrokeThickness="0" 
+                                                    StrokeShape="RoundRectangle 9">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <!-- Past days: darker solid green -->
+                                                        <Setter Property="Background" Value="#7A9900" />
+                                                        <Style.Triggers>
+                                                            <!-- Today: bright green -->
+                                                            <DataTrigger TargetType="Border" Binding="{Binding IsToday}" Value="True">
+                                                                <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- Day Label -->
+                                        <Label Text="{Binding Day}" 
+                                               FontSize="10" 
+                                               TextColor="{StaticResource TextSecondary}"
+                                               HorizontalOptions="Center" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                        
                     </VerticalStackLayout>
                 </Border>
 
@@ -95,7 +159,7 @@
                                     TrackColor="#1A1A1A"
                                     ProgressColor="{StaticResource Primary}"
                                     Thickness="5" />
-                                <Label Text="г" FontSize="11" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                <Image Source="proteins_icon.png" WidthRequest="20" HeightRequest="20" HorizontalOptions="Center" VerticalOptions="Center"/>
                             </Grid>
                         </Grid>
                     </Border>
@@ -114,7 +178,7 @@
                                     TrackColor="#1A1A1A"
                                     ProgressColor="{StaticResource Primary}"
                                     Thickness="5" />
-                                <Label Text="г" FontSize="11" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                <Image Source="pizza_icon.png" WidthRequest="20" HeightRequest="20" HorizontalOptions="Center" VerticalOptions="Center"/>
                             </Grid>
                         </Grid>
                     </Border>
@@ -133,7 +197,7 @@
                                     TrackColor="#1A1A1A"
                                     ProgressColor="{StaticResource Primary}"
                                     Thickness="5" />
-                                <Label Text="г" FontSize="11" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                <Image Source="bread_icon.png" WidthRequest="20" HeightRequest="20" HorizontalOptions="Center" VerticalOptions="Center"/>
                             </Grid>
                         </Grid>
                     </Border>
@@ -155,7 +219,7 @@
                                     TrackColor="#1A1A1A"
                                     ProgressColor="{StaticResource Primary}"
                                     Thickness="5" />
-                                <Label Text="👟" FontSize="11" HorizontalOptions="Center" VerticalOptions="Center" />
+                                <Image Source="sneaker_icon.png" WidthRequest="20" HeightRequest="20" HorizontalOptions="Center" VerticalOptions="Center"/>
                             </Grid>
                         </Grid>
                     </Border>

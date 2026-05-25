@@ -7,7 +7,7 @@ using NutritionApp.Services;
 
 namespace NutritionApp.ViewModels
 {
-    public class AddFoodViewModel : INotifyPropertyChanged, IQueryAttributable
+    public class AddFoodViewModel : INotifyPropertyChanged
     {
         private string _mealType;
         public string MealType
@@ -15,7 +15,15 @@ namespace NutritionApp.ViewModels
             get => _mealType;
             set { _mealType = value; OnPropertyChanged(); }
         }
+
+        private int? _editEntryId;
+        public int? EditEntryId
+        {
+            get => _editEntryId;
+            set { _editEntryId = value; OnPropertyChanged(); }
+        }
         private readonly ApiService _apiService;
+        private readonly GeminiService _geminiService;
         private List<FoodDatabaseItem> _allProducts = new();
         
         private string _name;
@@ -87,23 +95,25 @@ namespace NutritionApp.ViewModels
             set { _isLoading = value; OnPropertyChanged(); }
         }
 
-        public ICommand SaveCommand { get; }
+        private bool _isAnalyzingImage;
+        public bool IsAnalyzingImage
+        {
+            get => _isAnalyzingImage;
+            set { _isAnalyzingImage = value; OnPropertyChanged(); }
+        }
 
-        public AddFoodViewModel(ApiService apiService)
+        public ICommand SaveCommand { get; }
+        public ICommand AnalyzeFoodImageCommand { get; }
+
+        public AddFoodViewModel(ApiService apiService, GeminiService geminiService)
         {
             _apiService = apiService;
+            _geminiService = geminiService;
             SaveCommand = new Command(async () => await SaveFoodAsync());
+            AnalyzeFoodImageCommand = new Command(async () => await AnalyzeFoodImageAsync());
             
             // Load products in background
             _ = LoadProductsAsync();
-        }
-
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
-        {
-            if (query.ContainsKey("mealType"))
-            {
-                MealType = query["mealType"]?.ToString();
-            }
         }
 
         private async Task LoadProductsAsync()
@@ -113,6 +123,32 @@ namespace NutritionApp.ViewModels
             {
                 _allProducts = products;
             }
+        }
+
+        public void InitializeForEdit(FoodEntry entry)
+        {
+            EditEntryId = entry.Id;
+            MealType = entry.MealType;
+            Name = entry.Name;
+
+            double weightMultiplier = entry.Weight > 0 ? entry.Weight / 100.0 : 1;
+            _selectedProduct = new FoodDatabaseItem 
+            {
+                Name = entry.Name,
+                CaloriesPer100g = Math.Round(entry.Calories / weightMultiplier, 1),
+                ProteinPer100g = Math.Round(entry.Protein / weightMultiplier, 1),
+                FatPer100g = Math.Round(entry.Fat / weightMultiplier, 1),
+                CarbsPer100g = Math.Round(entry.Carbs / weightMultiplier, 1)
+            };
+            OnPropertyChanged(nameof(SelectedProduct));
+
+            Calories = entry.Calories.ToString();
+            Protein = entry.Protein.ToString();
+            Fat = entry.Fat.ToString();
+            Carbs = entry.Carbs.ToString();
+            Weight = entry.Weight.ToString();
+            // Don't show dropdown when editing
+            ShowDropdown = false;
         }
 
         private void FilterProducts()
@@ -186,7 +222,17 @@ namespace NutritionApp.ViewModels
                     LoggedAt = DateTime.UtcNow
                 };
 
-                var saved = await _apiService.LogFoodAsync(entry);
+                // Debug display alert removed for cleanliness
+                FoodEntry saved;
+                if (_editEntryId.HasValue)
+                {
+                    saved = await _apiService.UpdateFoodEntryAsync(_editEntryId.Value, entry);
+                }
+                else
+                {
+                    saved = await _apiService.LogFoodAsync(entry);
+                }
+
                 if (saved != null)
                 {
                     await Shell.Current.Navigation.PopAsync();
@@ -199,6 +245,69 @@ namespace NutritionApp.ViewModels
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        private async Task AnalyzeFoodImageAsync()
+        {
+            if (IsAnalyzingImage) return;
+
+            try
+            {
+                if (MediaPicker.Default.IsCaptureSupported)
+                {
+                    // Request camera permission
+                    var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
+                    if (status != PermissionStatus.Granted)
+                    {
+                        status = await Permissions.RequestAsync<Permissions.Camera>();
+                    }
+
+                    if (status != PermissionStatus.Granted)
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Помилка", "Доступ до камери заборонено.", "ОК");
+                        return;
+                    }
+
+                    var photo = await MediaPicker.Default.CapturePhotoAsync();
+
+                    if (photo != null)
+                    {
+                        IsAnalyzingImage = true;
+                        
+                        using var stream = await photo.OpenReadAsync();
+                        using var memoryStream = new MemoryStream();
+                        await stream.CopyToAsync(memoryStream);
+                        var imageBytes = memoryStream.ToArray();
+
+                        var result = await _geminiService.AnalyzeFoodImageAsync(imageBytes);
+
+                        if (result != null)
+                        {
+                            Weight = "100"; // Default weight from gemini prompt
+                            SelectedProduct = result;
+                            
+                            // Let the user know
+                            await Application.Current.MainPage.DisplayAlert("Успіх", $"Розпізнано: {result.Name}", "Клас!");
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Упс", "Не вдалося розпізнати їжу на фото. Спробуйте ще раз.", "ОК");
+                        }
+                    }
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert("Помилка", "Ваш пристрій не підтримує зйомку фото.", "ОК");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Помилка", $"Сталася помилка: {ex.Message}", "ОК");
+            }
+            finally
+            {
+                IsAnalyzingImage = false;
             }
         }
 

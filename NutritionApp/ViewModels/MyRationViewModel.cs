@@ -54,13 +54,17 @@ namespace NutritionApp.ViewModels
 
         public ICommand LoadDataCommand { get; }
         public ICommand AddFoodCommand { get; }
+        public ICommand EditFoodCommand { get; }
+        public ICommand DeleteFoodCommand { get; }
         public ICommand GoBackCommand { get; }
 
         public MyRationViewModel(ApiService apiService)
         {
             _apiService = apiService;
             LoadDataCommand = new Command(async () => await LoadDataAsync());
-            AddFoodCommand = new Command<MealGroup>(async (group) => await GoToAddFood(group?.Name));
+            AddFoodCommand = new Command<string>(async (mealType) => await GoToAddFood(mealType));
+            EditFoodCommand = new Command<FoodEntry>(async (entry) => await EditFoodAsync(entry));
+            DeleteFoodCommand = new Command<FoodEntry>(async (entry) => await DeleteFoodAsync(entry));
             GoBackCommand = new Command(async () => await Shell.Current.Navigation.PopAsync());
             
             InitializeGroups();
@@ -114,11 +118,8 @@ namespace NutritionApp.ViewModels
             _isNavigating = true;
             try 
             { 
-                var navParams = new Dictionary<string, object>
-                {
-                    { "mealType", mealType }
-                };
-                await Shell.Current.GoToAsync(nameof(Views.AddFoodPage), navParams); 
+                var encodedMealType = Uri.EscapeDataString(mealType ?? "Перекус");
+                await Shell.Current.GoToAsync($"{nameof(Views.AddFoodPage)}?mealType={encodedMealType}");
             }
             finally { await Task.Delay(500); _isNavigating = false; }
         }
@@ -127,6 +128,40 @@ namespace NutritionApp.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        private async Task EditFoodAsync(FoodEntry entry)
+        {
+            if (entry == null) return;
+            
+            var navigationParameter = new Dictionary<string, object>
+            {
+                { "foodEntry", entry }
+            };
+            await Shell.Current.GoToAsync($"{nameof(Views.AddFoodPage)}", navigationParameter);
+        }
+
+        private async Task DeleteFoodAsync(FoodEntry entry)
+        {
+            if (entry == null) return;
+
+            bool confirm = await Application.Current.MainPage.DisplayAlert("Видалення", $"Видалити {entry.Name}?", "Так", "Ні");
+            if (!confirm) return;
+
+            var success = await _apiService.DeleteFoodEntryAsync(entry.Id);
+            if (success)
+            {
+                // Remove from local collection
+                var group = MealGroups.FirstOrDefault(g => g.Contains(entry));
+                if (group != null)
+                {
+                    group.Remove(entry);
+                    group.UpdateCalories();
+                }
+            }
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert("Помилка", "Не вдалося видалити запис", "ОК");
+            }
         }
     }
 }

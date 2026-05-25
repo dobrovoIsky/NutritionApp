@@ -5,41 +5,29 @@
              Shell.NavBarIsVisible="False"
              Background="{DynamicResource PageBackgroundGradient}">
 
-    <Grid RowDefinitions="160,*" Padding="0">
+    <Grid RowDefinitions="Auto,*" Padding="16,20,16,0">
         <!-- Header -->
-        <Grid Row="0" Padding="0,16,0,16">
-
-
-            <!-- Back Button -->
-            <Border WidthRequest="40" 
-                    HeightRequest="40"
-                    StrokeShape="RoundRectangle 20"
-                    BackgroundColor="#FFFFFF33"
-                    Stroke="Transparent"
-                    HorizontalOptions="Start"
-                    VerticalOptions="Start"
-                    Margin="16,16,0,0">
+        <Grid Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,24">
+            <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20"
+                    BackgroundColor="#FFFFFF22" Stroke="White" StrokeThickness="1"
+                    HorizontalOptions="Start" VerticalOptions="Center" Margin="0,0,16,0">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnBackClicked"/>
                 </Border.GestureRecognizers>
-                <Label Text="вЂ№" FontSize="28" TextColor="White" VerticalOptions="Center" HorizontalOptions="Center"/>
+                <Label Text="‹" FontSize="28" TextColor="White" VerticalOptions="Center" HorizontalOptions="Center" TranslationY="-2"/>
             </Border>
 
-            <VerticalStackLayout Spacing="8" VerticalOptions="Center" HorizontalOptions="Center">
-                <Label Text="Р”РµС‚Р°Р»С– С‚СЂРµРЅСѓРІР°РЅРЅСЏ" FontAttributes="Bold" FontSize="22" TextColor="White" HorizontalOptions="Center"/>
-                <Label x:Name="GoalLabel" FontSize="14" TextColor="#FFEFF2" HorizontalOptions="Center"/>
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                <Label x:Name="GoalLabel" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                <Label Text="Деталі тренування" FontAttributes="Bold" FontSize="32" TextColor="{StaticResource TextPrimary}" />
             </VerticalStackLayout>
         </Grid>
 
         <!-- Content -->
-        <Border Grid.Row="1" BackgroundColor="{DynamicResource CardBackground}" Stroke="{DynamicResource BorderColor}" StrokeThickness="1" 
-                Padding="16" Margin="16,-32,16,16" StrokeShape="RoundRectangle 24">
-            <ScrollView>
-                <VerticalStackLayout x:Name="ContentContainer" Spacing="16">
-                    <!-- Dynamic Content -->
-                </VerticalStackLayout>
-            </ScrollView>
-        </Border>
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never" Padding="0,0,0,40">
+            <VerticalStackLayout x:Name="ContentContainer" Spacing="16">
+                <!-- Dynamic Content -->
+            </VerticalStackLayout>
+        </ScrollView>
     </Grid>
 </ContentPage>
-

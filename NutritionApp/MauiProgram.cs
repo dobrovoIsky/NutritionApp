@@ -29,6 +29,7 @@ namespace NutritionApp
             builder.Services.AddTransient<ProfileViewModel>();
             builder.Services.AddSingleton<CacheService>();
             builder.Services.AddSingleton<ApiService>();
+            builder.Services.AddSingleton<GeminiService>();
 #if ANDROID
             builder.Services.AddSingleton<IPedometerService, Platforms.Android.PedometerService>();
 #else

@@ -1,7 +1,6 @@
 using Android;
 using Android.Content;
 using Android.Content.PM;
-using Android.Hardware;
 using Android.OS;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
@@ -10,21 +9,26 @@ using NutritionApp.Services;
 
 namespace NutritionApp.Platforms.Android;
 
-public class PedometerService : Java.Lang.Object, IPedometerService, ISensorEventListener
+public class PedometerService : IPedometerService
 {
-    private const string BaselineDateKey = "PedometerBaselineDate";
-    private const string BaselineValueKey = "PedometerBaselineValue";
-
-    private SensorManager? _sensorManager;
-    private Sensor? _stepCounter;
-    private float _baseline;
     private int _todaySteps;
-
     public bool IsSupported { get; private set; }
 
     public int TodaySteps => _todaySteps;
 
     public event EventHandler<int>? StepsChanged;
+
+    public PedometerService()
+    {
+        Microsoft.Maui.Controls.MessagingCenter.Subscribe<PedometerForegroundService, int>(this, "StepsUpdated", (sender, steps) =>
+        {
+            _todaySteps = steps;
+            StepsChanged?.Invoke(this, steps);
+        });
+        
+        // Initial load
+        _todaySteps = Preferences.Get("TodaySteps", 0);
+    }
 
     public Task<bool> EnsurePermissionAsync()
     {
@@ -51,63 +55,23 @@ public class PedometerService : Java.Lang.Object, IPedometerService, ISensorEven
             return;
         }
 
-        var context = Platform.CurrentActivity ?? Platform.AppContext;
-        _sensorManager = (SensorManager?)context.GetSystemService(Context.SensorService);
-        _stepCounter = _sensorManager?.GetDefaultSensor(SensorType.StepCounter);
-
-        if (_stepCounter == null)
-        {
-            IsSupported = false;
-            return;
-        }
-
         IsSupported = true;
-        EnsureBaselineForToday(0);
-        _sensorManager.RegisterListener(this, _stepCounter, SensorDelay.Normal);
+        
+        var context = Platform.CurrentActivity ?? Platform.AppContext;
+        var intent = new Intent(context, typeof(PedometerForegroundService));
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            context.StartForegroundService(intent);
+        else
+            context.StartService(intent);
+            
+        // Initial trigger to refresh UI
+        StepsChanged?.Invoke(this, _todaySteps);
     }
 
     public void Stop()
     {
-        if (_sensorManager != null && _stepCounter != null)
-            _sensorManager.UnregisterListener(this, _stepCounter);
-    }
-
-    public void OnAccuracyChanged(Sensor? sensor, SensorStatus accuracy) { }
-
-    public void OnSensorChanged(SensorEvent? e)
-    {
-        if (e?.Values == null || e.Values.Count == 0)
-            return;
-
-        var cumulative = e.Values[0];
-        EnsureBaselineForToday(cumulative);
-        UpdateSteps(cumulative);
-    }
-
-    private void EnsureBaselineForToday(float cumulative)
-    {
-        var today = DateTime.Today.ToString("O");
-        var savedDate = Preferences.Get(BaselineDateKey, string.Empty);
-
-        if (savedDate != today)
-        {
-            _baseline = cumulative > 0 ? cumulative : 0;
-            Preferences.Set(BaselineDateKey, today);
-            Preferences.Set(BaselineValueKey, _baseline);
-            UpdateSteps(cumulative);
-            return;
-        }
-
-        _baseline = (float)Preferences.Get(BaselineValueKey, 0f);
-    }
-
-    private void UpdateSteps(float cumulative)
-    {
-        var steps = (int)Math.Max(0, cumulative - _baseline);
-        if (steps == _todaySteps)
-            return;
-
-        _todaySteps = steps;
-        StepsChanged?.Invoke(this, _todaySteps);
+        var context = Platform.CurrentActivity ?? Platform.AppContext;
+        var intent = new Intent(context, typeof(PedometerForegroundService));
+        context.StopService(intent);
     }
 }

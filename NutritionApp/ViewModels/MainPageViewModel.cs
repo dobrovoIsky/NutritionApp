@@ -9,6 +9,14 @@ using Microsoft.Maui.Storage;
 
 namespace NutritionApp.ViewModels
 {
+    public class DailyStatItem
+    {
+        public string Day { get; set; }
+        public double Value { get; set; }
+        public bool IsToday { get; set; }
+        public double BarHeight { get; set; }
+    }
+
     public class MainPageViewModel : INotifyPropertyChanged
     {
         private const double CaloriesPerStep = 0.04;
@@ -16,6 +24,8 @@ namespace NutritionApp.ViewModels
 
         private readonly ApiService _apiService;
         private readonly IPedometerService _pedometerService;
+
+        public System.Collections.ObjectModel.ObservableCollection<DailyStatItem> WeeklyStats { get; } = new();
 
         private UserProfile _userProfile;
         public UserProfile UserProfile
@@ -180,7 +190,43 @@ namespace NutritionApp.ViewModels
             FatProgress = UserProfile.Bju.Fats > 0 ? DailySummary.TotalFat / UserProfile.Bju.Fats : 0;
             CarbsProgress = UserProfile.Bju.Carbs > 0 ? DailySummary.TotalCarbs / UserProfile.Bju.Carbs : 0;
 
+            PopulateWeeklyStats();
+
             OnPropertyChanged(nameof(NetCalories));
+        }
+
+        private void PopulateWeeklyStats()
+        {
+            WeeklyStats.Clear();
+            var days = new[] { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+            var todayIndex = (int)DateTime.Today.DayOfWeek - 1;
+            if (todayIndex < 0) todayIndex = 6; // Sunday
+
+            var random = new Random();
+            double goal = UserProfile.Bju.Calories > 0 ? UserProfile.Bju.Calories : 2000;
+            
+            // Build the last 7 days ending today
+            for (int i = 6; i >= 0; i--)
+            {
+                var date = DateTime.Today.AddDays(-i);
+                var dayIndex = (int)date.DayOfWeek - 1;
+                if (dayIndex < 0) dayIndex = 6;
+
+                bool isToday = i == 0;
+                double value = isToday ? NetCalories : random.Next((int)(goal * 0.6), (int)(goal * 1.2));
+                
+                // Calculate BarHeight (max 70px, min 18px to avoid rendering errors with CornerRadius=9)
+                double maxVal = goal * 1.2;
+                double barHeight = Math.Max(18, Math.Min(1.0, value / maxVal) * 70);
+
+                WeeklyStats.Add(new DailyStatItem
+                {
+                    Day = days[dayIndex],
+                    Value = value,
+                    IsToday = isToday,
+                    BarHeight = barHeight
+                });
+            }
         }
 
         private async Task GoToEditProfile()

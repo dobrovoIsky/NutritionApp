@@ -88,19 +88,19 @@
 
     <!-- Border -->
     <Style TargetType="Border">
-        <Setter Property="Stroke" Value="{StaticResource BorderColor}" />
+        <Setter Property="Stroke" Value="#1AFFFFFF" />
         <Setter Property="StrokeThickness" Value="1" />
         <Setter Property="StrokeShape" Value="RoundRectangle 24" />
-        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}" />
+        <Setter Property="Background" Value="#0AFFFFFF" />
         <Setter Property="Padding" Value="16" />
     </Style>
 
     <!-- Active Glow Border -> Changed to Flat Active Border for premium look -->
     <Style x:Key="ActiveGlowBorder" TargetType="Border">
-        <Setter Property="Stroke" Value="{StaticResource Primary}" />
+        <Setter Property="Stroke" Value="#1AFFFFFF" />
         <Setter Property="StrokeThickness" Value="1" />
         <Setter Property="StrokeShape" Value="RoundRectangle 24" />
-        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}" />
+        <Setter Property="Background" Value="#0AFFFFFF" />
         <Setter Property="Padding" Value="16" />
     </Style>
 

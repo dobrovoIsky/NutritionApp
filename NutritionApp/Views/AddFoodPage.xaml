@@ -8,85 +8,120 @@
              Title="Додати їжу"
              Background="{StaticResource PageBackgroundGradient}">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="20" Padding="20">
-            
-            <Border BackgroundColor="{StaticResource CardBackground}"
-                    Stroke="{StaticResource BorderColor}"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 16"
-                    Padding="20">
-                <VerticalStackLayout Spacing="15">
-                    
-                    <Label Text="Назва страви / продукту" TextColor="{StaticResource TextSecondary}" FontSize="14"/>
-                    <Entry Text="{Binding Name}" Placeholder="Пошук бази: Гречка, Борщ..." />
+    <Grid RowDefinitions="Auto,*" Padding="16,20,16,0">
+        <!-- Header -->
+        <Grid Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,24">
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                <Label Text="{Binding MealType, TargetNullValue='Перекус'}" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                <Label Text="Додати їжу" FontAttributes="Bold" FontSize="32" TextColor="{StaticResource TextPrimary}" />
+            </VerticalStackLayout>
+        </Grid>
 
-                    <Border BackgroundColor="{StaticResource PageBackground}"
-                            Stroke="{StaticResource BorderColor}"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 8"
-                            IsVisible="{Binding ShowDropdown}"
-                            MaximumHeightRequest="200"
-                            Margin="0,-10,0,0">
-                        <CollectionView ItemsSource="{Binding FilteredProducts}" 
-                                        SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
-                                        SelectionMode="Single">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="models:FoodDatabaseItem">
-                                    <Grid Padding="12" RowDefinitions="Auto,Auto">
-                                        <Label Text="{Binding Name}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
-                                        <HorizontalStackLayout Grid.Row="1" Spacing="8" Margin="0,4,0,0">
-                                            <Label Text="{Binding CaloriesPer100g, StringFormat='{0} ккал'}" FontSize="12" TextColor="{StaticResource Primary}" />
-                                            <Label Text="{Binding ProteinPer100g, StringFormat='Б:{0}'}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
-                                            <Label Text="{Binding FatPer100g, StringFormat='Ж:{0}'}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
-                                            <Label Text="{Binding CarbsPer100g, StringFormat='В:{0}'}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
-                                        </HorizontalStackLayout>
-                                    </Grid>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </Border>
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never" Padding="0,0,0,40">
+            <VerticalStackLayout Spacing="20">
+                
+                <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
+                    <VerticalStackLayout Spacing="16">
+                        
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Що ви з'їли?" TextColor="{StaticResource TextSecondary}" FontSize="14" VerticalOptions="Center"/>
+                            <Border Grid.Column="1" StrokeShape="RoundRectangle 8" BackgroundColor="#1E3A8A" Padding="12,6" Stroke="Transparent">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding AnalyzeFoodImageCommand}"/>
+                                </Border.GestureRecognizers>
+                                <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                    <Label Text="📸" FontSize="14" VerticalOptions="Center"/>
+                                    <Label Text="Розпізнати по фото" FontSize="12" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+                            </Border>
+                        </Grid>
+                        
+                        <ActivityIndicator IsRunning="{Binding IsAnalyzingImage}" IsVisible="{Binding IsAnalyzingImage}" Color="{StaticResource Primary}" />
+                        
+                        <Entry Text="{Binding Name}" Placeholder="Гречка, Борщ, Банан..." FontAttributes="Bold" FontSize="18"/>
 
-                    <Label Text="Вага (г)" TextColor="{StaticResource TextSecondary}" FontSize="14" Margin="0,10,0,0"/>
-                    <Entry Text="{Binding Weight}" Keyboard="Numeric" Placeholder="200" />
+                        <Border BackgroundColor="{StaticResource PageBackground}"
+                                Stroke="{StaticResource BorderColor}"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 8"
+                                IsVisible="{Binding ShowDropdown}"
+                                MaximumHeightRequest="200"
+                                Margin="0,-10,0,0">
+                            <CollectionView ItemsSource="{Binding FilteredProducts}" 
+                                            SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
+                                            SelectionMode="Single">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:FoodDatabaseItem">
+                                        <Grid Padding="12" RowDefinitions="Auto,Auto">
+                                            <Label Text="{Binding Name}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" />
+                                            <HorizontalStackLayout Grid.Row="1" Spacing="8" Margin="0,4,0,0">
+                                                <Label Text="{Binding CaloriesPer100g, StringFormat='{0} ккал'}" FontSize="12" TextColor="{StaticResource Primary}" />
+                                                <Label Text="{Binding ProteinPer100g, StringFormat='Б:{0}'}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                                                <Label Text="{Binding FatPer100g, StringFormat='Ж:{0}'}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                                                <Label Text="{Binding CarbsPer100g, StringFormat='В:{0}'}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                                            </HorizontalStackLayout>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </Border>
 
-                    <Label Text="Калорії (ккал)" TextColor="{StaticResource TextSecondary}" FontSize="14" Margin="0,10,0,0"/>
-                    <Entry Text="{Binding Calories}" Keyboard="Numeric" Placeholder="350" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,12,0,0">
+                            <Border Grid.Column="0" BackgroundColor="{StaticResource PageBackground}" Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Вага (г)" TextColor="{StaticResource TextSecondary}" FontSize="12"/>
+                                    <Entry Text="{Binding Weight}" Keyboard="Numeric" Placeholder="200" FontSize="18" FontAttributes="Bold" BackgroundColor="Transparent" HeightRequest="40" Margin="0,-8,0,0"/>
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border Grid.Column="1" BackgroundColor="{StaticResource PageBackground}" Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Калорії" TextColor="{StaticResource TextSecondary}" FontSize="12"/>
+                                    <Entry Text="{Binding Calories}" Keyboard="Numeric" Placeholder="350" FontSize="18" FontAttributes="Bold" BackgroundColor="Transparent" HeightRequest="40" Margin="0,-8,0,0"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
 
-                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="15" Margin="0,10,0,0">
-                        <VerticalStackLayout>
-                            <Label Text="Білки" TextColor="{StaticResource TextSecondary}" FontSize="12"/>
-                            <Entry Text="{Binding Protein}" Keyboard="Numeric" Placeholder="0" />
-                        </VerticalStackLayout>
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="15" Margin="0,4,0,0">
+                            <Border Grid.Column="0" BackgroundColor="{StaticResource PageBackground}" Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Білки" TextColor="{StaticResource TextSecondary}" FontSize="12"/>
+                                    <Entry Text="{Binding Protein}" Keyboard="Numeric" Placeholder="0" FontSize="16" FontAttributes="Bold" BackgroundColor="Transparent" HeightRequest="40" Margin="0,-8,0,0"/>
+                                </VerticalStackLayout>
+                            </Border>
 
-                        <VerticalStackLayout Grid.Column="1">
-                            <Label Text="Жири" TextColor="{StaticResource TextSecondary}" FontSize="12"/>
-                            <Entry Text="{Binding Fat}" Keyboard="Numeric" Placeholder="0" />
-                        </VerticalStackLayout>
+                            <Border Grid.Column="1" BackgroundColor="{StaticResource PageBackground}" Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Жири" TextColor="{StaticResource TextSecondary}" FontSize="12"/>
+                                    <Entry Text="{Binding Fat}" Keyboard="Numeric" Placeholder="0" FontSize="16" FontAttributes="Bold" BackgroundColor="Transparent" HeightRequest="40" Margin="0,-8,0,0"/>
+                                </VerticalStackLayout>
+                            </Border>
 
-                        <VerticalStackLayout Grid.Column="2">
-                            <Label Text="Вугл." TextColor="{StaticResource TextSecondary}" FontSize="12"/>
-                            <Entry Text="{Binding Carbs}" Keyboard="Numeric" Placeholder="0" />
-                        </VerticalStackLayout>
-                    </Grid>
+                            <Border Grid.Column="2" BackgroundColor="{StaticResource PageBackground}" Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 12" Padding="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="Вугл." TextColor="{StaticResource TextSecondary}" FontSize="12"/>
+                                    <Entry Text="{Binding Carbs}" Keyboard="Numeric" Placeholder="0" FontSize="16" FontAttributes="Bold" BackgroundColor="Transparent" HeightRequest="40" Margin="0,-8,0,0"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
 
-                </VerticalStackLayout>
-            </Border>
+                    </VerticalStackLayout>
+                </Border>
 
-            <Button Text="Зберегти"
-                    Style="{StaticResource AccentButton}"
-                    Command="{Binding SaveCommand}"
-                    HeightRequest="50"
-                    CornerRadius="25"
-                    FontAttributes="Bold"
-                    FontSize="16"
-                    Margin="0,20,0,0"/>
+                <Button Text="Зберегти"
+                        Style="{StaticResource AccentButton}"
+                        Command="{Binding SaveCommand}"
+                        HeightRequest="56"
+                        CornerRadius="28"
+                        FontAttributes="Bold"
+                        FontSize="18"
+                        Margin="0,20,0,0"/>
 
-            <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                               IsVisible="{Binding IsLoading}"
-                               Color="{StaticResource Primary}"
-                               HorizontalOptions="Center" />
-                               
-        </VerticalStackLayout>
-    </ScrollView>
+                <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                                   IsVisible="{Binding IsLoading}"
+                                   Color="{StaticResource Primary}"
+                                   HorizontalOptions="Center" />
+                                   
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

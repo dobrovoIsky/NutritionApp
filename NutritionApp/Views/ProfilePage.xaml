@@ -1,306 +1,160 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:NutritionApp.ViewModels"
              x:Class="NutritionApp.Views.ProfilePage"
+             x:DataType="viewmodels:ProfileViewModel"
              Shell.NavBarIsVisible="False"
              Background="{StaticResource PageBackgroundGradient}">
 
-    <Grid RowDefinitions="260,*" Padding="0">
+    <Grid RowDefinitions="Auto,*" Padding="16,20,16,0">
 
-        <!-- Верхній блок з градієнтом -->
-        <Grid Row="0" Padding="0,16,0,16">
-
-
-            <VerticalStackLayout Spacing="14"
-                                 VerticalOptions="Center"
-                                 HorizontalOptions="Center">
-                <!-- Аватар у кругу зверху - тепер натискається -->
-                <Border HeightRequest="104"
-                        WidthRequest="104"
-                        Stroke="White"
-                        StrokeThickness="3"
-                        StrokeShape="RoundRectangle 52"
-                        BackgroundColor="#FFFFFF22"
-                        HorizontalOptions="Center">
-                    <Border.Shadow>
-                        <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.25"/>
-                    </Border.Shadow>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnAvatarTapped"/>
-                    </Border.GestureRecognizers>
-                    <Image x:Name="AvatarImage"
-                           Source="{Binding SelectedAvatar.ImageSource}"
-                           HeightRequest="100"
-                           WidthRequest="100"
-                           Aspect="AspectFill">
-                         <Image.Clip>
-                             <EllipseGeometry Center="50,50" RadiusX="50" RadiusY="50"/>
-                         </Image.Clip>
-                    </Image>
-                </Border>
-
-                <!-- Підказка -->
-                <Label Text="(натисни для зміни аватара)"
-                       FontSize="11"
-                       TextColor="#FFFFFFAA"
-                       HorizontalOptions="Center"/>
-
-                <Label x:Name="UsernameLabel"
-                       Text="{Binding UserProfile.Username, StringFormat='Вітаємо, {0}!'}"
-                       FontAttributes="Bold"
-                       FontSize="22"
-                       TextColor="White"
-                       HorizontalOptions="Center"/>
-
-                <Label Text="Твій профіль та показники"
-                       FontSize="14"
-                       TextColor="#FFEFF2"
-                       HorizontalOptions="Center"/>
+        <!-- Header -->
+        <Grid Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,24">
+            <Border WidthRequest="60" HeightRequest="60" StrokeShape="RoundRectangle 30"
+                    BackgroundColor="#FFFFFF22" Stroke="White" StrokeThickness="2"
+                    HorizontalOptions="Start" VerticalOptions="Center">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="5" Opacity="0.2"/>
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnAvatarTapped"/>
+                </Border.GestureRecognizers>
+                <Image x:Name="AvatarImage"
+                       Source="{Binding SelectedAvatar.ImageSource}"
+                       Aspect="AspectFill">
+                    <Image.Clip>
+                        <EllipseGeometry Center="30,30" RadiusX="30" RadiusY="30"/>
+                    </Image.Clip>
+                </Image>
+            </Border>
+            
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="16,0,0,0">
+                <Label Text="Твій профіль" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                <Label x:Name="UsernameLabel" Text="{Binding UserProfile.Username, StringFormat='{0}'}" FontAttributes="Bold" FontSize="32" TextColor="{StaticResource TextPrimary}" />
             </VerticalStackLayout>
         </Grid>
 
-        <!-- Контент -->
-        <Border Grid.Row="1"
-                BackgroundColor="{StaticResource CardBackground}"
-                Stroke="{StaticResource BorderColor}"
-                StrokeThickness="1"
-                Padding="20"
-                Margin="16,-32,16,0"
-                StrokeShape="RoundRectangle 24">
+        <!-- Content -->
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never" Padding="0,0,0,40">
+            <VerticalStackLayout Spacing="20">
 
-            <ScrollView>
-                <VerticalStackLayout Spacing="18">
+                <!-- Кнопки дій -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Text="Редагувати"
+                            Clicked="OnEditProfileClicked"
+                            Style="{StaticResource AccentButton}"
+                            HeightRequest="50"
+                            CornerRadius="25"
+                            FontAttributes="Bold"/>
 
-                    <!-- Кнопки дій -->
-                    <Grid ColumnDefinitions="*,*"
-                          ColumnSpacing="10">
-                        <Button Text="Edit profile"
-                                Clicked="OnEditProfileClicked"
-                                HeightRequest="48"
-                                CornerRadius="14"
-                                BackgroundColor="{StaticResource Primary}"
-                                TextColor="White"
-                                FontAttributes="Bold"/>
+                    <Button Grid.Column="1"
+                            Text="Вийти"
+                            Clicked="OnLogoutButtonClicked"
+                            HeightRequest="50"
+                            CornerRadius="25"
+                            BackgroundColor="Transparent"       
+                            TextColor="{StaticResource TextSecondary}"
+                            BorderColor="{StaticResource BorderColor}"
+                            BorderWidth="1"
+                            FontAttributes="Bold"/>
+                </Grid>
 
-                        <Button Grid.Column="1"
-                                Text="Logout"
-                                Clicked="OnLogoutButtonClicked"
-                                HeightRequest="48"
-                                CornerRadius="14"
-                                BackgroundColor="Transparent"
-                                TextColor="{StaticResource Primary}"
-                                BorderColor="{StaticResource Primary}"
-                                BorderWidth="1.2"/>
-                    </Grid>
+                <Label Text="Мої показники" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" Margin="0,8,0,0"/>
 
-                    <!-- Блок з основними даними -->
-                    <VerticalStackLayout Spacing="12">
-                        <Label Text="Мої показники"
-                               FontSize="18"
-                               FontAttributes="Bold"
-                               TextColor="{StaticResource TextPrimary}"/>
-
-                        <Grid ColumnDefinitions="*,*"
-                              RowSpacing="12"
-                              ColumnSpacing="12">
-
-                            <Border Stroke="{StaticResource BorderColor}"
-                                    BackgroundColor="{StaticResource CardBackground}"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 14"
-                                    Padding="12">
-                                <VerticalStackLayout Spacing="4">
-                                    <Label Text="Height"
-                                           FontSize="13"
-                                           TextColor="{StaticResource TextSecondary}"/>
-                                    <Label Text="{Binding UserProfile.Height, StringFormat='{0:F1} см'}"
-                                           FontSize="18"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource TextPrimary}"/>
-                                </VerticalStackLayout>
-                            </Border>
-
-                            <Border Grid.Column="1"
-                                    Stroke="{StaticResource BorderColor}"
-                                    BackgroundColor="{StaticResource CardBackground}"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 14"
-                                    Padding="12">
-                                <VerticalStackLayout Spacing="4">
-                                    <Label Text="Weight"
-                                           FontSize="13"
-                                           TextColor="{StaticResource TextSecondary}"/>
-                                    <Label Text="{Binding UserProfile.Weight, StringFormat='{0:F1} кг'}"
-                                           FontSize="18"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource TextPrimary}"/>
-                                </VerticalStackLayout>
-                            </Border>
-
-                            <Border Grid.Row="1"
-                                    Stroke="{StaticResource BorderColor}"
-                                    BackgroundColor="{StaticResource CardBackground}"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 14"
-                                    Padding="12">
-                                <VerticalStackLayout Spacing="4">
-                                    <Label Text="Age"
-                                           FontSize="13"
-                                           TextColor="{StaticResource TextSecondary}"/>
-                                    <Label Text="{Binding UserProfile.Age, StringFormat='{0} років'}"
-                                           FontSize="18"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource TextPrimary}"/>
-                                </VerticalStackLayout>
-                            </Border>
-
-                            <Border Grid.Row="1" Grid.Column="1"
-                                    Stroke="{StaticResource BorderColor}"
-                                    BackgroundColor="{StaticResource CardBackground}"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 14"
-                                    Padding="12">
-                                <VerticalStackLayout Spacing="4">
-                                    <Label Text="Activity"
-                                           FontSize="13"
-                                           TextColor="{StaticResource TextSecondary}"/>
-                                    <Label Text="{Binding UserProfile.ActivityLevel}"
-                                           FontSize="16"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource TextPrimary}"
-                                           LineBreakMode="TailTruncation"/>
-                                </VerticalStackLayout>
-                            </Border>
-
-                            <Border Grid.Row="2" Grid.ColumnSpan="2"
-                                    Stroke="{StaticResource BorderColor}"
-                                    BackgroundColor="{StaticResource CardBackground}"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 14"
-                                    Padding="12">
-                                <VerticalStackLayout Spacing="4">
-                                    <Label Text="Goal"
-                                           FontSize="13"
-                                           TextColor="{StaticResource TextSecondary}"/>
-                                    <Label Text="{Binding UserProfile.Goal}"
-                                           FontSize="18"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource TextPrimary}"/>
-                                </VerticalStackLayout>
-                            </Border>
-                        </Grid>
-                    </VerticalStackLayout>
-
-                    <!-- Налаштування -->
-                    <Label Text="Налаштування"
-                           FontSize="18"
-                           FontAttributes="Bold"
-                           TextColor="{StaticResource TextPrimary}"
-                           Margin="0,8,0,0"/>
-
-                    <!-- Нагадування про воду -->
-                    <Border Stroke="{StaticResource BorderColor}"
-                            BackgroundColor="{StaticResource CardBackground}"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 14"
-                            Padding="14">
-                        <VerticalStackLayout Spacing="12">
-                            <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
-                                <Border WidthRequest="40" 
-                                        HeightRequest="40"
-                                        StrokeShape="RoundRectangle 20"
-                                        BackgroundColor="#1E3A8A"
-                                        Stroke="Transparent">
-                                    <Label Text="💧" 
-                                           FontSize="18" 
-                                           VerticalOptions="Center" 
-                                           HorizontalOptions="Center"/>
-                                </Border>
-                                <VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" VerticalOptions="Center">
-                                    <Label Text="Нагадування про воду"
-                                           FontSize="15"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource TextPrimary}"/>
-                                    <Label Text="Регулярні сповіщення пити воду"
-                                           FontSize="12"
-                                           TextColor="{StaticResource TextSecondary}"/>
-                                </VerticalStackLayout>
-                                <Switch x:Name="WaterReminderSwitch"
-                                        Grid.Column="2"
-                                        Toggled="OnWaterReminderToggled"
-                                        VerticalOptions="Center"/>
-                            </Grid>
-
-                            <!-- Вибір інтервалу (показується тільки коли включено) -->
-                            <Border x:Name="IntervalPickerContainer"
-                                    IsVisible="False"
-                                    Stroke="{StaticResource BorderColor}"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 10"
-                                    BackgroundColor="{StaticResource PageBackground}"
-                                    Padding="10">
-                                <VerticalStackLayout Spacing="10">
-                                    <Picker x:Name="IntervalPicker"
-                                            Title="Інтервал нагадувань"
-                                            SelectedIndexChanged="OnIntervalChanged"
-                                            TextColor="{StaticResource TextPrimary}"
-                                            TitleColor="{StaticResource TextSecondary}">
-                                        <Picker.ItemsSource>
-                                            <x:Array Type="{x:Type x:String}">
-                                                <x:String>Кожні 30 хвилин</x:String>
-                                                <x:String>Кожні 45 хвилин</x:String>
-                                                <x:String>Кожні 60 хвилин</x:String>
-                                                <x:String>Кожні 90 хвилин</x:String>
-                                                <x:String>Кожні 2 години</x:String>
-                                            </x:Array>
-                                        </Picker.ItemsSource>
-                                    </Picker>
-
-                                    <!-- Вибір часу: Від - До -->
-                                    <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="12" Margin="0,8,0,0">
-                                        <VerticalStackLayout Spacing="4">
-                                            <Label Text="Start Time" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
-                                            <Border Stroke="{StaticResource BorderColor}" 
-                                                    StrokeShape="RoundRectangle 8"
-                                                    BackgroundColor="{StaticResource PageBackground}"
-                                                    Padding="8,0"
-                                                    HeightRequest="40">
-                                                <TimePicker Time="{Binding WaterStartTime}" 
-                                                            Format="HH:mm" 
-                                                            TextColor="{StaticResource TextPrimary}"
-                                                            VerticalOptions="Center"/>
-                                            </Border>
-                                        </VerticalStackLayout>
-                                        
-                                        <Label Text="—" 
-                                               Grid.Column="1" 
-                                               VerticalOptions="Center" 
-                                               Margin="0,18,0,0"
-                                               TextColor="{StaticResource TextSecondary}"/>
-
-                                        <VerticalStackLayout Grid.Column="2" Spacing="4">
-                                            <Label Text="End Time" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
-                                            <Border Stroke="{StaticResource BorderColor}" 
-                                                    StrokeShape="RoundRectangle 8"
-                                                    BackgroundColor="{StaticResource PageBackground}"
-                                                    Padding="8,0"
-                                                    HeightRequest="40">
-                                                <TimePicker Time="{Binding WaterEndTime}" 
-                                                            Format="HH:mm" 
-                                                            TextColor="{StaticResource TextPrimary}"
-                                                            VerticalOptions="Center"/>
-                                            </Border>
-                                        </VerticalStackLayout>
-                                    </Grid>
-                                </VerticalStackLayout>
-                            </Border>
+                <!-- Блок з основними даними -->
+                <Grid ColumnDefinitions="*,*" RowSpacing="12" ColumnSpacing="12">
+                    
+                    <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Ріст" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
+                            <Label Text="{Binding UserProfile.Height, StringFormat='{0:F1} см'}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
                         </VerticalStackLayout>
                     </Border>
 
+                    <Border Grid.Column="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Вага" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
+                            <Label Text="{Binding UserProfile.Weight, StringFormat='{0:F1} кг'}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        </VerticalStackLayout>
+                    </Border>
 
-                </VerticalStackLayout>
-            </ScrollView>
-        </Border>
+                    <Border Grid.Row="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Вік" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
+                            <Label Text="{Binding UserProfile.Age, StringFormat='{0} років'}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Активність" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
+                            <Label Text="{Binding UserProfile.ActivityLevel}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Ціль" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
+                            <Label Text="{Binding UserProfile.Goal}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <Label Text="Налаштування" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" Margin="0,16,0,0"/>
+
+                <!-- Нагадування про воду -->
+                <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
+                    <VerticalStackLayout Spacing="16">
+                        <Grid ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                            <Border WidthRequest="44" HeightRequest="44" StrokeShape="RoundRectangle 22" BackgroundColor="#1E3A8A" StrokeThickness="0">
+                                <Label Text="💧" FontSize="20" VerticalOptions="Center" HorizontalOptions="Center"/>
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" VerticalOptions="Center">
+                                <Label Text="Нагадування про воду" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                                <Label Text="Сповіщення пити воду" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Switch x:Name="WaterReminderSwitch" Grid.Column="2" Toggled="OnWaterReminderToggled" VerticalOptions="Center"/>
+                        </Grid>
+
+                        <Border x:Name="IntervalPickerContainer" IsVisible="False" Stroke="{StaticResource BorderColor}" StrokeThickness="1" StrokeShape="RoundRectangle 12" BackgroundColor="{StaticResource PageBackground}" Padding="12">
+                            <VerticalStackLayout Spacing="12">
+                                <Picker x:Name="IntervalPicker" Title="Інтервал нагадувань" SelectedIndexChanged="OnIntervalChanged" TextColor="{StaticResource TextPrimary}" TitleColor="{StaticResource TextSecondary}">
+                                    <Picker.ItemsSource>
+                                        <x:Array Type="{x:Type x:String}">
+                                            <x:String>Кожні 30 хвилин</x:String>
+                                            <x:String>Кожні 45 хвилин</x:String>
+                                            <x:String>Кожні 60 хвилин</x:String>
+                                            <x:String>Кожні 90 хвилин</x:String>
+                                            <x:String>Кожні 2 години</x:String>
+                                        </x:Array>
+                                    </Picker.ItemsSource>
+                                </Picker>
+
+                                <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="12" Margin="0,4,0,0">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="Start Time" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                                        <Border Stroke="{StaticResource BorderColor}" StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource CardBackground}" Padding="8,0" HeightRequest="40">
+                                            <TimePicker Time="{Binding WaterStartTime}" Format="HH:mm" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                    
+                                    <Label Text="—" Grid.Column="1" VerticalOptions="Center" Margin="0,18,0,0" TextColor="{StaticResource TextSecondary}"/>
+
+                                    <VerticalStackLayout Grid.Column="2" Spacing="4">
+                                        <Label Text="End Time" FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                                        <Border Stroke="{StaticResource BorderColor}" StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource CardBackground}" Padding="8,0" HeightRequest="40">
+                                            <TimePicker Time="{Binding WaterEndTime}" Format="HH:mm" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
 
         <!-- Popup для вибору аватара -->
         <Grid x:Name="AvatarPopup" 
@@ -344,7 +198,7 @@
                                              VerticalItemSpacing="8"/>
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate>
+                            <DataTemplate x:DataType="viewmodels:AvatarOption">
                                 <Border HeightRequest="70"
                                         WidthRequest="70"
                                         StrokeThickness="3"
