@@ -31,7 +31,8 @@ public class ApiService
 
         _jsonOptions = new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
         };
     }
 
@@ -232,7 +233,7 @@ public class ApiService
         public List<FoodItem> Foods { get; set; }
 
         [JsonPropertyName("totalCalories")]
-        public int TotalCalories { get; set; }
+        public double TotalCalories { get; set; }
     }
 
     public class FoodItem
@@ -244,7 +245,7 @@ public class ApiService
         public string Weight { get; set; }
 
         [JsonPropertyName("calories")]
-        public int Calories { get; set; }
+        public double Calories { get; set; }
 
         [JsonPropertyName("protein")]
         public double Protein { get; set; }
