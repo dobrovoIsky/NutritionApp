@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Collections.Concurrent;
+using System.Text;
 
 namespace NutritionApp.Services;
 
@@ -528,6 +529,20 @@ public class ApiService
             Debug.WriteLine($"DeleteFoodEntry exception: {ex.Message}");
             return false;
         }
+    }
+
+    public async Task<FoodDatabaseItem> AnalyzeFoodImageAsync(byte[] imageBytes)
+    {
+        var base64Image = Convert.ToBase64String(imageBytes);
+        var payload = new { base64Image = base64Image };
+        var json = JsonSerializer.Serialize(payload, _jsonOptions);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PostAsync($"/api/Nutrition/analyze-image", content);
+        response.EnsureSuccessStatusCode();
+
+        var responseJson = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<FoodDatabaseItem>(responseJson, _jsonOptions);
     }
 
     public async Task<List<FoodEntry>> GetDailyFoodEntriesAsync(int userId, DateTime? date = null)

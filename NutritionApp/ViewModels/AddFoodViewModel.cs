@@ -23,7 +23,6 @@ namespace NutritionApp.ViewModels
             set { _editEntryId = value; OnPropertyChanged(); }
         }
         private readonly ApiService _apiService;
-        private readonly GeminiService _geminiService;
         private List<FoodDatabaseItem> _allProducts = new();
         
         private string _name;
@@ -105,10 +104,9 @@ namespace NutritionApp.ViewModels
         public ICommand SaveCommand { get; }
         public ICommand AnalyzeFoodImageCommand { get; }
 
-        public AddFoodViewModel(ApiService apiService, GeminiService geminiService)
+        public AddFoodViewModel(ApiService apiService)
         {
             _apiService = apiService;
-            _geminiService = geminiService;
             SaveCommand = new Command(async () => await SaveFoodAsync());
             AnalyzeFoodImageCommand = new Command(async () => await AnalyzeFoodImageAsync());
             
@@ -299,7 +297,7 @@ namespace NutritionApp.ViewModels
                         }
 #endif
 
-                        var result = await _geminiService.AnalyzeFoodImageAsync(imageBytes);
+                        var result = await _apiService.AnalyzeFoodImageAsync(imageBytes);
 
                         if (result != null)
                         {
