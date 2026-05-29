@@ -272,17 +272,13 @@ namespace NutritionApp.ViewModels
                     if (photo != null)
                     {
                         IsAnalyzingImage = true;
-                        
-                        using var stream = await photo.OpenReadAsync();
-                        using var originalMs = new MemoryStream();
-                        await stream.CopyToAsync(originalMs);
-                        var imageBytes = originalMs.ToArray();
+                        byte[] imageBytes = null;
 
 #if ANDROID || IOS || MACCATALYST || WINDOWS
                         try
                         {
-                            using var stream2 = new MemoryStream(imageBytes);
-                            Microsoft.Maui.Graphics.IImage image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream2);
+                            using var stream = await photo.OpenReadAsync();
+                            Microsoft.Maui.Graphics.IImage image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream);
                             if (image != null)
                             {
                                 Microsoft.Maui.Graphics.IImage downsizedImage = image.Downsize(800, 800, true);
@@ -296,6 +292,15 @@ namespace NutritionApp.ViewModels
                             System.Diagnostics.Debug.WriteLine($"Failed to downsize image: {ex}");
                         }
 #endif
+
+                        // Fallback if downsizing failed or skipped
+                        if (imageBytes == null)
+                        {
+                            using var stream = await photo.OpenReadAsync();
+                            using var originalMs = new MemoryStream();
+                            await stream.CopyToAsync(originalMs);
+                            imageBytes = originalMs.ToArray();
+                        }
 
                         var result = await _apiService.AnalyzeFoodImageAsync(imageBytes);
 
