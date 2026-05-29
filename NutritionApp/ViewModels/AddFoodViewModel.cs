@@ -276,16 +276,27 @@ namespace NutritionApp.ViewModels
                         IsAnalyzingImage = true;
                         
                         using var stream = await photo.OpenReadAsync();
+                        using var originalMs = new MemoryStream();
+                        await stream.CopyToAsync(originalMs);
+                        var imageBytes = originalMs.ToArray();
+
 #if ANDROID || IOS || MACCATALYST || WINDOWS
-                        Microsoft.Maui.Graphics.IImage image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream);
-                        Microsoft.Maui.Graphics.IImage downsizedImage = image.Downsize(800, 800, true);
-                        using var memoryStream = new MemoryStream();
-                        downsizedImage.Save(memoryStream);
-                        var imageBytes = memoryStream.ToArray();
-#else
-                        using var memoryStream = new MemoryStream();
-                        await stream.CopyToAsync(memoryStream);
-                        var imageBytes = memoryStream.ToArray();
+                        try
+                        {
+                            using var stream2 = new MemoryStream(imageBytes);
+                            Microsoft.Maui.Graphics.IImage image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream2);
+                            if (image != null)
+                            {
+                                Microsoft.Maui.Graphics.IImage downsizedImage = image.Downsize(800, 800, true);
+                                using var resizedMs = new MemoryStream();
+                                downsizedImage.Save(resizedMs, Microsoft.Maui.Graphics.ImageFormat.Jpeg);
+                                imageBytes = resizedMs.ToArray();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Failed to downsize image: {ex}");
+                        }
 #endif
 
                         var result = await _geminiService.AnalyzeFoodImageAsync(imageBytes);

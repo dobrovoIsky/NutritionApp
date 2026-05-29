@@ -66,8 +66,11 @@ public class GeminiService
             {
                 // clean up potential markdown formatting if model ignores response_mime_type
                 resultText = resultText.Replace("```json", "").Replace("```", "").Trim();
-                
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var options = new JsonSerializerOptions 
+                { 
+                    PropertyNameCaseInsensitive = true,
+                    NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
+                };
                 var parsedItem = JsonSerializer.Deserialize<FoodDatabaseItem>(resultText, options);
                 
                 if (parsedItem != null)
@@ -81,8 +84,8 @@ public class GeminiService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error analyzing food image: {ex.Message}");
-            return null;
+            System.Diagnostics.Debug.WriteLine($"Error analyzing food image: {ex.Message}");
+            throw; // Rethrow to let the UI display the actual error
         }
     }
 
