@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;    
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -17,8 +17,98 @@ namespace NutritionApp.ViewModels
         public UserProfile UserProfile
         {
             get => _userProfile;
-            set { _userProfile = value; OnPropertyChanged(); }
+            set 
+            { 
+                _userProfile = value; 
+                OnPropertyChanged(); 
+                OnPropertyChanged(nameof(SelectedGoal));
+                OnPropertyChanged(nameof(SelectedActivityLevel));
+                OnPropertyChanged(nameof(SelectedGender));
+            }
         }
+
+        public string SelectedGoal
+        {
+            get => ConvertGoalToUa(_userProfile?.Goal);
+            set
+            {
+                if (_userProfile != null)
+                    _userProfile.Goal = ConvertGoalToEn(value);
+                OnPropertyChanged();
+            }
+        }
+
+        public string SelectedActivityLevel
+        {
+            get => ConvertActivityToUa(_userProfile?.ActivityLevel);
+            set
+            {
+                if (_userProfile != null)
+                    _userProfile.ActivityLevel = ConvertActivityToEn(value);
+                OnPropertyChanged();
+            }
+        }
+
+        public string SelectedGender
+        {
+            get => ConvertGenderToUa(_userProfile?.Gender);
+            set
+            {
+                if (_userProfile != null)
+                    _userProfile.Gender = ConvertGenderToEn(value);
+                OnPropertyChanged();
+            }
+        }
+
+        private string ConvertGoalToUa(string goal) => goal switch
+        {
+            "lose weight" => "Схуднення",
+            "gain muscle" => "Набір маси",
+            "maintain weight" => "Підтримка ваги",
+            _ => "Підтримка ваги"
+        };
+
+        private string ConvertGoalToEn(string goal) => goal switch
+        {
+            "Схуднення" => "lose weight",
+            "Набір маси" => "gain muscle",
+            "Підтримка ваги" => "maintain weight",
+            _ => "maintain weight"
+        };
+
+        private string ConvertActivityToUa(string activity) => activity switch
+        {
+            "sedentary" => "Сидячий спосіб життя",
+            "lightly active" => "Легка активність",
+            "moderately active" => "Помірна активність",
+            "very active" => "Висока активність",
+            "extra active" => "Дуже висока активність",
+            _ => "Помірна активність"
+        };
+
+        private string ConvertActivityToEn(string activity) => activity switch
+        {
+            "Сидячий спосіб життя" => "sedentary",
+            "Легка активність" => "lightly active",
+            "Помірна активність" => "moderately active",
+            "Висока активність" => "very active",
+            "Дуже висока активність" => "extra active",
+            _ => "moderately active"
+        };
+
+        private string ConvertGenderToUa(string gender) => gender switch
+        {
+            "male" => "Чоловіча",
+            "female" => "Жіноча",
+            _ => "Чоловіча"
+        };
+
+        private string ConvertGenderToEn(string gender) => gender switch
+        {
+            "Чоловіча" => "male",
+            "Жіноча" => "female",
+            _ => "male"
+        };
 
         private bool _isLoading;
         public bool IsLoading
@@ -75,14 +165,13 @@ namespace NutritionApp.ViewModels
                     return;
                 }
 
-                // Створюємо payload з правильними назвами полів для сервера (PascalCase)
                 var payload = new
                 {
                     Height = UserProfile.Height,
                     Weight = UserProfile.Weight,
                     Age = UserProfile.Age,
-                    Goal = UserProfile.Goal ?? string.Empty,
-                    ActivityLevel = UserProfile.ActivityLevel ?? string.Empty,
+                    Goal = UserProfile.Goal ?? "maintain weight",
+                    ActivityLevel = UserProfile.ActivityLevel ?? "moderately active",
                     AvatarId = UserProfile.AvatarId,
                     Gender = UserProfile.Gender ?? "male"
                 };

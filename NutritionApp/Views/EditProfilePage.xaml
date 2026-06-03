@@ -64,12 +64,12 @@
                         <VerticalStackLayout Spacing="8">
                             <Label Text="Ціль" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" Margin="4,0,0,0"/>
                             <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource PageBackground}" Padding="4,0" StrokeThickness="0">
-                                <Picker SelectedItem="{Binding UserProfile.Goal}" TextColor="{StaticResource TextPrimary}" Title="Оберіть ціль">
+                                <Picker SelectedItem="{Binding SelectedGoal}" TextColor="{StaticResource TextPrimary}" Title="Оберіть ціль">
                                     <Picker.ItemsSource>
                                         <x:Array Type="{x:Type x:String}">
-                                            <x:String>lose weight</x:String>
-                                            <x:String>maintain weight</x:String>
-                                            <x:String>gain muscle</x:String>
+                                            <x:String>Схуднення</x:String>
+                                            <x:String>Набір маси</x:String>
+                                            <x:String>Підтримка ваги</x:String>
                                         </x:Array>
                                     </Picker.ItemsSource>
                                 </Picker>
@@ -79,13 +79,14 @@
                         <VerticalStackLayout Spacing="8">
                             <Label Text="Рівень активності" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" Margin="4,0,0,0"/>
                             <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource PageBackground}" Padding="4,0" StrokeThickness="0">
-                                <Picker SelectedItem="{Binding UserProfile.ActivityLevel}" TextColor="{StaticResource TextPrimary}" Title="Оберіть рівень активності">
+                                <Picker SelectedItem="{Binding SelectedActivityLevel}" TextColor="{StaticResource TextPrimary}" Title="Оберіть рівень активності">
                                     <Picker.ItemsSource>
                                         <x:Array Type="{x:Type x:String}">
-                                            <x:String>sedentary</x:String>
-                                            <x:String>lightly active</x:String>
-                                            <x:String>moderately active</x:String>
-                                            <x:String>very active</x:String>
+                                            <x:String>Сидячий спосіб життя</x:String>
+                                            <x:String>Легка активність</x:String>
+                                            <x:String>Помірна активність</x:String>
+                                            <x:String>Висока активність</x:String>
+                                            <x:String>Дуже висока активність</x:String>
                                         </x:Array>
                                     </Picker.ItemsSource>
                                 </Picker>
@@ -95,11 +96,11 @@
                         <VerticalStackLayout Spacing="8">
                             <Label Text="Стать" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" Margin="4,0,0,0"/>
                             <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource PageBackground}" Padding="4,0" StrokeThickness="0">
-                                <Picker SelectedItem="{Binding UserProfile.Gender}" TextColor="{StaticResource TextPrimary}" Title="Оберіть стать">
+                                <Picker SelectedItem="{Binding SelectedGender}" TextColor="{StaticResource TextPrimary}" Title="Оберіть стать">
                                     <Picker.ItemsSource>
                                         <x:Array Type="{x:Type x:String}">
-                                            <x:String>male</x:String>
-                                            <x:String>female</x:String>
+                                            <x:String>Чоловіча</x:String>
+                                            <x:String>Жіноча</x:String>
                                         </x:Array>
                                     </Picker.ItemsSource>
                                 </Picker>
