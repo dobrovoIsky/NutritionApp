@@ -108,15 +108,15 @@
 
         <!-- Overlay для додавання продукту -->
         <Grid IsVisible="{Binding IsAddingCustomProduct}" Grid.RowSpan="4" BackgroundColor="#B3000000" Margin="-16,-20,-16,0">
-            <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="#1F1F2E" Padding="24" HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="320">
+            <Border Style="{StaticResource ActiveGlowBorder}" Background="#1F1F2E" Padding="24" HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="320">
                 <VerticalStackLayout Spacing="16">
                     <Label Text="Свій продукт" FontSize="20" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
                     
-                    <Border BackgroundColor="#2D2D2D" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="12,0">
+                    <Border Background="#2D2D2D" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="12,0">
                         <Entry Placeholder="Назва продукту" Text="{Binding NewProductName}" TextColor="White" PlaceholderColor="#888888" BackgroundColor="Transparent"/>
                     </Border>
                     
-                    <Border BackgroundColor="#2D2D2D" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="12,0">
+                    <Border Background="#2D2D2D" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="12,0">
                         <Picker Title="Оберіть категорію" SelectedItem="{Binding NewProductCategory}" ItemsSource="{Binding CategoriesWithoutAll}" TextColor="White" TitleColor="#888888" BackgroundColor="Transparent"/>
                     </Border>
                     

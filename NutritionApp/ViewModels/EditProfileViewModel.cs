@@ -65,6 +65,7 @@ namespace NutritionApp.ViewModels
             "lose weight" => "Схуднення",
             "gain muscle" => "Набір маси",
             "maintain weight" => "Підтримка ваги",
+            null => "Підтримка ваги",
             _ => "Підтримка ваги"
         };
 
@@ -73,6 +74,7 @@ namespace NutritionApp.ViewModels
             "Схуднення" => "lose weight",
             "Набір маси" => "gain muscle",
             "Підтримка ваги" => "maintain weight",
+            null => "maintain weight",
             _ => "maintain weight"
         };
 
@@ -83,6 +85,7 @@ namespace NutritionApp.ViewModels
             "moderately active" => "Помірна активність",
             "very active" => "Висока активність",
             "extra active" => "Дуже висока активність",
+            null => "Помірна активність",
             _ => "Помірна активність"
         };
 
@@ -93,6 +96,7 @@ namespace NutritionApp.ViewModels
             "Помірна активність" => "moderately active",
             "Висока активність" => "very active",
             "Дуже висока активність" => "extra active",
+            null => "moderately active",
             _ => "moderately active"
         };
 
@@ -100,6 +104,7 @@ namespace NutritionApp.ViewModels
         {
             "male" => "Чоловіча",
             "female" => "Жіноча",
+            null => "Чоловіча",
             _ => "Чоловіча"
         };
 
@@ -107,6 +112,7 @@ namespace NutritionApp.ViewModels
         {
             "Чоловіча" => "male",
             "Жіноча" => "female",
+            null => "male",
             _ => "male"
         };
 
