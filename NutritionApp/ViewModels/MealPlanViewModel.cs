@@ -34,9 +34,12 @@ namespace NutritionApp.ViewModels
             {
                 _isLoading = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsNotLoading));
                 OnPropertyChanged(nameof(ShowInitialMessage));
             }
         }
+
+        public bool IsNotLoading => !IsLoading;
 
         private bool _hasData;
         public bool HasData

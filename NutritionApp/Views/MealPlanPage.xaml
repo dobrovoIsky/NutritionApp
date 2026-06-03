@@ -54,7 +54,24 @@
             </Border>
 
             <!-- Кнопка генерації -->
-            <Button Grid.Row="2" Text="✨ Згенерувати рецепти" Command="{Binding GeneratePlanCommand}" Style="{StaticResource AccentButton}" HeightRequest="54" CornerRadius="27" FontAttributes="Bold" FontSize="16" Margin="0,0,0,16"/>
+            <Grid Grid.Row="2" Margin="0,0,0,16">
+                <!-- Звичайна кнопка -->
+                <Button Text="✨ Згенерувати рецепти" 
+                        Command="{Binding GeneratePlanCommand}" 
+                        IsVisible="{Binding IsNotLoading}"
+                        Style="{StaticResource AccentButton}" 
+                        HeightRequest="54" CornerRadius="27" FontAttributes="Bold" FontSize="16"/>
+                
+                <!-- Стан завантаження -->
+                <Border IsVisible="{Binding IsLoading}" 
+                        BackgroundColor="#2D2D2D" StrokeThickness="0"
+                        HeightRequest="54" StrokeShape="RoundRectangle 27" Padding="0">
+                    <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                        <ActivityIndicator IsRunning="{Binding IsLoading}" Color="{StaticResource Primary}" HeightRequest="24" WidthRequest="24"/>
+                        <Label Text="Генерується..." TextColor="{StaticResource Primary}" FontAttributes="Bold" FontSize="16" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </Border>
+            </Grid>
 
             <!-- Скролюваний контент -->
             <ScrollView Grid.Row="3" VerticalScrollBarVisibility="Never" Padding="0,0,0,72">
