@@ -661,6 +661,8 @@ public class ApiService
             var persistentCached = await _cacheService.GetAsync<List<FoodDatabaseItem>>(cacheKey);
             return persistentCached ?? new List<FoodDatabaseItem>();
         }
+    }
+
     public async Task<FoodDatabaseItem> AddFoodDatabaseItemAsync(FoodDatabaseItem item)
     {
         try
