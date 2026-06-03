@@ -29,10 +29,10 @@ namespace NutritionApp.ViewModels
 
         public string SelectedGoal
         {
-            get => ConvertGoalToUa(_userProfile?.Goal);
+            get => _userProfile == null ? null : ConvertGoalToUa(_userProfile.Goal);
             set
             {
-                if (_userProfile != null)
+                if (_userProfile != null && value != null)
                 {
                     var enValue = ConvertGoalToEn(value);
                     if (_userProfile.Goal != enValue)
@@ -46,10 +46,10 @@ namespace NutritionApp.ViewModels
 
         public string SelectedActivityLevel
         {
-            get => ConvertActivityToUa(_userProfile?.ActivityLevel);
+            get => _userProfile == null ? null : ConvertActivityToUa(_userProfile.ActivityLevel);
             set
             {
-                if (_userProfile != null)
+                if (_userProfile != null && value != null)
                 {
                     var enValue = ConvertActivityToEn(value);
                     if (_userProfile.ActivityLevel != enValue)
@@ -63,10 +63,10 @@ namespace NutritionApp.ViewModels
 
         public string SelectedGender
         {
-            get => ConvertGenderToUa(_userProfile?.Gender);
+            get => _userProfile == null ? null : ConvertGenderToUa(_userProfile.Gender);
             set
             {
-                if (_userProfile != null)
+                if (_userProfile != null && value != null)
                 {
                     var enValue = ConvertGenderToEn(value);
                     if (_userProfile.Gender != enValue)
