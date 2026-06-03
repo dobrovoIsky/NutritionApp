@@ -199,6 +199,7 @@ public class ApiService
                 // Оновлюємо кеш
                 if (profile != null)
                 {
+                    SetMemoryCache($"profile_{userId}", profile, ProfileCacheTTL);
                     await _cacheService.SaveAsync($"profile_{userId}", profile);
                 }
                 return profile;

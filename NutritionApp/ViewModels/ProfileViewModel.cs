@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -17,8 +17,32 @@ namespace NutritionApp.ViewModels
         public UserProfile UserProfile
         {
             get => _userProfile;
-            set { _userProfile = value; OnPropertyChanged(); }
+            set 
+            { 
+                _userProfile = value; 
+                OnPropertyChanged(); 
+                OnPropertyChanged(nameof(GoalUa));
+                OnPropertyChanged(nameof(ActivityLevelUa));
+            }
         }
+
+        public string GoalUa => _userProfile?.Goal switch
+        {
+            "lose weight" => "Схуднення",
+            "gain muscle" => "Набір маси",
+            "maintain weight" => "Підтримка ваги",
+            _ => _userProfile?.Goal ?? "—"
+        };
+
+        public string ActivityLevelUa => _userProfile?.ActivityLevel switch
+        {
+            "sedentary" => "Сидячий спосіб життя",
+            "lightly active" => "Легка активність",
+            "moderately active" => "Помірна активність",
+            "very active" => "Висока активність",
+            "extra active" => "Дуже висока активність",
+            _ => _userProfile?.ActivityLevel ?? "—"
+        };
 
         private bool _isLoading;
         public bool IsLoading
@@ -97,7 +121,7 @@ namespace NutritionApp.ViewModels
         {
             _apiService = apiService;
             _waterService = waterService;
-            LoadUserProfileCommand = new Command(async () => await LoadUserProfileAsync(forceRefresh: false));
+            LoadUserProfileCommand = new Command(async () => await LoadUserProfileAsync(forceRefresh: true));
         }
 
         public async Task LoadUserProfileAsync(bool forceRefresh = false)

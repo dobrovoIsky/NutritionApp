@@ -103,7 +103,7 @@
                                 <Label Text="⚡" FontSize="18" VerticalOptions="Center"/>
                                 <Label Text="Активність" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
                             </HorizontalStackLayout>
-                            <Label Text="{Binding UserProfile.ActivityLevel}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Primary}" LineBreakMode="TailTruncation" VerticalOptions="Center" HeightRequest="30"/>
+                            <Label Text="{Binding ActivityLevelUa}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Primary}" LineBreakMode="TailTruncation" VerticalOptions="Center" HeightRequest="30"/>
                         </VerticalStackLayout>
                     </Border>
 
@@ -113,7 +113,7 @@
                                 <Label Text="🎯" FontSize="18" VerticalOptions="Center"/>
                                 <Label Text="Ціль" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
                             </HorizontalStackLayout>
-                            <Label Text="{Binding UserProfile.Goal}" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="{Binding GoalUa}" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
                         </VerticalStackLayout>
                     </Border>
                 </Grid>
