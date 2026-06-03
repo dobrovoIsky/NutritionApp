@@ -116,6 +116,28 @@ namespace NutritionApp.ViewModels
             _ => "male"
         };
 
+        public List<string> GoalOptions { get; } = new()
+        {
+            "Схуднення",
+            "Набір маси",
+            "Підтримка ваги"
+        };
+
+        public List<string> ActivityOptions { get; } = new()
+        {
+            "Сидячий спосіб життя",
+            "Легка активність",
+            "Помірна активність",
+            "Висока активність",
+            "Дуже висока активність"
+        };
+
+        public List<string> GenderOptions { get; } = new()
+        {
+            "Чоловіча",
+            "Жіноча"
+        };
+
         private bool _isLoading;
         public bool IsLoading
         {
