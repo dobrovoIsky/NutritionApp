@@ -24,7 +24,7 @@
         </Grid>
 
         <!-- Content -->
-        <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*">
+        <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,*">
 
             <Border Grid.Row="0" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16" Margin="0,0,0,12">
                 <Border.GestureRecognizers>
@@ -56,8 +56,9 @@
             <!-- Кнопка генерації -->
             <Grid Grid.Row="2" Margin="0,0,0,16">
                 <!-- Звичайна кнопка -->
-                <Button Text="✨ Згенерувати рецепти" 
+                <Button x:Name="GenerateBtn" Text="✨ Згенерувати рецепти" 
                         Command="{Binding GeneratePlanCommand}" 
+                        Clicked="OnGenerateClicked"
                         IsVisible="{Binding IsNotLoading}"
                         Style="{StaticResource AccentButton}" 
                         HeightRequest="54" CornerRadius="27" FontAttributes="Bold" FontSize="16"/>
