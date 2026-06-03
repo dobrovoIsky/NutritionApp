@@ -222,6 +222,26 @@ namespace NutritionApp.ViewModels
                     LoggedAt = DateTime.UtcNow
                 };
 
+                // Check if we need to add this to the global database
+                if (!_allProducts.Any(p => p.Name.Equals(Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    double weightMultiplier = entry.Weight > 0 ? entry.Weight / 100.0 : 1.0;
+                    var dbItem = new FoodDatabaseItem
+                    {
+                        Name = Name,
+                        CaloriesPer100g = Math.Round(entry.Calories / weightMultiplier, 1),
+                        ProteinPer100g = Math.Round(entry.Protein / weightMultiplier, 1),
+                        FatPer100g = Math.Round(entry.Fat / weightMultiplier, 1),
+                        CarbsPer100g = Math.Round(entry.Carbs / weightMultiplier, 1)
+                    };
+                    
+                    var savedDbItem = await _apiService.AddFoodDatabaseItemAsync(dbItem);
+                    if (savedDbItem != null)
+                    {
+                        _allProducts.Add(savedDbItem);
+                    }
+                }
+
                 // Debug display alert removed for cleanliness
                 FoodEntry saved;
                 if (_editEntryId.HasValue)
@@ -357,12 +377,8 @@ namespace NutritionApp.ViewModels
                     var product = await _apiService.SearchByBarcodeAsync(barcode);
                     if (product != null)
                     {
-                        Name = product.Name;
-                        Calories = product.CaloriesPer100g.ToString();
-                        Protein = product.ProteinPer100g.ToString();
-                        Fat = product.FatPer100g.ToString();
-                        Carbs = product.CarbsPer100g.ToString();
                         Weight = "100";
+                        SelectedProduct = product;
                     }
                     else
                     {

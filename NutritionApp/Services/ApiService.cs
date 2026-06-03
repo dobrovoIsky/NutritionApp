@@ -661,6 +661,30 @@ public class ApiService
             var persistentCached = await _cacheService.GetAsync<List<FoodDatabaseItem>>(cacheKey);
             return persistentCached ?? new List<FoodDatabaseItem>();
         }
+    public async Task<FoodDatabaseItem> AddFoodDatabaseItemAsync(FoodDatabaseItem item)
+    {
+        try
+        {
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                return null;
+
+            var response = await _httpClient.PostAsJsonAsync("/api/tracker/products", item, _jsonOptions);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var createdItem = JsonSerializer.Deserialize<FoodDatabaseItem>(responseContent, _jsonOptions);
+                
+                // Clear cache so it fetches the new item next time
+                _memoryCache.TryRemove("food_database_items", out _);
+                return createdItem;
+            }
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"AddFoodDatabaseItemAsync exception: {ex.Message}");
+            return null;
+        }
     }
 
     public async Task<FoodDatabaseItem> SearchByBarcodeAsync(string barcode)
