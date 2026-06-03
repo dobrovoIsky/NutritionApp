@@ -37,11 +37,8 @@
             Icon="history_icon.png" 
             ContentTemplate="{DataTemplate local:SavedRecipesPage}" />
 
-        <ShellContent
-            Title="Тренування"
-            Route="WorkoutPage"
-            Icon="dumbbell_icon.png"
-            ContentTemplate="{DataTemplate local:WorkoutPage}" />
+
+
 
         <ShellContent
             Title="Профіль"
