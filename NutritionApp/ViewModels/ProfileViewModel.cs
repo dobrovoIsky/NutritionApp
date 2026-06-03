@@ -141,7 +141,7 @@ namespace NutritionApp.ViewModels
 
                 if (userId > 0)
                 {
-                    UserProfile = await _apiService.GetUserProfileAsync(userId);
+                    UserProfile = await _apiService.GetUserProfileAsync(userId, forceRefresh);
                     _lastUserId = userId;
                     _isDataLoaded = true;
                     Debug.WriteLine($"ProfileViewModel: Loaded - Height={UserProfile?.Height}, Weight={UserProfile?.Weight}");

@@ -151,13 +151,16 @@ public class ApiService
 
     // ===== PROFILE =====
 
-    public async Task<UserProfile> GetUserProfileAsync(int userId)
+    public async Task<UserProfile> GetUserProfileAsync(int userId, bool forceRefresh = false)
     {
         string cacheKey = $"profile_{userId}";
         
-        // Check memory cache first
-        var cached = GetFromMemoryCache<UserProfile>(cacheKey);
-        if (cached != null) return cached;
+        // Check memory cache first (skip if force refresh)
+        if (!forceRefresh)
+        {
+            var cached = GetFromMemoryCache<UserProfile>(cacheKey);
+            if (cached != null) return cached;
+        }
         
         try
         {
