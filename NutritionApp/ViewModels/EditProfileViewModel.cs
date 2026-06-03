@@ -211,20 +211,14 @@ namespace NutritionApp.ViewModels
                     return;
                 }
 
-                var payload = new
-                {
-                    Height = UserProfile.Height,
-                    Weight = UserProfile.Weight,
-                    Age = UserProfile.Age,
-                    Goal = UserProfile.Goal ?? "maintain weight",
-                    ActivityLevel = UserProfile.ActivityLevel ?? "moderately active",
-                    AvatarId = UserProfile.AvatarId,
-                    Gender = UserProfile.Gender ?? "male"
-                };
+                // Оновлюємо відсутні значення за замовчуванням перед відправкою
+                if (string.IsNullOrEmpty(UserProfile.Goal)) UserProfile.Goal = "maintain weight";
+                if (string.IsNullOrEmpty(UserProfile.ActivityLevel)) UserProfile.ActivityLevel = "moderately active";
+                if (string.IsNullOrEmpty(UserProfile.Gender)) UserProfile.Gender = "male";
 
-                Debug.WriteLine($"EditProfile: Saving profile for userId: {userId}, payload: Height={payload.Height}, Weight={payload.Weight}");
+                Debug.WriteLine($"EditProfile: Saving profile for userId: {userId}, payload: Height={UserProfile.Height}, Weight={UserProfile.Weight}, Username={UserProfile.Username}");
 
-                var updatedProfile = await _apiService.UpdateUserProfileAsync(userId, payload);
+                var updatedProfile = await _apiService.UpdateUserProfileAsync(userId, UserProfile);
                 if (updatedProfile != null)
                 {
                     UserProfile = updatedProfile;
