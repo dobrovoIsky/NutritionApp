@@ -33,8 +33,14 @@ namespace NutritionApp.ViewModels
             set
             {
                 if (_userProfile != null)
-                    _userProfile.Goal = ConvertGoalToEn(value);
-                OnPropertyChanged();
+                {
+                    var enValue = ConvertGoalToEn(value);
+                    if (_userProfile.Goal != enValue)
+                    {
+                        _userProfile.Goal = enValue;
+                        OnPropertyChanged();
+                    }
+                }
             }
         }
 
@@ -44,8 +50,14 @@ namespace NutritionApp.ViewModels
             set
             {
                 if (_userProfile != null)
-                    _userProfile.ActivityLevel = ConvertActivityToEn(value);
-                OnPropertyChanged();
+                {
+                    var enValue = ConvertActivityToEn(value);
+                    if (_userProfile.ActivityLevel != enValue)
+                    {
+                        _userProfile.ActivityLevel = enValue;
+                        OnPropertyChanged();
+                    }
+                }
             }
         }
 
@@ -55,8 +67,14 @@ namespace NutritionApp.ViewModels
             set
             {
                 if (_userProfile != null)
-                    _userProfile.Gender = ConvertGenderToEn(value);
-                OnPropertyChanged();
+                {
+                    var enValue = ConvertGenderToEn(value);
+                    if (_userProfile.Gender != enValue)
+                    {
+                        _userProfile.Gender = enValue;
+                        OnPropertyChanged();
+                    }
+                }
             }
         }
 
