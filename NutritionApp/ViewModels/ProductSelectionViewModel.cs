@@ -86,7 +86,7 @@ namespace NutritionApp.ViewModels
             }
         }
 
-        public IEnumerable<string> CategoriesWithoutAll => Categories.Where(c => c != "Всі");
+        public List<string> CategoriesWithoutAll => Categories.Where(c => c != "Всі").ToList();
 
         public ICommand ToggleProductCommand { get; }
         public ICommand ShowAddCustomProductCommand { get; }

@@ -108,7 +108,7 @@
 
         <!-- Overlay для додавання продукту -->
         <Grid IsVisible="{Binding IsAddingCustomProduct}" Grid.RowSpan="4" BackgroundColor="#B3000000" Margin="-16,-20,-16,0">
-            <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="24" HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="320">
+            <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="#1F1F2E" Padding="24" HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="320">
                 <VerticalStackLayout Spacing="16">
                     <Label Text="Свій продукт" FontSize="20" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
                     
