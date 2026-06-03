@@ -23,15 +23,26 @@
                 <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
                     <VerticalStackLayout Spacing="16">
                         
-                        <Grid ColumnDefinitions="*,Auto">
+                        <Grid ColumnDefinitions="*,Auto,Auto">
                             <Label Text="Що ви з'їли?" TextColor="{StaticResource TextSecondary}" FontSize="14" VerticalOptions="Center"/>
-                            <Border Grid.Column="1" StrokeShape="RoundRectangle 8" BackgroundColor="#1E3A8A" Padding="12,6" Stroke="Transparent">
+                            
+                            <Border Grid.Column="1" StrokeShape="RoundRectangle 8" BackgroundColor="#059669" Padding="12,6" Stroke="Transparent" Margin="0,0,8,0">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ScanBarcodeCommand}"/>
+                                </Border.GestureRecognizers>
+                                <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                    <Label Text="🔎" FontSize="14" VerticalOptions="Center"/>
+                                    <Label Text="Штрихкод" FontSize="12" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+                            </Border>
+
+                            <Border Grid.Column="2" StrokeShape="RoundRectangle 8" BackgroundColor="#1E3A8A" Padding="12,6" Stroke="Transparent">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding AnalyzeFoodImageCommand}"/>
                                 </Border.GestureRecognizers>
                                 <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
                                     <Label Text="📸" FontSize="14" VerticalOptions="Center"/>
-                                    <Label Text="Розпізнати по фото" FontSize="12" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
+                                    <Label Text="По фото" FontSize="12" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
                                 </HorizontalStackLayout>
                             </Border>
                         </Grid>

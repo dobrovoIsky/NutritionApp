@@ -72,18 +72,34 @@ namespace NutritionApp.ViewModels
             ? $"Обрано {_selectedProducts.Count} продуктів" 
             : "Натисніть, щоб обрати";
 
-        public ObservableCollection<ApiService.MealItem> Meals { get; } = new();
+        // Побажання користувача
+        private string _preferencesText;
+        public string PreferencesText
+        {
+            get => _preferencesText;
+            set
+            {
+                _preferencesText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<ApiService.MealItem> Recipes { get; } = new();
 
         public ICommand GeneratePlanCommand { get; }
         public ICommand OpenProductSelectionCommand { get; }
-        public ICommand LogFoodFromPlanCommand { get; }
+        public ICommand RemoveFoodCommand { get; }
+        public ICommand LogRecipeCommand { get; }
+        public ICommand SaveRecipeCommand { get; }
 
         public MealPlanViewModel(ApiService apiService)
         {
             _apiService = apiService;
             GeneratePlanCommand = new Command(async () => await GeneratePlanAsync());
             OpenProductSelectionCommand = new Command(async () => await OpenProductSelectionAsync());
-            LogFoodFromPlanCommand = new Command<ApiService.FoodItem>(async (food) => await LogFoodFromPlanAsync(food));
+            RemoveFoodCommand = new Command<ApiService.FoodItem>(RemoveFood);
+            LogRecipeCommand = new Command<ApiService.MealItem>(async (recipe) => await LogRecipeAsync(recipe));
+            SaveRecipeCommand = new Command<ApiService.MealItem>(async (recipe) => await SaveRecipeAsync(recipe));
             HasData = false;
             HasError = false;
             
@@ -128,7 +144,7 @@ namespace NutritionApp.ViewModels
             OnPropertyChanged(nameof(SelectedProductsText));
         }
 
-        private async Task GeneratePlanAsync()
+    private async Task GeneratePlanAsync()
         {
             if (IsLoading) return;
             try
@@ -138,26 +154,26 @@ namespace NutritionApp.ViewModels
                 HasData = false;
                 ErrorMessage = "";
                 Summary = "";
-                Meals.Clear();
+                Recipes.Clear();
 
                 int userId = Preferences.Get("UserId", 0);
                 if (userId > 0)
                 {
-                    // Передаємо вибрані продукти в API
-                    var result = await _apiService.GenerateMealPlanAsync(userId, _selectedProducts);
+                    // Передаємо вибрані продукти та побажання в API
+                    var result = await _apiService.GenerateMealPlanAsync(userId, _selectedProducts, PreferencesText);
 
                     if (result != null && result.Meals != null && result.Meals.Count > 0)
                     {
-                        Summary = result.Summary ?? "Ваш персональний план харчування готовий!";
-                        foreach (var meal in result.Meals)
+                        Summary = result.Summary ?? "Ваші персональні рецепти готові!";
+                        foreach (var recipe in result.Meals)
                         {
-                            Meals.Add(meal);
+                            Recipes.Add(recipe);
                         }
                         HasData = true;
                     }
                     else
                     {
-                        ErrorMessage = "Не вдалося отримати план харчування.";
+                        ErrorMessage = "Не вдалося отримати рецепти.";
                         HasError = true;
                     }
                 }
@@ -179,53 +195,107 @@ namespace NutritionApp.ViewModels
             }
         }
 
-        private async Task LogFoodFromPlanAsync(ApiService.FoodItem food)
+        private void RemoveFood(ApiService.FoodItem food)
         {
-            if (food == null) return;
+            if (food == null || Recipes == null) return;
+            
+            foreach (var recipe in Recipes)
+            {
+                if (recipe.Foods != null && recipe.Foods.Contains(food))
+                {
+                    recipe.Foods.Remove(food);
+                    // Перераховуємо калорії для рецепту
+                    recipe.TotalCalories = recipe.Foods.Sum(f => f.Calories);
+                    break;
+                }
+            }
+        }
+
+        private async Task LogRecipeAsync(ApiService.MealItem recipe)
+        {
+            if (recipe == null) return;
             try
             {
                 int userId = Preferences.Get("UserId", 0);
                 if (userId == 0) return;
 
-                // Запитуємо у користувача куди додати страву
-                string action = await Application.Current.MainPage.DisplayActionSheet("Куди додати страву?", "Скасувати", null, "Сніданок", "Обід", "Вечеря", "Перекус");
+                // Запитуємо у користувача куди додати рецепт
+                string action = await Application.Current.MainPage.DisplayActionSheet("Куди додати цю страву?", "Скасувати", null, "Сніданок", "Обід", "Вечеря", "Перекус");
                 
                 if (action == "Скасувати" || string.IsNullOrEmpty(action))
                 {
                     return; // Користувач скасував
                 }
 
-                // Extract numeric weight if possible
-                double weight = 0;
-                var weightStr = new string(food.Weight?.Where(char.IsDigit).ToArray());
-                double.TryParse(weightStr, out weight);
+                // Логуємо як ОДНУ страву (Dish) з сумарними показниками
+                var totalCalories = recipe.Foods?.Sum(f => f.Calories) ?? recipe.TotalCalories;
+                var totalProtein = recipe.Foods?.Sum(f => f.Protein) ?? 0;
+                var totalFat = recipe.Foods?.Sum(f => f.Fat) ?? 0;
+                var totalCarbs = recipe.Foods?.Sum(f => f.Carbs) ?? 0;
+                var totalWeight = recipe.Foods?.Sum(f => 
+                {
+                    var weightStr = new string(f.Weight?.Where(char.IsDigit).ToArray());
+                    double.TryParse(weightStr, out double w);
+                    return w;
+                }) ?? 100;
 
                 var entry = new Models.FoodEntry
                 {
                     UserId = userId,
-                    Name = food.Name,
-                    Calories = food.Calories,
-                    Protein = food.Protein,
-                    Fat = food.Fat,
-                    Carbs = food.Carbs,
-                    Weight = weight > 0 ? weight : 100, // Default 100 if couldn't parse
-                    MealType = action, // Встановлюємо вибраний тип
+                    Name = recipe.Name,
+                    Calories = totalCalories,
+                    Protein = totalProtein,
+                    Fat = totalFat,
+                    Carbs = totalCarbs,
+                    Weight = totalWeight > 0 ? totalWeight : 100, // Default 100
+                    MealType = action, 
                     LoggedAt = DateTime.UtcNow
                 };
 
                 var saved = await _apiService.LogFoodAsync(entry);
                 if (saved != null)
                 {
-                    await Application.Current.MainPage.DisplayAlert("Успіх", $"'{food.Name}' додано в {action.ToLower()}!", "ОК");
+                    await Application.Current.MainPage.DisplayAlert("Успіх", $"Страва '{recipe.Name}' додана до щоденника!", "OK");
+                    MessagingCenter.Send(this, "FoodLogged");
                 }
                 else
                 {
-                    await Application.Current.MainPage.DisplayAlert("Помилка", "Не вдалося зберегти дані", "ОК");
+                    await Application.Current.MainPage.DisplayAlert("Помилка", "Не вдалося зберегти страву.", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Помилка", ex.Message, "ОК");
+                await Application.Current.MainPage.DisplayAlert("Помилка", $"Сталася помилка: {ex.Message}", "ОК");
+            }
+        }
+
+        private async Task SaveRecipeAsync(ApiService.MealItem recipe)
+        {
+            if (recipe == null) return;
+            try
+            {
+                var savedJson = Preferences.Get("SavedRecipes", "");
+                var savedRecipes = string.IsNullOrEmpty(savedJson) 
+                    ? new List<ApiService.MealItem>() 
+                    : System.Text.Json.JsonSerializer.Deserialize<List<ApiService.MealItem>>(savedJson);
+                
+                if (savedRecipes == null) savedRecipes = new List<ApiService.MealItem>();
+                
+                if (savedRecipes.Any(r => r.Name == recipe.Name))
+                {
+                    await Application.Current.MainPage.DisplayAlert("Увага", "Цей рецепт вже збережено!", "OK");
+                    return;
+                }
+                
+                savedRecipes.Add(recipe);
+                var newJson = System.Text.Json.JsonSerializer.Serialize(savedRecipes);
+                Preferences.Set("SavedRecipes", newJson);
+                
+                await Application.Current.MainPage.DisplayAlert("Успіх", "Рецепт збережено у вкладку 'Рецепти'!", "OK");
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Помилка", $"Не вдалося зберегти рецепт: {ex.Message}", "OK");
             }
         }
 

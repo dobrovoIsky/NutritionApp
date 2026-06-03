@@ -40,68 +40,85 @@
             <VerticalStackLayout Spacing="20">
 
                 <!-- Кнопки дій -->
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                    <Button Text="Редагувати"
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                    <Button Text="✏️ Редагувати"
                             Clicked="OnEditProfileClicked"
                             Style="{StaticResource AccentButton}"
-                            HeightRequest="50"
-                            CornerRadius="25"
-                            FontAttributes="Bold"/>
+                            HeightRequest="52"
+                            CornerRadius="26"
+                            FontAttributes="Bold"
+                            FontSize="15"/>
 
                     <Button Grid.Column="1"
-                            Text="Вийти"
+                            Text="🚪 Вийти"
                             Clicked="OnLogoutButtonClicked"
-                            HeightRequest="50"
-                            CornerRadius="25"
-                            BackgroundColor="Transparent"       
-                            TextColor="{StaticResource TextSecondary}"
-                            BorderColor="{StaticResource BorderColor}"
+                            HeightRequest="52"
+                            CornerRadius="26"
+                            BackgroundColor="#22FFFFFF"       
+                            TextColor="White"
+                            BorderColor="#44FFFFFF"
                             BorderWidth="1"
-                            FontAttributes="Bold"/>
+                            FontAttributes="Bold"
+                            FontSize="15"/>
                 </Grid>
 
-                <Label Text="Мої показники" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" Margin="0,8,0,0"/>
+                <Label Text="Мої показники" FontSize="22" FontAttributes="Bold" TextColor="White" Margin="0,16,0,8"/>
 
                 <!-- Блок з основними даними -->
-                <Grid ColumnDefinitions="*,*" RowSpacing="12" ColumnSpacing="12">
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="15" ColumnSpacing="15">
                     
-                    <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Ріст" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
-                            <Label Text="{Binding UserProfile.Height, StringFormat='{0:F1} см'}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                    <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
+                        <VerticalStackLayout Spacing="8">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="📏" FontSize="18" VerticalOptions="Center"/>
+                                <Label Text="Ріст" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding UserProfile.Height, StringFormat='{0:F1} см'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Column="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Вага" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
-                            <Label Text="{Binding UserProfile.Weight, StringFormat='{0:F1} кг'}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
+                        <VerticalStackLayout Spacing="8">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="⚖️" FontSize="18" VerticalOptions="Center"/>
+                                <Label Text="Вага" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding UserProfile.Weight, StringFormat='{0:F1} кг'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Row="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Вік" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
-                            <Label Text="{Binding UserProfile.Age, StringFormat='{0} років'}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
+                        <VerticalStackLayout Spacing="8">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="🎂" FontSize="18" VerticalOptions="Center"/>
+                                <Label Text="Вік" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding UserProfile.Age, StringFormat='{0} років'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Активність" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
-                            <Label Text="{Binding UserProfile.ActivityLevel}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation"/>
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
+                        <VerticalStackLayout Spacing="8">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="⚡" FontSize="18" VerticalOptions="Center"/>
+                                <Label Text="Активність" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding UserProfile.ActivityLevel}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Primary}" LineBreakMode="TailTruncation" VerticalOptions="Center" HeightRequest="30"/>
                         </VerticalStackLayout>
                     </Border>
 
-                    <Border Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Ціль" FontSize="13" TextColor="{StaticResource TextSecondary}"/>
-                            <Label Text="{Binding UserProfile.Goal}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                    <Border Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
+                        <VerticalStackLayout Spacing="8">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="🎯" FontSize="18" VerticalOptions="Center"/>
+                                <Label Text="Ціль" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding UserProfile.Goal}" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
                         </VerticalStackLayout>
                     </Border>
                 </Grid>
 
-                <Label Text="Налаштування" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" Margin="0,16,0,0"/>
+                <Label Text="Налаштування" FontSize="22" FontAttributes="Bold" TextColor="White" Margin="0,24,0,8"/>
 
                 <!-- Нагадування про воду -->
                 <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16">
@@ -190,12 +207,12 @@
                                     SelectedItem="{Binding SelectedAvatar}"
                                     SelectionChanged="OnAvatarSelected"
                                     HorizontalOptions="Center"
-                                    HeightRequest="160">
+                                    HeightRequest="180">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" 
-                                             Span="4"
-                                             HorizontalItemSpacing="8"
-                                             VerticalItemSpacing="8"/>
+                                             Span="2"
+                                             HorizontalItemSpacing="16"
+                                             VerticalItemSpacing="16"/>
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="viewmodels:AvatarOption">

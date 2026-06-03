@@ -4,6 +4,8 @@ using NutritionApp.ViewModels;
 using NutritionApp.Views;
 using Plugin.LocalNotification;
 
+using ZXing.Net.Maui.Controls;
+
 namespace NutritionApp
 {
     public static class MauiProgram
@@ -13,6 +15,7 @@ namespace NutritionApp
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseBarcodeReader()
                 .UseLocalNotification()
                 .ConfigureFonts(fonts =>
                 {
@@ -47,12 +50,13 @@ namespace NutritionApp
             builder.Services.AddSingleton<MealPlanViewModel>(); // Singleton for caching
 
             builder.Services.AddTransient<ProfilePage>();
-            builder.Services.AddTransient<HistoryPage>();
-            builder.Services.AddSingleton<HistoryViewModel>(); // Singleton for caching
+            builder.Services.AddTransient<SavedRecipesPage>();
+            builder.Services.AddSingleton<SavedRecipesViewModel>();
             builder.Services.AddTransient<HistoryDetailPage>();
             builder.Services.AddTransient<WorkoutPage>();
             builder.Services.AddTransient<AddFoodPage>();
             builder.Services.AddTransient<AddFoodViewModel>();
+            builder.Services.AddTransient<BarcodeScannerPage>();
             builder.Services.AddTransient<HistoryDetailPage>();
             builder.Services.AddTransient<MyRationPage>();
             builder.Services.AddTransient<MyRationViewModel>();

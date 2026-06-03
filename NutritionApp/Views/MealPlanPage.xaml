@@ -26,7 +26,6 @@
         <!-- Content -->
         <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*">
 
-            <!-- Кнопка вибору продуктів -->
             <Border Grid.Row="0" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16" Margin="0,0,0,12">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding OpenProductSelectionCommand}"/>
@@ -46,11 +45,19 @@
                 </Grid>
             </Border>
 
+            <!-- Побажання -->
+            <Border Grid.Row="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16" Margin="0,0,0,16">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Особливі побажання" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                    <Entry Placeholder="Наприклад: без цибулі, тільки вегетаріанське" Text="{Binding PreferencesText}" TextColor="White" PlaceholderColor="{StaticResource TextSecondary}" BackgroundColor="Transparent"/>
+                </VerticalStackLayout>
+            </Border>
+
             <!-- Кнопка генерації -->
-            <Button Grid.Row="1" Text="✨ Згенерувати новий план" Command="{Binding GeneratePlanCommand}" Style="{StaticResource AccentButton}" HeightRequest="54" CornerRadius="27" FontAttributes="Bold" FontSize="16" Margin="0,0,0,16"/>
+            <Button Grid.Row="2" Text="✨ Згенерувати рецепти" Command="{Binding GeneratePlanCommand}" Style="{StaticResource AccentButton}" HeightRequest="54" CornerRadius="27" FontAttributes="Bold" FontSize="16" Margin="0,0,0,16"/>
 
             <!-- Скролюваний контент -->
-            <ScrollView Grid.Row="2" VerticalScrollBarVisibility="Never" Padding="0,0,0,72">
+            <ScrollView Grid.Row="3" VerticalScrollBarVisibility="Never" Padding="0,0,0,72">
                 <VerticalStackLayout Spacing="16">
 
                     <!-- Індикатор завантаження -->
@@ -71,25 +78,30 @@
                     <!-- Summary -->
                     <Label Text="{Binding Summary}" IsVisible="{Binding HasData}" FontSize="15" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="0,0,0,8"/>
 
-                    <!-- Прийоми їжі -->
-                    <CollectionView ItemsSource="{Binding Meals}" IsVisible="{Binding HasData}">
+                    <!-- Рецепти -->
+                    <CollectionView ItemsSource="{Binding Recipes}" IsVisible="{Binding HasData}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="16" Margin="0,0,0,12">
                                     <VerticalStackLayout Spacing="12">
 
-                                        <!-- Заголовок прийому їжі -->
+                                        <!-- Заголовок рецепту -->
                                         <Grid ColumnDefinitions="*,Auto">
                                             <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
                                                 <Label Text="🍽️" FontSize="20"/>
                                                 <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
                                             </HorizontalStackLayout>
-                                            <Border Grid.Column="1" BackgroundColor="#1E1E38" StrokeShape="RoundRectangle 10" StrokeThickness="0" Padding="10,6">
-                                                <Label Text="{Binding Time}" FontSize="13" TextColor="{StaticResource Primary}" FontAttributes="Bold"/>
-                                            </Border>
+                                            
+                                            <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                                                <Button Text="💾" Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:MealPlanViewModel}}, Path=SaveRecipeCommand}" CommandParameter="{Binding .}" WidthRequest="40" HeightRequest="40" CornerRadius="20" Padding="0" BackgroundColor="#6366F1" TextColor="White" FontSize="18"/>
+                                                <Button Text="+" Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:MealPlanViewModel}}, Path=LogRecipeCommand}" CommandParameter="{Binding .}" WidthRequest="40" HeightRequest="40" CornerRadius="20" Padding="0" BackgroundColor="#10B981" TextColor="White" FontAttributes="Bold" FontSize="22"/>
+                                            </HorizontalStackLayout>
                                         </Grid>
 
-                                        <!-- Список продуктів -->
+                                        <!-- Опис приготування -->
+                                        <Label Text="{Binding Description}" FontSize="14" TextColor="{StaticResource TextSecondary}" Margin="0,4,0,8" LineBreakMode="WordWrap"/>
+
+                                        <!-- Список інгредієнтів -->
                                         <VerticalStackLayout BindableLayout.ItemsSource="{Binding Foods}" Spacing="8">
                                             <BindableLayout.ItemTemplate>
                                                 <DataTemplate>
@@ -98,7 +110,7 @@
                                                             <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
                                                             <Label Grid.Column="1" Text="{Binding Weight}" FontSize="14" Margin="0,0,12,0" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
 
-                                                            <Button Grid.Column="2" Grid.RowSpan="2" Text="+" Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:MealPlanViewModel}}, Path=LogFoodFromPlanCommand}" CommandParameter="{Binding .}" WidthRequest="44" HeightRequest="44" CornerRadius="22" Padding="0" BackgroundColor="#10B981" TextColor="White" FontAttributes="Bold" FontSize="22" VerticalOptions="Center"/>
+                                                            <Button Grid.Column="2" Grid.RowSpan="2" Text="🗑️" Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:MealPlanViewModel}}, Path=RemoveFoodCommand}" CommandParameter="{Binding .}" WidthRequest="44" HeightRequest="44" CornerRadius="22" Padding="0" BackgroundColor="#EF4444" TextColor="White" FontSize="18" VerticalOptions="Center"/>
 
                                                             <HorizontalStackLayout Grid.Row="1" Grid.ColumnSpan="2" Spacing="12" Margin="0,6,0,0">
                                                                 <Label Text="{Binding Calories, StringFormat='🔥 {0:F0} ккал'}" FontSize="12" FontAttributes="Bold" TextColor="#EA580C"/>
@@ -112,7 +124,7 @@
                                             </BindableLayout.ItemTemplate>
                                         </VerticalStackLayout>
 
-                                        <!-- Загальні калорії прийому -->
+                                        <!-- Загальні калорії рецепту -->
                                         <Border BackgroundColor="#2A1810" StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="10,6" HorizontalOptions="End" Margin="0,4,0,0">
                                             <Label Text="{Binding TotalCalories, StringFormat='Всього: {0:F0} ккал'}" FontSize="13" TextColor="#EA580C" FontAttributes="Bold"/>
                                         </Border>
@@ -126,7 +138,7 @@
                     <!-- Початкове повідомлення -->
                     <VerticalStackLayout IsVisible="{Binding ShowInitialMessage}" Spacing="16" HorizontalOptions="Center" Margin="0,40,0,0">
                         <Label Text="🥗" FontSize="60" HorizontalOptions="Center"/>
-                        <Label Text="Натисни кнопку, щоб згенерувати план харчування" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                        <Label Text="Натисни кнопку, щоб згенерувати рецепти" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>

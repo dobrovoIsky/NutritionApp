@@ -103,12 +103,14 @@ namespace NutritionApp.ViewModels
 
         public ICommand SaveCommand { get; }
         public ICommand AnalyzeFoodImageCommand { get; }
+        public ICommand ScanBarcodeCommand { get; }
 
         public AddFoodViewModel(ApiService apiService)
         {
             _apiService = apiService;
             SaveCommand = new Command(async () => await SaveFoodAsync());
             AnalyzeFoodImageCommand = new Command(async () => await AnalyzeFoodImageAsync());
+            ScanBarcodeCommand = new Command(async () => await ScanBarcodeAsync());
             
             // Load products in background
             _ = LoadProductsAsync();
@@ -331,6 +333,53 @@ namespace NutritionApp.ViewModels
             {
                 IsAnalyzingImage = false;
             }
+        }
+
+        private async Task ScanBarcodeAsync()
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
+            if (status != PermissionStatus.Granted)
+            {
+                status = await Permissions.RequestAsync<Permissions.Camera>();
+                if (status != PermissionStatus.Granted)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Помилка", "Потрібен доступ до камери для сканування.", "OK");
+                    return;
+                }
+            }
+
+            var scannerPage = new Views.BarcodeScannerPage();
+            scannerPage.OnBarcodeScanned += async (barcode) =>
+            {
+                IsAnalyzingImage = true;
+                try
+                {
+                    var product = await _apiService.SearchByBarcodeAsync(barcode);
+                    if (product != null)
+                    {
+                        Name = product.Name;
+                        Calories = product.CaloriesPer100g.ToString();
+                        Protein = product.ProteinPer100g.ToString();
+                        Fat = product.FatPer100g.ToString();
+                        Carbs = product.CarbsPer100g.ToString();
+                        Weight = "100";
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Не знайдено", "Продукт не знайдено в базі Open Food Facts.", "OK");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Помилка", "Не вдалося отримати дані по штрихкоду.", "OK");
+                }
+                finally
+                {
+                    IsAnalyzingImage = false;
+                }
+            };
+
+            await Application.Current.MainPage.Navigation.PushModalAsync(scannerPage);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

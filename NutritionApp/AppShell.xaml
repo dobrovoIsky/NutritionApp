@@ -32,10 +32,10 @@
             ContentTemplate="{DataTemplate local:MealPlanPage}" />
 
         <ShellContent
-            Title="Історія"
-            Route="HistoryPage"
+            Title="Рецепти"
+            Route="SavedRecipesPage"
             Icon="history_icon.png" 
-            ContentTemplate="{DataTemplate local:HistoryPage}" />
+            ContentTemplate="{DataTemplate local:SavedRecipesPage}" />
 
         <ShellContent
             Title="Тренування"

@@ -100,17 +100,32 @@
             </CollectionView.EmptyView>
         </CollectionView>
 
-        <!-- Нижня панель з кнопками -->
-        <Grid Grid.Row="3" ColumnDefinitions="*,2*" ColumnSpacing="16" Padding="0,16,0,20">
-            <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="0">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding AddCustomProductCommand}"/>
-                </Border.GestureRecognizers>
-                <Label Text="+ Свій" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" VerticalOptions="Center"/>
-            </Border>
-            
-            <Button Grid.Column="1" Text="✓ Підтвердити вибір" Clicked="OnConfirmClicked" Style="{StaticResource AccentButton}" HeightRequest="56" CornerRadius="28" FontAttributes="Bold" FontSize="18"/>
+        <!-- Кнопки внизу -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="16" Margin="0,16,0,32">
+            <Button Text="+ Свій продукт" Command="{Binding ShowAddCustomProductCommand}" BackgroundColor="#2D2D2D" TextColor="White" CornerRadius="16" FontAttributes="Bold" HeightRequest="56"/>
+            <Button Grid.Column="1" Text="Підтвердити" Clicked="OnConfirmClicked" BackgroundColor="#10B981" TextColor="White" CornerRadius="16" FontAttributes="Bold" HeightRequest="56"/>
         </Grid>
 
+        <!-- Overlay для додавання продукту -->
+        <Grid IsVisible="{Binding IsAddingCustomProduct}" Grid.RowSpan="4" BackgroundColor="#B3000000" Margin="-16,-20,-16,0">
+            <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="24" HorizontalOptions="Center" VerticalOptions="Center" WidthRequest="320">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Свій продукт" FontSize="20" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
+                    
+                    <Border BackgroundColor="#2D2D2D" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="12,0">
+                        <Entry Placeholder="Назва продукту" Text="{Binding NewProductName}" TextColor="White" PlaceholderColor="#888888" BackgroundColor="Transparent"/>
+                    </Border>
+                    
+                    <Border BackgroundColor="#2D2D2D" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="12,0">
+                        <Picker Title="Оберіть категорію" SelectedItem="{Binding NewProductCategory}" ItemsSource="{Binding CategoriesWithoutAll}" TextColor="White" TitleColor="#888888" BackgroundColor="Transparent"/>
+                    </Border>
+                    
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,10,0,0">
+                        <Button Text="Скасувати" Command="{Binding CancelCustomProductCommand}" BackgroundColor="#555555" TextColor="White" CornerRadius="8" FontAttributes="Bold"/>
+                        <Button Grid.Column="1" Text="Зберегти" Command="{Binding SaveCustomProductCommand}" BackgroundColor="#10B981" TextColor="White" CornerRadius="8" FontAttributes="Bold"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </Grid>
 </ContentPage>

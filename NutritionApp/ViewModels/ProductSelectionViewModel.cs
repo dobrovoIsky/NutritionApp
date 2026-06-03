@@ -52,19 +52,61 @@ namespace NutritionApp.ViewModels
         
         public int SelectedCount => _allProducts?.Count(p => p.IsSelected) ?? 0;
         
+        // Custom product properties
+        private bool _isAddingCustomProduct;
+        public bool IsAddingCustomProduct
+        {
+            get => _isAddingCustomProduct;
+            set
+            {
+                _isAddingCustomProduct = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private string _newProductName;
+        public string NewProductName
+        {
+            get => _newProductName;
+            set
+            {
+                _newProductName = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private string _newProductCategory;
+        public string NewProductCategory
+        {
+            get => _newProductCategory;
+            set
+            {
+                _newProductCategory = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public IEnumerable<string> CategoriesWithoutAll => Categories.Where(c => c != "Всі");
+
         public ICommand ToggleProductCommand { get; }
-        public ICommand AddCustomProductCommand { get; }
+        public ICommand ShowAddCustomProductCommand { get; }
+        public ICommand CancelCustomProductCommand { get; }
+        public ICommand SaveCustomProductCommand { get; }
         public ICommand ConfirmCommand { get; }
         public ICommand SelectCategoryCommand { get; }
         public ICommand ClearAllCommand { get; }
         public ICommand LoadMoreCommand { get; }
+        
+        private const string CustomProductsKey = "CustomProducts";
         
         public Action<List<string>> OnProductsSelected { get; set; }
         
         public ProductSelectionViewModel()
         {
             ToggleProductCommand = new Command<ProductItem>(ToggleProduct);
-            AddCustomProductCommand = new Command(async () => await AddCustomProductAsync());
+            ShowAddCustomProductCommand = new Command(ShowAddCustomProduct);
+            CancelCustomProductCommand = new Command(CancelCustomProduct);
+            SaveCustomProductCommand = new Command(SaveCustomProduct);
             ConfirmCommand = new Command(ConfirmSelection);
             SelectCategoryCommand = new Command<string>(SelectCategory);
             ClearAllCommand = new Command(ClearAll);
@@ -86,6 +128,9 @@ namespace NutritionApp.ViewModels
                 }
             }
             
+            // Завантажуємо власні продукти
+            LoadCustomProducts();
+            
             // Завантажуємо улюблені
             LoadFavoriteProducts();
             
@@ -100,6 +145,7 @@ namespace NutritionApp.ViewModels
             
             ApplyFilter();
             OnPropertyChanged(nameof(SelectedCount));
+            OnPropertyChanged(nameof(CategoriesWithoutAll));
         }
         
         private void LoadFavoriteProducts()
@@ -185,30 +231,96 @@ namespace NutritionApp.ViewModels
             SaveFavoriteProducts();
         }
         
-        private async Task AddCustomProductAsync()
+        private void ShowAddCustomProduct()
         {
-            var customName = await Application.Current.MainPage.DisplayPromptAsync(
-                "Додати продукт",
-                "Введіть назву продукту:",
-                "Додати",
-                "Скасувати",
-                placeholder: "Наприклад: Тофу",
-                maxLength: 50);
-            
-            if (!string.IsNullOrWhiteSpace(customName))
+            NewProductName = string.Empty;
+            NewProductCategory = CategoriesWithoutAll.FirstOrDefault() ?? "Інше";
+            IsAddingCustomProduct = true;
+        }
+
+        private void CancelCustomProduct()
+        {
+            IsAddingCustomProduct = false;
+        }
+
+        private void SaveCustomProduct()
+        {
+            if (string.IsNullOrWhiteSpace(NewProductName))
             {
-                if (_allProducts.Any(p => p.Name.ToLower() == customName.ToLower()))
-                {
-                    await Application.Current.MainPage.DisplayAlert("Увага", "Такий продукт вже є!", "OK");
-                    return;
-                }
-                
-                var newProduct = new ProductItem(customName.Trim(), "Інше", "✨") { IsSelected = true };
-                _allProducts.Add(newProduct);
-                ApplyFilter();
-                OnPropertyChanged(nameof(SelectedCount));
-                SaveFavoriteProducts();
+                Application.Current.MainPage.DisplayAlert("Увага", "Введіть назву продукту", "OK");
+                return;
             }
+
+            var customName = NewProductName.Trim();
+            if (_allProducts.Any(p => p.Name.ToLower() == customName.ToLower()))
+            {
+                Application.Current.MainPage.DisplayAlert("Увага", "Такий продукт вже є!", "OK");
+                return;
+            }
+
+            var category = string.IsNullOrWhiteSpace(NewProductCategory) ? "Інше" : NewProductCategory;
+            
+            // Generate a simple emoji based on category or default
+            var emoji = "✨";
+            if (category.Contains("Овочі")) emoji = "🥦";
+            else if (category.Contains("Фрукти")) emoji = "🍎";
+            else if (category.Contains("М'ясо")) emoji = "🥩";
+            else if (category.Contains("Молочні")) emoji = "🧀";
+
+            var newProduct = new ProductItem(customName, category, emoji) { IsSelected = true };
+            _allProducts.Add(newProduct);
+            
+            // Save to preferences
+            var customProductsList = _allProducts.Where(p => p.Emoji == "✨" || p.Emoji == "🥦" || p.Emoji == "🍎" || p.Emoji == "🥩" || p.Emoji == "🧀")
+                                                 .Select(p => new { Name = p.Name, Category = p.Category, Emoji = p.Emoji })
+                                                 .ToList();
+                                                 
+            // Actually it's better to maintain a separate list of CustomProducts to save
+            SaveCustomProductsToPrefs();
+            
+            IsAddingCustomProduct = false;
+            ApplyFilter();
+            OnPropertyChanged(nameof(SelectedCount));
+            SaveFavoriteProducts();
+        }
+
+        private void SaveCustomProductsToPrefs()
+        {
+            try
+            {
+                // We'll identify custom products by checking if they are not in the default ProductsData list
+                var defaultNames = ProductsData.GetAllProducts().Select(p => p.Name).ToHashSet();
+                var customProducts = _allProducts.Where(p => !defaultNames.Contains(p.Name))
+                                                 .Select(p => new { Name = p.Name, Category = p.Category, Emoji = p.Emoji })
+                                                 .ToList();
+                
+                var json = System.Text.Json.JsonSerializer.Serialize(customProducts);
+                Preferences.Set(CustomProductsKey, json);
+            }
+            catch { }
+        }
+
+        private void LoadCustomProducts()
+        {
+            try
+            {
+                var customJson = Preferences.Get(CustomProductsKey, "");
+                if (!string.IsNullOrEmpty(customJson))
+                {
+                    var customProducts = System.Text.Json.JsonSerializer.Deserialize<List<ProductItem>>(customJson);
+                    if (customProducts != null)
+                    {
+                        foreach (var cp in customProducts)
+                        {
+                            if (!_allProducts.Any(p => p.Name == cp.Name))
+                            {
+                                _allProducts.Add(cp);
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
         }
         
         private void ConfirmSelection()

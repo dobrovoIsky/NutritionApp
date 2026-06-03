@@ -68,6 +68,8 @@
 		<PackageReference Include="Plugin.Firebase.Auth.Google" Version="3.1.2" />
 		
 		<PackageReference Include="Plugin.LocalNotification" Version="11.1.4" />
+		
+		<PackageReference Include="ZXing.Net.Maui.Controls" Version="0.4.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Views\SplashPage.xaml.cs">

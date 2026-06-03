@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Collections.Concurrent;
 using System.Text;
+using System.ComponentModel;
 
 namespace NutritionApp.Services;
 
@@ -222,19 +223,37 @@ public class ApiService
         public List<MealItem> Meals { get; set; }
     }
 
-    public class MealItem
+    public class MealItem : INotifyPropertyChanged
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
         [JsonPropertyName("time")]
-        public string Time { get; set; }
+        public string Description { get; set; }
 
         [JsonPropertyName("foods")]
-        public List<FoodItem> Foods { get; set; }
+        public System.Collections.ObjectModel.ObservableCollection<FoodItem> Foods { get; set; }
 
+        private double _totalCalories;
         [JsonPropertyName("totalCalories")]
-        public double TotalCalories { get; set; }
+        public double TotalCalories
+        {
+            get => _totalCalories;
+            set
+            {
+                if (_totalCalories != value)
+                {
+                    _totalCalories = value;
+                    OnPropertyChanged(nameof(TotalCalories));
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public class FoodItem
@@ -258,16 +277,17 @@ public class ApiService
         public double Carbs { get; set; }
     }
 
-    public async Task<MealPlanJsonResponse> GenerateMealPlanAsync(int userId, List<string> availableProducts = null)
+    public async Task<MealPlanJsonResponse> GenerateMealPlanAsync(int userId, List<string> availableProducts = null, string preferences = null)
     {
         // Генерація завжди має йти через інтернет
         try
         {
-            Debug.WriteLine($"Generate meal plan for userId: {userId}, products count: {availableProducts?.Count ?? 0}");
+            Debug.WriteLine($"Generate meal plan for userId: {userId}, products count: {availableProducts?.Count ?? 0}, preferences: {preferences}");
             
             var requestBody = new { 
                 UserId = userId, 
-                AvailableProducts = availableProducts 
+                AvailableProducts = availableProducts,
+                Preferences = preferences
             };
             
             var response = await _httpClient.PostAsJsonAsync("/api/Nutrition/generate-custom-plan", requestBody);
@@ -636,6 +656,67 @@ public class ApiService
             Debug.WriteLine($"GetFoodDatabaseItemsAsync exception: {ex.Message}");
             var persistentCached = await _cacheService.GetAsync<List<FoodDatabaseItem>>(cacheKey);
             return persistentCached ?? new List<FoodDatabaseItem>();
+        }
+    }
+
+    public async Task<FoodDatabaseItem> SearchByBarcodeAsync(string barcode)
+    {
+        try
+        {
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                throw new Exception("Offline");
+
+            using var httpClient = new HttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(10);
+            var url = $"https://world.openfoodfacts.org/api/v0/product/{barcode}.json";
+            
+            var response = await httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            
+            var json = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+            
+            if (doc.RootElement.GetProperty("status").GetInt32() == 1)
+            {
+                var product = doc.RootElement.GetProperty("product");
+                
+                var name = product.TryGetProperty("product_name", out var nameProp) ? nameProp.GetString() : "Невідомий продукт";
+                // Try to get Ukrainian name if available
+                if (product.TryGetProperty("product_name_uk", out var nameUkProp) && !string.IsNullOrEmpty(nameUkProp.GetString()))
+                {
+                    name = nameUkProp.GetString();
+                }
+
+                double calories = 0, protein = 0, fat = 0, carbs = 0;
+                
+                if (product.TryGetProperty("nutriments", out var nutriments))
+                {
+                    if (nutriments.TryGetProperty("energy-kcal_100g", out var calProp) && calProp.ValueKind == JsonValueKind.Number)
+                        calories = calProp.GetDouble();
+                    if (nutriments.TryGetProperty("proteins_100g", out var protProp) && protProp.ValueKind == JsonValueKind.Number)
+                        protein = protProp.GetDouble();
+                    if (nutriments.TryGetProperty("fat_100g", out var fatProp) && fatProp.ValueKind == JsonValueKind.Number)
+                        fat = fatProp.GetDouble();
+                    if (nutriments.TryGetProperty("carbohydrates_100g", out var carbsProp) && carbsProp.ValueKind == JsonValueKind.Number)
+                        carbs = carbsProp.GetDouble();
+                }
+
+                return new FoodDatabaseItem
+                {
+                    Name = name,
+                    CaloriesPer100g = calories,
+                    ProteinPer100g = protein,
+                    FatPer100g = fat,
+                    CarbsPer100g = carbs
+                };
+            }
+            
+            return null; // Product not found
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"SearchByBarcodeAsync exception: {ex.Message}");
+            return null;
         }
     }
 
