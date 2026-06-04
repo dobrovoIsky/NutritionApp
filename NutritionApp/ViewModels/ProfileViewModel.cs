@@ -170,7 +170,8 @@ namespace NutritionApp.ViewModels
             if (result != null)
             {
                 UserProfile.CurrentStreak = result.CurrentStreak;
-                UserProfile.Points = result.TotalPoints;
+                UserProfile.Balance = result.TotalPoints;
+                UserProfile.MonthlyPoints = result.MonthlyPoints;
                 
                 // Force UI update
                 OnPropertyChanged(nameof(UserProfile));

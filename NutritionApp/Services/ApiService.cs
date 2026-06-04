@@ -243,6 +243,8 @@ public class ApiService
         public int PointsEarned { get; set; }
         [JsonPropertyName("totalPoints")]
         public int TotalPoints { get; set; }
+        [JsonPropertyName("monthlyPoints")]
+        public int MonthlyPoints { get; set; }
     }
 
     public async Task<StreakCheckResult> CheckStreakAsync(int userId)
