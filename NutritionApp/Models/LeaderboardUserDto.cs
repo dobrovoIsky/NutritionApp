@@ -10,8 +10,8 @@ namespace NutritionApp.Models
         [JsonPropertyName("username")]
         public string Username { get; set; }
 
-        [JsonPropertyName("avatarId")]
-        public int AvatarId { get; set; }
+        [JsonPropertyName("avatarBase64")]
+        public string? AvatarBase64 { get; set; }
 
         [JsonPropertyName("points")]
         public int MonthlyPoints { get; set; }
