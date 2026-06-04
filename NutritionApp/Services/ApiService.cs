@@ -216,6 +216,57 @@ public class ApiService
         }
     }
 
+    public async Task<List<NutritionApp.Models.LeaderboardUserDto>> GetLeaderboardAsync()
+    {
+        try
+        {
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                return new List<NutritionApp.Models.LeaderboardUserDto>();
+
+            var json = await _httpClient.GetStringAsync("/api/profile/leaderboard");
+            return JsonSerializer.Deserialize<List<NutritionApp.Models.LeaderboardUserDto>>(json, _jsonOptions) ?? new List<NutritionApp.Models.LeaderboardUserDto>();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"GetLeaderboardAsync exception: {ex.Message}");
+            return new List<NutritionApp.Models.LeaderboardUserDto>();
+        }
+    }
+
+    public class StreakCheckResult
+    {
+        [JsonPropertyName("streakUpdated")]
+        public bool StreakUpdated { get; set; }
+        [JsonPropertyName("currentStreak")]
+        public int CurrentStreak { get; set; }
+        [JsonPropertyName("pointsEarned")]
+        public int PointsEarned { get; set; }
+        [JsonPropertyName("totalPoints")]
+        public int TotalPoints { get; set; }
+    }
+
+    public async Task<StreakCheckResult> CheckStreakAsync(int userId)
+    {
+        try
+        {
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                return null;
+
+            var response = await _httpClient.PostAsync($"/api/profile/{userId}/check-streak", null);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<StreakCheckResult>(json, _jsonOptions);
+            }
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"CheckStreakAsync exception: {ex.Message}");
+            return null;
+        }
+    }
+
     // ===== MEAL PLAN =====
 
     public class MealPlanJsonResponse

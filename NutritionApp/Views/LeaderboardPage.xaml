@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:NutritionApp.ViewModels"
+             x:Class="NutritionApp.Views.LeaderboardPage"
+             Background="{StaticResource PageBackgroundGradient}"
+             Title="Рейтинг користувачів">
+
+    <Grid RowDefinitions="Auto, *">
+        <!-- Заголовок -->
+        <Border Grid.Row="0" Margin="20,20,20,10" Style="{StaticResource ActiveGlowBorder}">
+            <StackLayout Padding="20">
+                <Label Text="🏆 Лідерборд" Style="{StaticResource TitleLabel}" HorizontalOptions="Center" />
+                <Label Text="Топ 50 користувачів за балами" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" Margin="0,5,0,0"/>
+            </StackLayout>
+        </Border>
+
+        <RefreshView Grid.Row="1" Command="{Binding LoadLeaderboardCommand}" IsRefreshing="{Binding IsLoading}">
+            <CollectionView ItemsSource="{Binding LeaderboardUsers}" Margin="20,0,20,20">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,5" StrokeThickness="0" BackgroundColor="{StaticResource CardBackground}" StrokeShape="RoundRectangle 15">
+                            <Grid Padding="15" ColumnDefinitions="Auto, Auto, *, Auto">
+                                <!-- Місце -->
+                                <Label Grid.Column="0" Text="{Binding Rank}" VerticalOptions="Center" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextSecondary}" WidthRequest="30" />
+                                
+                                <!-- Аватар (Заглушка) -->
+                                <Border Grid.Column="1" WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" StrokeThickness="0" Margin="10,0" BackgroundColor="{StaticResource AccentColor}">
+                                    <Label Text="{Binding AvatarChar}" VerticalOptions="Center" HorizontalOptions="Center" TextColor="White" FontAttributes="Bold" FontSize="16" />
+                                </Border>
+                                
+                                <!-- Інфо -->
+                                <StackLayout Grid.Column="2" VerticalOptions="Center">
+                                    <Label Text="{Binding User.Username}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" FontSize="16" />
+                                    <Label Text="{Binding User.Points, StringFormat='{0} балів'}" TextColor="{StaticResource AccentColor}" FontSize="14" />
+                                </StackLayout>
+                                
+                                <!-- Стрік -->
+                                <StackLayout Grid.Column="3" Orientation="Horizontal" VerticalOptions="Center" Spacing="5">
+                                    <Label Text="🔥" FontSize="18" />
+                                    <Label Text="{Binding User.CurrentStreak}" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold" FontSize="16" VerticalOptions="Center" />
+                                </StackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.EmptyView>
+                    <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="Завантаження рейтингу..." TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
+                    </StackLayout>
+                </CollectionView.EmptyView>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

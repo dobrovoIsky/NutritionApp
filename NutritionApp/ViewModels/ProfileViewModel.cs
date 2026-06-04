@@ -161,6 +161,28 @@ namespace NutritionApp.ViewModels
             }
         }
 
+        public async Task CheckStreakAsync()
+        {
+            int userId = Preferences.Get("UserId", 0);
+            if (userId <= 0 || UserProfile == null) return;
+
+            var result = await _apiService.CheckStreakAsync(userId);
+            if (result != null)
+            {
+                UserProfile.CurrentStreak = result.CurrentStreak;
+                UserProfile.Points = result.TotalPoints;
+                
+                // Force UI update
+                OnPropertyChanged(nameof(UserProfile));
+                
+                if (result.StreakUpdated)
+                {
+                    // Show a toast or just log it (optional)
+                    Debug.WriteLine($"Streak updated! Earned {result.PointsEarned} points.");
+                }
+            }
+        }
+
         private async Task SaveAvatarAsync()
         {
             if (SelectedAvatar == null || UserProfile == null || UserProfile.Id <= 0) return;

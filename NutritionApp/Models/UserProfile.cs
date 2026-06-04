@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace NutritionApp.Models
 {
@@ -32,10 +32,16 @@ namespace NutritionApp.Models
         public string Gender { get; set; }
 
         [JsonPropertyName("theme")]
-        public string Theme { get; set; }
+        public string Theme { get; set; } = "light";
 
         [JsonPropertyName("language")]
-        public string Language { get; set; }
+        public string Language { get; set; } = "uk";
+
+        [JsonPropertyName("points")]
+        public int Points { get; set; }
+
+        [JsonPropertyName("currentStreak")]
+        public int CurrentStreak { get; set; }
 
         [JsonPropertyName("avatarId")]
         public int AvatarId { get; set; }
