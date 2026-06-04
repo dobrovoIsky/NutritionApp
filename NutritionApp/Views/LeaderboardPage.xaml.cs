@@ -1,23 +1,31 @@
 using Microsoft.Maui.Controls;
 using NutritionApp.ViewModels;
+using System.Diagnostics;
 
 namespace NutritionApp.Views
 {
     public partial class LeaderboardPage : ContentPage
     {
-        private LeaderboardViewModel _viewModel;
+        private readonly LeaderboardViewModel _viewModel;
 
-        public LeaderboardPage()
+        public LeaderboardPage(LeaderboardViewModel viewModel)
         {
             InitializeComponent();
-            _viewModel = new LeaderboardViewModel();
+            _viewModel = viewModel;
             BindingContext = _viewModel;
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
-            _viewModel.LoadLeaderboardCommand.Execute(null);
+            try
+            {
+                _viewModel.LoadLeaderboardCommand.Execute(null);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"LeaderboardPage.OnAppearing error: {ex.Message}");
+            }
         }
     }
 }

@@ -50,6 +50,8 @@ namespace NutritionApp
             builder.Services.AddSingleton<MealPlanViewModel>(); // Singleton for caching
 
             builder.Services.AddTransient<ProfilePage>();
+            builder.Services.AddTransient<LeaderboardPage>();
+            builder.Services.AddTransient<LeaderboardViewModel>();
             builder.Services.AddTransient<SavedRecipesPage>();
             builder.Services.AddSingleton<SavedRecipesViewModel>();
             builder.Services.AddTransient<HistoryDetailPage>();

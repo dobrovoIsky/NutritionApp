@@ -1,4 +1,4 @@
-﻿using NutritionApp.Views;
+using NutritionApp.Views;
 
 namespace NutritionApp;
 
@@ -7,6 +7,18 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+
+        // Глобальний обробник необроблених виключень — щоб додаток не вилітав
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+        {
+            System.Diagnostics.Debug.WriteLine($"UNHANDLED EXCEPTION: {e.ExceptionObject}");
+        };
+
+        TaskScheduler.UnobservedTaskException += (s, e) =>
+        {
+            System.Diagnostics.Debug.WriteLine($"UNOBSERVED TASK EXCEPTION: {e.Exception}");
+            e.SetObserved(); // Prevent crash
+        };
 
         // Підписуємось на Google Auth callback
         MessagingCenter.Subscribe<object, string>(this, "GoogleAuthCallback", async (sender, uri) =>

@@ -21,8 +21,15 @@ public partial class ProfilePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.LoadUserProfileAsync(forceRefresh: true);
-        await _viewModel.CheckStreakAsync();
+        try
+        {
+            await _viewModel.LoadUserProfileAsync(forceRefresh: true);
+            await _viewModel.CheckStreakAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"ProfilePage.OnAppearing error: {ex.Message}");
+        }
     }
 
     private void LoadWaterReminderSettings()

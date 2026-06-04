@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -36,9 +37,9 @@ namespace NutritionApp.ViewModels
 
         public ICommand LoadLeaderboardCommand { get; }
 
-        public LeaderboardViewModel()
+        public LeaderboardViewModel(ApiService apiService)
         {
-            _apiService = Application.Current.MainPage.Handler.MauiContext.Services.GetService<ApiService>();
+            _apiService = apiService;
             LoadLeaderboardCommand = new Command(async () => await LoadLeaderboardAsync());
         }
 
@@ -58,6 +59,10 @@ namespace NutritionApp.ViewModels
                     LeaderboardUsers.Add(new LeaderboardItem { User = u, Rank = rank });
                     rank++;
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"LoadLeaderboardAsync error: {ex.Message}");
             }
             finally
             {
