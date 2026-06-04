@@ -22,6 +22,7 @@ namespace NutritionApp.ViewModels
     {
         private readonly ApiService _apiService;
         private bool _isLoading;
+        private bool _isDataLoaded = false;
 
         public ObservableCollection<LeaderboardItem> LeaderboardUsers { get; set; } = new ObservableCollection<LeaderboardItem>();
 
@@ -36,15 +37,18 @@ namespace NutritionApp.ViewModels
         }
 
         public ICommand LoadLeaderboardCommand { get; }
+        public ICommand RefreshLeaderboardCommand { get; }
 
         public LeaderboardViewModel(ApiService apiService)
         {
             _apiService = apiService;
-            LoadLeaderboardCommand = new Command(async () => await LoadLeaderboardAsync());
+            LoadLeaderboardCommand = new Command(async () => await LoadLeaderboardAsync(forceRefresh: false));
+            RefreshLeaderboardCommand = new Command(async () => await LoadLeaderboardAsync(forceRefresh: true));
         }
 
-        private async Task LoadLeaderboardAsync()
+        private async Task LoadLeaderboardAsync(bool forceRefresh = false)
         {
+            if (_isDataLoaded && !forceRefresh) return;
             if (IsLoading) return;
             IsLoading = true;
 
@@ -67,6 +71,7 @@ namespace NutritionApp.ViewModels
             finally
             {
                 IsLoading = false;
+                _isDataLoaded = true;
             }
         }
 

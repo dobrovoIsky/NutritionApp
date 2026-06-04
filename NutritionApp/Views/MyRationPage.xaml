@@ -9,12 +9,7 @@
              Shell.NavBarIsVisible="False"
              Background="{StaticResource PageBackgroundGradient}">
 
-    <!-- Додаємо конвертер у ресурси -->
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <local:InvertedBoolConverter x:Key="InvertedBoolConverter" xmlns:local="clr-namespace:NutritionApp.Converters" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
+
 
     <Grid RowDefinitions="Auto,*" Padding="16,20,16,0">
         <!-- Header -->

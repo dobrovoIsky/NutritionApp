@@ -12,6 +12,7 @@ namespace NutritionApp.Services;
 public class ApiService
 {
     private readonly HttpClient _httpClient;
+    private static readonly HttpClient _externalHttpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly CacheService _cacheService;
 
@@ -19,6 +20,8 @@ public class ApiService
     private static readonly ConcurrentDictionary<string, (object Data, DateTime Expiry)> _memoryCache = new();
     private static readonly TimeSpan ProfileCacheTTL = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan HistoryCacheTTL = TimeSpan.FromMinutes(2);
+    private static readonly TimeSpan FoodCacheTTL = TimeSpan.FromSeconds(60);
+    private static readonly TimeSpan LeaderboardCacheTTL = TimeSpan.FromMinutes(2);
 
     private const string GOOGLE_CLIENT_ID = "51820459176-b6fadepnveqmnrrdncuejb7h2balavk0.apps.googleusercontent.com";
     private const string SERVER_URL = "https://bjuapiserver1.onrender.com";
@@ -62,6 +65,16 @@ public class ApiService
     {
         _memoryCache.Clear();
         Debug.WriteLine("Memory cache CLEARED");
+    }
+
+    public static void InvalidateFoodCache(int userId, string dateStr = null)
+    {
+        var keysToRemove = _memoryCache.Keys
+            .Where(k => k.StartsWith($"food_entries_{userId}") || k.StartsWith($"daily_summary_{userId}"))
+            .ToList();
+        foreach (var key in keysToRemove)
+            _memoryCache.TryRemove(key, out _);
+        Debug.WriteLine($"Food cache invalidated for user {userId}");
     }
 
     // ===== AUTH =====
@@ -216,15 +229,26 @@ public class ApiService
         }
     }
 
-    public async Task<List<NutritionApp.Models.LeaderboardUserDto>> GetLeaderboardAsync()
+    public async Task<List<NutritionApp.Models.LeaderboardUserDto>> GetLeaderboardAsync(bool forceRefresh = false)
     {
+        string cacheKey = "leaderboard";
+
+        // Check memory cache first (skip if force refresh)
+        if (!forceRefresh)
+        {
+            var cached = GetFromMemoryCache<List<NutritionApp.Models.LeaderboardUserDto>>(cacheKey);
+            if (cached != null) return cached;
+        }
+
         try
         {
             if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
                 return new List<NutritionApp.Models.LeaderboardUserDto>();
 
             var json = await _httpClient.GetStringAsync("/api/profile/leaderboard");
-            return JsonSerializer.Deserialize<List<NutritionApp.Models.LeaderboardUserDto>>(json, _jsonOptions) ?? new List<NutritionApp.Models.LeaderboardUserDto>();
+            var result = JsonSerializer.Deserialize<List<NutritionApp.Models.LeaderboardUserDto>>(json, _jsonOptions) ?? new List<NutritionApp.Models.LeaderboardUserDto>();
+            SetMemoryCache(cacheKey, result, LeaderboardCacheTTL);
+            return result;
         }
         catch (Exception ex)
         {
@@ -575,7 +599,7 @@ public class ApiService
             if (response.IsSuccessStatusCode)
             {
                 var savedEntry = JsonSerializer.Deserialize<FoodEntry>(content, _jsonOptions);
-                ClearMemoryCache();
+                InvalidateFoodCache(entry.UserId, entry.LoggedAt.ToString("yyyy-MM-dd"));
                 return savedEntry;
             }
             return null;
@@ -596,7 +620,7 @@ public class ApiService
             if (response.IsSuccessStatusCode)
             {
                 var updatedEntry = JsonSerializer.Deserialize<FoodEntry>(content, _jsonOptions);
-                ClearMemoryCache();
+                InvalidateFoodCache(entry.UserId, entry.LoggedAt.ToString("yyyy-MM-dd"));
                 return updatedEntry;
             }
             return null;
@@ -608,14 +632,17 @@ public class ApiService
         }
     }
 
-    public async Task<bool> DeleteFoodEntryAsync(int id)
+    public async Task<bool> DeleteFoodEntryAsync(int id, int userId = 0)
     {
         try
         {
             var response = await _httpClient.DeleteAsync($"/api/tracker/{id}");
             if (response.IsSuccessStatusCode)
             {
-                ClearMemoryCache();
+                if (userId > 0)
+                    InvalidateFoodCache(userId);
+                else
+                    ClearMemoryCache();
                 return true;
             }
             return false;
@@ -646,6 +673,10 @@ public class ApiService
         var dateStr = date?.ToString("yyyy-MM-dd");
         string cacheKey = $"food_entries_{userId}_{dateStr}";
 
+        // Check memory cache first
+        var memoryCached = GetFromMemoryCache<List<FoodEntry>>(cacheKey);
+        if (memoryCached != null) return memoryCached;
+
         try
         {
             if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
@@ -655,6 +686,7 @@ public class ApiService
             var json = await _httpClient.GetStringAsync(url);
             var result = JsonSerializer.Deserialize<List<FoodEntry>>(json, _jsonOptions) ?? new List<FoodEntry>();
             
+            SetMemoryCache(cacheKey, result, FoodCacheTTL);
             await _cacheService.SaveAsync(cacheKey, result);
             return result;
         }
@@ -671,6 +703,10 @@ public class ApiService
         var dateStr = date?.ToString("yyyy-MM-dd");
         string cacheKey = $"daily_summary_{userId}_{dateStr}";
 
+        // Check memory cache first
+        var memoryCached = GetFromMemoryCache<DailySummary>(cacheKey);
+        if (memoryCached != null) return memoryCached;
+
         try
         {
             if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
@@ -680,6 +716,7 @@ public class ApiService
             var json = await _httpClient.GetStringAsync(url);
             var result = JsonSerializer.Deserialize<DailySummary>(json, _jsonOptions) ?? new DailySummary();
 
+            SetMemoryCache(cacheKey, result, FoodCacheTTL);
             await _cacheService.SaveAsync(cacheKey, result);
             return result;
         }
@@ -768,11 +805,9 @@ public class ApiService
             if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
                 throw new Exception("Offline");
 
-            using var httpClient = new HttpClient();
-            httpClient.Timeout = TimeSpan.FromSeconds(10);
             var url = $"https://world.openfoodfacts.org/api/v0/product/{barcode}.json";
             
-            var response = await httpClient.GetAsync(url);
+            var response = await _externalHttpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
             
             var json = await response.Content.ReadAsStringAsync();

@@ -170,9 +170,12 @@ namespace NutritionApp.ViewModels
 
         public async Task LoadTrackerDataAsync(int userId)
         {
-            DailySummary = await _apiService.GetDailySummaryAsync(userId);
-            FoodEntries = new System.Collections.ObjectModel.ObservableCollection<FoodEntry>(
-                await _apiService.GetDailyFoodEntriesAsync(userId));
+            var summaryTask = _apiService.GetDailySummaryAsync(userId);
+            var entriesTask = _apiService.GetDailyFoodEntriesAsync(userId);
+            await Task.WhenAll(summaryTask, entriesTask);
+
+            DailySummary = summaryTask.Result;
+            FoodEntries = new System.Collections.ObjectModel.ObservableCollection<FoodEntry>(entriesTask.Result);
             UpdateProgress();
         }
 

@@ -147,7 +147,7 @@ namespace NutritionApp.ViewModels
             bool confirm = await Application.Current.MainPage.DisplayAlert("Видалення", $"Видалити {entry.Name}?", "Так", "Ні");
             if (!confirm) return;
 
-            var success = await _apiService.DeleteFoodEntryAsync(entry.Id);
+            var success = await _apiService.DeleteFoodEntryAsync(entry.Id, entry.UserId);
             if (success)
             {
                 // Remove from local collection

@@ -6,6 +6,7 @@
 
    <Color x:Key="Primary">#CCFF00</Color>  
    <Color x:Key="Accent">#CCFF00</Color>  
+   <Color x:Key="AccentColor">#CCFF00</Color>
 
    <Color x:Key="TextPrimary">#FFFFFF</Color>  
    <Color x:Key="TextSecondary">#8E8E93</Color>  

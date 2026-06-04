@@ -23,8 +23,9 @@ public partial class ProfilePage : ContentPage
         base.OnAppearing();
         try
         {
-            await _viewModel.LoadUserProfileAsync(forceRefresh: true);
-            await _viewModel.CheckStreakAsync();
+            var loadTask = _viewModel.LoadUserProfileAsync(forceRefresh: false);
+            var streakTask = _viewModel.CheckStreakAsync();
+            await Task.WhenAll(loadTask, streakTask);
         }
         catch (Exception ex)
         {

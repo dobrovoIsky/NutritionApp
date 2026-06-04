@@ -29,7 +29,7 @@ namespace NutritionApp
 #endif
             // Сервіси
             builder.Services.AddSingleton<WaterReminderService>();
-            builder.Services.AddTransient<ProfileViewModel>();
+            builder.Services.AddSingleton<ProfileViewModel>();
             builder.Services.AddSingleton<CacheService>();
             builder.Services.AddSingleton<ApiService>();
 #if ANDROID
@@ -38,8 +38,8 @@ namespace NutritionApp
             builder.Services.AddSingleton<IPedometerService, PedometerServiceStub>();
 #endif
 
-            builder.Services.AddSingleton<LoginPage>();
-            builder.Services.AddSingleton<RegisterPage>();
+            builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<RegisterPage>();
             builder.Services.AddSingleton<MainPage>();
 
             builder.Services.AddSingleton<MainPageViewModel>();
@@ -51,7 +51,7 @@ namespace NutritionApp
 
             builder.Services.AddTransient<ProfilePage>();
             builder.Services.AddTransient<LeaderboardPage>();
-            builder.Services.AddTransient<LeaderboardViewModel>();
+            builder.Services.AddSingleton<LeaderboardViewModel>();
             builder.Services.AddTransient<SavedRecipesPage>();
             builder.Services.AddSingleton<SavedRecipesViewModel>();
             builder.Services.AddTransient<HistoryDetailPage>();
@@ -59,7 +59,6 @@ namespace NutritionApp
             builder.Services.AddTransient<AddFoodPage>();
             builder.Services.AddTransient<AddFoodViewModel>();
             builder.Services.AddTransient<BarcodeScannerPage>();
-            builder.Services.AddTransient<HistoryDetailPage>();
             builder.Services.AddTransient<MyRationPage>();
             builder.Services.AddTransient<MyRationViewModel>();
 

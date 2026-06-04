@@ -9,19 +9,18 @@
 
     <ContentPage.Resources>
         <converters:Base64ToImageSourceConverter x:Key="Base64Converter" />
-        <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
     </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto, *">
         <!-- Заголовок -->
         <Border Grid.Row="0" Margin="20,20,20,10" Style="{StaticResource ActiveGlowBorder}">
-            <StackLayout Padding="20">
+            <VerticalStackLayout Padding="20">
                 <Label Text="🏆 Лідерборд" Style="{StaticResource TitleLabel}" HorizontalOptions="Center" />
                 <Label Text="Топ 50 користувачів за балами" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" Margin="0,5,0,0"/>
-            </StackLayout>
+            </VerticalStackLayout>
         </Border>
 
-        <RefreshView Grid.Row="1" Command="{Binding LoadLeaderboardCommand}" IsRefreshing="{Binding IsLoading}">
+        <RefreshView Grid.Row="1" Command="{Binding RefreshLeaderboardCommand}" IsRefreshing="{Binding IsLoading}">
             <CollectionView ItemsSource="{Binding LeaderboardUsers}" Margin="20,0,20,20">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
@@ -39,24 +38,24 @@
                                 </Border>
                                 
                                 <!-- Інфо -->
-                                <StackLayout Grid.Column="2" VerticalOptions="Center">
+                                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center">
                                     <Label Text="{Binding User.Username}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" FontSize="16" />
                                     <Label Text="{Binding User.MonthlyPoints, StringFormat='{0} XP'}" TextColor="{StaticResource AccentColor}" FontSize="14" />
-                                </StackLayout>
+                                </VerticalStackLayout>
                                 
                                 <!-- Стрік -->
-                                <StackLayout Grid.Column="3" Orientation="Horizontal" VerticalOptions="Center" Spacing="5">
+                                <HorizontalStackLayout Grid.Column="3" VerticalOptions="Center" Spacing="5">
                                     <Label Text="🔥" FontSize="18" />
                                     <Label Text="{Binding User.CurrentStreak}" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold" FontSize="16" VerticalOptions="Center" />
-                                </StackLayout>
+                                </HorizontalStackLayout>
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
                 <CollectionView.EmptyView>
-                    <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
                         <Label Text="Завантаження рейтингу..." TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center" />
-                    </StackLayout>
+                    </VerticalStackLayout>
                 </CollectionView.EmptyView>
             </CollectionView>
         </RefreshView>

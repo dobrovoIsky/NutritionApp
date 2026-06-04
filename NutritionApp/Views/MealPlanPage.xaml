@@ -7,10 +7,7 @@
              Shell.NavBarIsVisible="False"
              Background="{StaticResource PageBackgroundGradient}">
 
-    <!-- Resources ПЕРЕД контентом -->
-    <ContentPage.Resources>
-        <converters:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
-    </ContentPage.Resources>
+
 
     <!-- Контент сторінки -->
     <Grid RowDefinitions="Auto,*" Padding="16,20,16,0">

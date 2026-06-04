@@ -10,7 +10,6 @@
 
     <ContentPage.Resources>
         <converters:Base64ToImageSourceConverter x:Key="Base64Converter" />
-        <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
     </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*" Padding="16,20,16,0">
@@ -46,11 +45,11 @@
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="16,0,0,0">
                 <Label Text="Твій профіль" FontSize="14" TextColor="{StaticResource TextSecondary}" />
                 <Label x:Name="UsernameLabel" Text="{Binding UserProfile.Username, StringFormat='{0}'}" FontAttributes="Bold" FontSize="32" TextColor="{StaticResource TextPrimary}" />
-                <StackLayout Orientation="Horizontal" Spacing="10" Margin="0,5,0,0">
+                <HorizontalStackLayout Spacing="10" Margin="0,5,0,0">
                     <Label Text="{Binding UserProfile.Balance, StringFormat='💎 {0}'}" TextColor="{StaticResource AccentColor}" FontAttributes="Bold" />
                     <Label Text="{Binding UserProfile.MonthlyPoints, StringFormat='🏆 {0} XP'}" TextColor="#FFD700" FontAttributes="Bold" />
                     <Label Text="{Binding UserProfile.CurrentStreak, StringFormat='🔥 {0} дн.'}" TextColor="#FF9500" FontAttributes="Bold" />
-                </StackLayout>
+                </HorizontalStackLayout>
             </VerticalStackLayout>
         </Grid>
 

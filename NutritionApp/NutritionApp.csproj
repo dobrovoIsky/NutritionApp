@@ -42,6 +42,12 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+	<!-- Release-оптимізація -->
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
+		<UseInterpreter>true</UseInterpreter>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.png" />

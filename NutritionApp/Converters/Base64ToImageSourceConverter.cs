@@ -1,9 +1,14 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 
 namespace NutritionApp.Converters;
 
 public class Base64ToImageSourceConverter : IValueConverter
 {
+    // Кеш декодованих байтів по хешу перших 64 символів base64 рядка
+    private static readonly ConcurrentDictionary<int, byte[]> _cache = new();
+    private const int MaxCacheSize = 60;
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is string base64 && !string.IsNullOrWhiteSpace(base64))
@@ -17,12 +22,27 @@ public class Base64ToImageSourceConverter : IValueConverter
                     base64 = base64.Substring(commaIndex + 1);
                 }
 
-                byte[] imageBytes = System.Convert.FromBase64String(base64);
+                // Використовуємо хеш для кешування
+                int cacheKey = base64.Length > 64
+                    ? base64.Substring(0, 64).GetHashCode() ^ base64.Length
+                    : base64.GetHashCode();
+
+                if (!_cache.TryGetValue(cacheKey, out byte[] imageBytes))
+                {
+                    imageBytes = System.Convert.FromBase64String(base64);
+
+                    // Обмежуємо розмір кешу
+                    if (_cache.Count >= MaxCacheSize)
+                    {
+                        _cache.Clear();
+                    }
+                    _cache[cacheKey] = imageBytes;
+                }
+
                 return ImageSource.FromStream(() => new MemoryStream(imageBytes));
             }
             catch
             {
-                // If it fails, don't return null if MAUI crashes on null ImageSource. But null is standard.
                 return null;
             }
         }
