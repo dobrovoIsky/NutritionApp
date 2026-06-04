@@ -34,11 +34,7 @@
                                 <Border Grid.Column="1" WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" StrokeThickness="0" Margin="10,0" BackgroundColor="{StaticResource AccentColor}">
                                     <Grid>
                                         <Label Text="{Binding AvatarChar}" IsVisible="{Binding HasAvatar, Converter={StaticResource InvertedBoolConverter}}" VerticalOptions="Center" HorizontalOptions="Center" TextColor="White" FontAttributes="Bold" FontSize="16" />
-                                        <Image WidthRequest="40" HeightRequest="40" Source="{Binding User.AvatarBase64, Converter={StaticResource Base64Converter}}" IsVisible="{Binding HasAvatar}" Aspect="AspectFill">
-                                            <Image.Clip>
-                                                <EllipseGeometry Center="20,20" RadiusX="20" RadiusY="20"/>
-                                            </Image.Clip>
-                                        </Image>
+                                        <Image WidthRequest="40" HeightRequest="40" Source="{Binding User.AvatarBase64, Converter={StaticResource Base64Converter}}" IsVisible="{Binding HasAvatar}" Aspect="AspectFill" />
                                     </Grid>
                                 </Border>
                                 

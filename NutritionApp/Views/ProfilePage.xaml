@@ -39,11 +39,7 @@
                            WidthRequest="60" HeightRequest="60"
                            Source="{Binding UserProfile.AvatarBase64, Converter={StaticResource Base64Converter}}"
                            IsVisible="{Binding HasAvatar}"
-                           Aspect="AspectFill">
-                        <Image.Clip>
-                            <EllipseGeometry Center="30,30" RadiusX="30" RadiusY="30"/>
-                        </Image.Clip>
-                    </Image>
+                           Aspect="AspectFill" />
                 </Grid>
             </Border>
             
