@@ -76,14 +76,25 @@ namespace NutritionApp.Controls
                 canvas.DrawCircle(center, radius);
 
                 // Draw progress
-                var progress = Math.Max(0, Math.Min(1, _bar.Progress));
-                if (progress > 0)
+                var clampedProgress = Math.Max(0, Math.Min(1, _bar.Progress));
+                if (clampedProgress > 0)
                 {
-                    canvas.StrokeColor = _bar.ProgressColor;
+                    var colorToUse = _bar.ProgressColor;
+                    
+                    if (_bar.Progress > 1.15)
+                    {
+                        colorToUse = Color.FromArgb("#FF3B30"); // Red
+                    }
+                    else if (_bar.Progress > 1.0)
+                    {
+                        colorToUse = Color.FromArgb("#FF9500"); // Orange
+                    }
+
+                    canvas.StrokeColor = colorToUse;
                     canvas.StrokeSize = thickness;
                     canvas.StrokeLineCap = LineCap.Round;
                     
-                    var endAngle = 90 - (progress * 360);
+                    var endAngle = 90 - (clampedProgress * 360);
                     // DrawArc takes bounding box
                     var rect = new RectF(center.X - radius, center.Y - radius, radius * 2, radius * 2);
                     canvas.DrawArc(rect, 90, (float)endAngle, true, false);

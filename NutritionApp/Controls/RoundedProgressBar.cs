@@ -66,15 +66,27 @@ namespace NutritionApp.Controls
                 canvas.FillRoundedRectangle(0, 0, width, height, cornerRadius);
 
                 // Draw progress fill
-                var progress = Math.Max(0, Math.Min(1, _bar.Progress));
-                if (progress > 0)
-                {
-                    var fillWidth = (float)(width * progress);
-                    // Ensure minimum width equals the height so corners look correct
-                    fillWidth = Math.Max(fillWidth, height);
-                    fillWidth = Math.Min(fillWidth, width);
+                var fillWidth = (float)(width * _bar.Progress);
+                // Clamp width to bounds
+                fillWidth = Math.Max(fillWidth, height); // Minimum width is height so corners look round
+                fillWidth = Math.Min(fillWidth, width);  // Max width is container width
 
-                    canvas.FillColor = _bar.ProgressColor;
+                if (fillWidth > 0)
+                {
+                    // Default color
+                    var colorToUse = _bar.ProgressColor;
+                    
+                    // Warning/Danger colors for overages
+                    if (_bar.Progress > 1.15)
+                    {
+                        colorToUse = Color.FromArgb("#FF3B30"); // Red
+                    }
+                    else if (_bar.Progress > 1.0)
+                    {
+                        colorToUse = Color.FromArgb("#FF9500"); // Orange
+                    }
+
+                    canvas.FillColor = colorToUse;
                     canvas.FillRoundedRectangle(0, 0, fillWidth, height, cornerRadius);
                 }
             }
