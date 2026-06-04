@@ -231,7 +231,7 @@
                             Style="{StaticResource LimeButton}"
                             Command="{Binding GoToMyRationCommand}" />
                     <Button Grid.Column="1"
-                            Text="План харчування"
+                            Text="Рецепти"
                             Style="{StaticResource AccentButton}"
                             Command="{Binding GoToMealPlanCommand}" />
                 </Grid>

@@ -94,10 +94,17 @@ namespace NutritionApp.Controls
                     canvas.StrokeSize = thickness;
                     canvas.StrokeLineCap = LineCap.Round;
                     
-                    var endAngle = 90 - (clampedProgress * 360);
-                    // DrawArc takes bounding box
-                    var rect = new RectF(center.X - radius, center.Y - radius, radius * 2, radius * 2);
-                    canvas.DrawArc(rect, 90, (float)endAngle, true, false);
+                    if (clampedProgress >= 1)
+                    {
+                        // Draw full circle to avoid DrawArc vanishing at 360 degrees
+                        canvas.DrawCircle(center, radius);
+                    }
+                    else
+                    {
+                        var endAngle = 90 - (clampedProgress * 360);
+                        var rect = new RectF(center.X - radius, center.Y - radius, radius * 2, radius * 2);
+                        canvas.DrawArc(rect, 90, (float)endAngle, true, false);
+                    }
                 }
             }
         }
