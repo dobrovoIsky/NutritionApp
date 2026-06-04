@@ -16,6 +16,7 @@ public class FloatingTabBarShellBehavior : Behavior<Shell>
         nameof(Views.MainPage),
         nameof(Views.MealPlanPage),
         nameof(Views.SavedRecipesPage),
+        nameof(Views.LeaderboardPage),
         nameof(Views.ProfilePage)
     ];
 
