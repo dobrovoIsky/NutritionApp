@@ -14,6 +14,7 @@ namespace NutritionApp.ViewModels
         public LeaderboardUserDto User { get; set; }
         public int Rank { get; set; }
         public string AvatarChar => !string.IsNullOrEmpty(User?.Username) ? User.Username.Substring(0, 1).ToUpper() : "?";
+        public bool HasAvatar => !string.IsNullOrEmpty(User?.AvatarBase64);
     }
 
     public class LeaderboardViewModel : INotifyPropertyChanged

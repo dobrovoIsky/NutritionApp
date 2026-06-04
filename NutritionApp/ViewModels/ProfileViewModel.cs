@@ -55,35 +55,59 @@ namespace NutritionApp.ViewModels
         private bool _isDataLoaded = false;
         private int _lastUserId = 0;
 
-        // Аватари
-        public ObservableCollection<AvatarOption> AvatarOptions { get; } = new()
-        {
-            new AvatarOption { Id = 1, ImageSource = "avatar1.png" },
-            new AvatarOption { Id = 2, ImageSource = "avatar2.png" },
-            new AvatarOption { Id = 3, ImageSource = "avatar3.png" },
-            new AvatarOption { Id = 4, ImageSource = "avatar4.png" }
-        };
+        public bool HasAvatar => !string.IsNullOrEmpty(UserProfile?.AvatarBase64);
+        public string AvatarInitial => !string.IsNullOrEmpty(UserProfile?.Username) ? UserProfile.Username.Substring(0, 1).ToUpper() : "?";
 
-        private AvatarOption _selectedAvatar;
-        private bool _isAvatarChanging = false;
+        public ICommand PickAvatarCommand { get; }
 
-        public AvatarOption SelectedAvatar
+        public ProfileViewModel(ApiService apiService, WaterReminderService waterService)
         {
-            get => _selectedAvatar;
-            set
+            _apiService = apiService;
+            _waterService = waterService;
+            LoadUserProfileCommand = new Command(async () => await LoadUserProfileAsync(forceRefresh: true));
+            PickAvatarCommand = new Command(async () => await PickAndUploadAvatarAsync());
+        }
+
+        private async Task PickAndUploadAvatarAsync()
+        {
+            try
             {
-                if (_selectedAvatar != value)
+                var result = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
                 {
-                    if (_selectedAvatar != null) _selectedAvatar.IsSelected = false;
-                    _selectedAvatar = value;
-                    if (_selectedAvatar != null) _selectedAvatar.IsSelected = true;
+                    Title = "Оберіть аватарку"
+                });
+
+                if (result != null)
+                {
+                    IsLoading = true;
+                    // Отримуємо потік
+                    using var stream = await result.OpenReadAsync();
+                    using var memoryStream = new MemoryStream();
+                    await stream.CopyToAsync(memoryStream);
                     
-                    OnPropertyChanged();
-                    if (!_isAvatarChanging && value != null)
+                    // Конвертуємо в Base64
+                    byte[] imageBytes = memoryStream.ToArray();
+                    string base64String = System.Convert.ToBase64String(imageBytes);
+
+                    // Відправляємо на сервер
+                    int userId = Preferences.Get("UserId", 0);
+                    bool success = await _apiService.UploadAvatarAsync(userId, base64String);
+
+                    if (success)
                     {
-                        _ = SaveAvatarAsync();
+                        UserProfile.AvatarBase64 = base64String;
+                        OnPropertyChanged(nameof(UserProfile));
+                        OnPropertyChanged(nameof(HasAvatar));
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error picking photo: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -117,12 +141,7 @@ namespace NutritionApp.ViewModels
 
         public ICommand LoadUserProfileCommand { get; }
 
-        public ProfileViewModel(ApiService apiService, WaterReminderService waterService)
-        {
-            _apiService = apiService;
-            _waterService = waterService;
-            LoadUserProfileCommand = new Command(async () => await LoadUserProfileAsync(forceRefresh: true));
-        }
+
 
         public async Task LoadUserProfileAsync(bool forceRefresh = false)
         {

@@ -46,8 +46,8 @@ namespace NutritionApp.Models
         [JsonPropertyName("currentStreak")]
         public int CurrentStreak { get; set; }
 
-        [JsonPropertyName("avatarId")]
-        public int AvatarId { get; set; }
+        [JsonPropertyName("avatarBase64")]
+        public string? AvatarBase64 { get; set; }
 
         [JsonPropertyName("bju")]
         public BjuResult Bju { get; set; }

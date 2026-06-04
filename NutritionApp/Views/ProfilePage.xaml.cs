@@ -110,24 +110,5 @@ public partial class ProfilePage : ContentPage
         await Shell.Current.GoToAsync(nameof(EditProfilePage));
     }
 
-    private void OnAvatarTapped(object sender, TappedEventArgs e)
-    {
-        AvatarPopup.IsVisible = true;
-    }
 
-    private void OnClosePopup(object sender, EventArgs e)
-    {
-        AvatarPopup.IsVisible = false;
-    }
-
-    private void OnAvatarSelected(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.CurrentSelection.Count > 0)
-        {
-            Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(300), () =>
-            {
-                AvatarPopup.IsVisible = false;
-            });
-        }
-    }
 }

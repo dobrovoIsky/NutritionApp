@@ -450,6 +450,25 @@ public class ApiService
         public string Tips { get; set; }
     }
 
+    public async Task<bool> UploadAvatarAsync(int userId, string base64Image)
+    {
+        try
+        {
+            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+                return false;
+
+            var payload = new { AvatarBase64 = base64Image };
+            var response = await _httpClient.PutAsJsonAsync($"/api/profile/{userId}/avatar", payload);
+
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"UploadAvatarAsync Error: {ex.Message}");
+            return false;
+        }
+    }
+
     public async Task<WorkoutPlan> GenerateWorkoutAsync(int userId, string goal, string intensity, int duration, List<string>? availableEquipment = null)
     {
         var payload = new { 
