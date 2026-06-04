@@ -171,13 +171,6 @@ namespace NutritionApp.ViewModels
                 IsLoading = false;
             }
 
-            // Встановлюємо аватар
-            if (UserProfile != null)
-            {
-                _isAvatarChanging = true;
-                SelectedAvatar = AvatarOptions.FirstOrDefault(a => a.Id == UserProfile.AvatarId);
-                _isAvatarChanging = false;
-            }
         }
 
         public async Task CheckStreakAsync()
@@ -200,39 +193,6 @@ namespace NutritionApp.ViewModels
                     // Show a toast or just log it (optional)
                     Debug.WriteLine($"Streak updated! Earned {result.PointsEarned} points.");
                 }
-            }
-        }
-
-        private async Task SaveAvatarAsync()
-        {
-            if (SelectedAvatar == null || UserProfile == null || UserProfile.Id <= 0) return;
-
-            try
-            {
-                Debug.WriteLine($"ProfileViewModel: Saving avatar {SelectedAvatar.Id} for user {UserProfile.Id}");
-
-                var payload = new
-                {
-                    Height = UserProfile.Height,
-                    Weight = UserProfile.Weight,
-                    Age = UserProfile.Age,
-                    Goal = UserProfile.Goal ?? string.Empty,
-                    ActivityLevel = UserProfile.ActivityLevel ?? string.Empty,
-                    AvatarId = SelectedAvatar.Id,
-                    Gender = UserProfile.Gender ?? "male"
-                };
-
-                var updatedProfile = await _apiService.UpdateUserProfileAsync(UserProfile.Id, payload);
-
-                if (updatedProfile != null)
-                {
-                    UserProfile = updatedProfile;
-                    Debug.WriteLine($"ProfileViewModel: Avatar saved successfully");
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"ProfileViewModel: SaveAvatarAsync exception: {ex.Message}");
             }
         }
 
