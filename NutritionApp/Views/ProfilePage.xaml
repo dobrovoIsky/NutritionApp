@@ -36,6 +36,7 @@
                     
                     <!-- Base64 Image -->
                     <Image x:Name="AvatarImage"
+                           WidthRequest="60" HeightRequest="60"
                            Source="{Binding UserProfile.AvatarBase64, Converter={StaticResource Base64Converter}}"
                            IsVisible="{Binding HasAvatar}"
                            Aspect="AspectFill">

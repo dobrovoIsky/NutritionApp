@@ -82,11 +82,21 @@ namespace NutritionApp.ViewModels
                     IsLoading = true;
                     // Отримуємо потік
                     using var stream = await result.OpenReadAsync();
+                    
+#if ANDROID || IOS || MACCATALYST || WINDOWS
+                    // Зменшуємо зображення, щоб уникнути вильоту через брак пам'яті (Out of Memory)
+                    using var image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream);
+                    using var resizedImage = image.Downsize(256, 256, true);
+                    using var memoryStream = new MemoryStream();
+                    resizedImage.Save(memoryStream);
+                    byte[] imageBytes = memoryStream.ToArray();
+#else
                     using var memoryStream = new MemoryStream();
                     await stream.CopyToAsync(memoryStream);
+                    byte[] imageBytes = memoryStream.ToArray();
+#endif
                     
                     // Конвертуємо в Base64
-                    byte[] imageBytes = memoryStream.ToArray();
                     string base64String = System.Convert.ToBase64String(imageBytes);
 
                     // Відправляємо на сервер
@@ -163,6 +173,9 @@ namespace NutritionApp.ViewModels
                     UserProfile = await _apiService.GetUserProfileAsync(userId, forceRefresh);
                     _lastUserId = userId;
                     _isDataLoaded = true;
+                    OnPropertyChanged(nameof(UserProfile));
+                    OnPropertyChanged(nameof(HasAvatar));
+                    OnPropertyChanged(nameof(AvatarInitial));
                     Debug.WriteLine($"ProfileViewModel: Loaded - Height={UserProfile?.Height}, Weight={UserProfile?.Weight}");
                 }
             }
