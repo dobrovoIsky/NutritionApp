@@ -37,8 +37,11 @@
             Icon="history_icon.png" 
             ContentTemplate="{DataTemplate local:SavedRecipesPage}" />
 
-
-
+        <ShellContent
+            Title="Рейтинг"
+            Route="LeaderboardPage"
+            Icon="history_icon.png" 
+            ContentTemplate="{DataTemplate local:LeaderboardPage}" />
 
         <ShellContent
             Title="Профіль"

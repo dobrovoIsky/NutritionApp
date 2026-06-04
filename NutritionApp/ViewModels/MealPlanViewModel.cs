@@ -162,6 +162,16 @@ namespace NutritionApp.ViewModels
                 int userId = Preferences.Get("UserId", 0);
                 if (userId > 0)
                 {
+                    // Check balance first
+                    var profile = await _apiService.GetUserProfileAsync(userId, forceRefresh: true);
+                    if (profile == null || profile.Balance < 10)
+                    {
+                        ErrorMessage = "💎 Недостатньо балів для генерації рецепту. (Потрібно 10)";
+                        HasError = true;
+                        IsLoading = false;
+                        return;
+                    }
+
                     // Передаємо вибрані продукти та побажання в API
                     var result = await _apiService.GenerateMealPlanAsync(userId, _selectedProducts, PreferencesText);
 

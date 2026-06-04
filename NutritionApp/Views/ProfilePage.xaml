@@ -33,7 +33,8 @@
                 <Label Text="Твій профіль" FontSize="14" TextColor="{StaticResource TextSecondary}" />
                 <Label x:Name="UsernameLabel" Text="{Binding UserProfile.Username, StringFormat='{0}'}" FontAttributes="Bold" FontSize="32" TextColor="{StaticResource TextPrimary}" />
                 <StackLayout Orientation="Horizontal" Spacing="10" Margin="0,5,0,0">
-                    <Label Text="{Binding UserProfile.Points, StringFormat='⭐ {0} балів'}" TextColor="{StaticResource AccentColor}" FontAttributes="Bold" />
+                    <Label Text="{Binding UserProfile.Balance, StringFormat='💎 {0}'}" TextColor="{StaticResource AccentColor}" FontAttributes="Bold" />
+                    <Label Text="{Binding UserProfile.MonthlyPoints, StringFormat='🏆 {0} XP'}" TextColor="#FFD700" FontAttributes="Bold" />
                     <Label Text="{Binding UserProfile.CurrentStreak, StringFormat='🔥 {0} дн.'}" TextColor="#FF9500" FontAttributes="Bold" />
                 </StackLayout>
             </VerticalStackLayout>
@@ -42,15 +43,6 @@
         <!-- Content -->
         <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never" Padding="0,0,0,40">
             <VerticalStackLayout Spacing="20">
-
-                <Button Text="🏆 Рейтинг користувачів"
-                        Clicked="OnLeaderboardClicked"
-                        Style="{StaticResource AccentButton}"
-                        BackgroundColor="#FF9500"
-                        HeightRequest="52"
-                        CornerRadius="26"
-                        FontAttributes="Bold"
-                        FontSize="15"/>
 
                 <!-- Кнопки дій -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="15">

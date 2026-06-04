@@ -14,7 +14,7 @@ namespace NutritionApp.Models
         public int AvatarId { get; set; }
 
         [JsonPropertyName("points")]
-        public int Points { get; set; }
+        public int MonthlyPoints { get; set; }
 
         [JsonPropertyName("currentStreak")]
         public int CurrentStreak { get; set; }

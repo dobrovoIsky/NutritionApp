@@ -32,7 +32,7 @@
                                 <!-- Інфо -->
                                 <StackLayout Grid.Column="2" VerticalOptions="Center">
                                     <Label Text="{Binding User.Username}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" FontSize="16" />
-                                    <Label Text="{Binding User.Points, StringFormat='{0} балів'}" TextColor="{StaticResource AccentColor}" FontSize="14" />
+                                    <Label Text="{Binding User.MonthlyPoints, StringFormat='{0} XP'}" TextColor="{StaticResource AccentColor}" FontSize="14" />
                                 </StackLayout>
                                 
                                 <!-- Стрік -->

@@ -19,6 +19,7 @@ public partial class FloatingTabBar : ContentView
         new() { Route = "MainPage", Title = "Головна", IconImage = "home_silhouette.png" },
         new() { Route = "MealPlanPage", Title = "Раціон", IconImage = "restaurant_icon.png" },
         new() { Route = "SavedRecipesPage", Title = "Рецепти", IconImage = "history_icon.png" },
+        new() { Route = "LeaderboardPage", Title = "Рейтинг", IconImage = "history_icon.png" },
         new() { Route = "ProfilePage", Title = "Профіль", IconImage = "avatar_icon.png" }
     ];
 

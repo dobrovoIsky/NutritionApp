@@ -37,8 +37,11 @@ namespace NutritionApp.Models
         [JsonPropertyName("language")]
         public string Language { get; set; } = "uk";
 
-        [JsonPropertyName("points")]
-        public int Points { get; set; }
+        [JsonPropertyName("balance")]
+        public int Balance { get; set; }
+
+        [JsonPropertyName("monthlyPoints")]
+        public int MonthlyPoints { get; set; }
 
         [JsonPropertyName("currentStreak")]
         public int CurrentStreak { get; set; }

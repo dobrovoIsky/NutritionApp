@@ -25,11 +25,6 @@ public partial class ProfilePage : ContentPage
         await _viewModel.CheckStreakAsync();
     }
 
-    private async void OnLeaderboardClicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new LeaderboardPage());
-    }
-
     private void LoadWaterReminderSettings()
     {
         WaterReminderSwitch.Toggled -= OnWaterReminderToggled;
