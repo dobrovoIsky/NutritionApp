@@ -23,29 +23,41 @@
                 <Border Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
                     <VerticalStackLayout Spacing="16">
                         
-                        <Grid ColumnDefinitions="*,Auto,Auto">
-                            <Label Text="Що ви з'їли?" TextColor="{StaticResource TextSecondary}" FontSize="14" VerticalOptions="Center"/>
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Що ви з'їли?" TextColor="{StaticResource TextSecondary}" FontSize="14"/>
                             
-                            <Border Grid.Column="1" StrokeShape="RoundRectangle 8" BackgroundColor="#059669" Padding="12,6" Stroke="Transparent" Margin="0,0,8,0">
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding ScanBarcodeCommand}"/>
-                                </Border.GestureRecognizers>
-                                <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                                    <Label Text="🔎" FontSize="14" VerticalOptions="Center"/>
-                                    <Label Text="Штрихкод" FontSize="12" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
-                                </HorizontalStackLayout>
-                            </Border>
+                            <HorizontalStackLayout Spacing="8">
+                                <Border StrokeShape="RoundRectangle 8" BackgroundColor="#059669" Padding="12,6" Stroke="Transparent">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ScanBarcodeCommand}"/>
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                        <Label Text="🔎" FontSize="14" VerticalOptions="Center"/>
+                                        <Label Text="Штрихкод" FontSize="12" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </Border>
 
-                            <Border Grid.Column="2" StrokeShape="RoundRectangle 8" BackgroundColor="#1E3A8A" Padding="12,6" Stroke="Transparent">
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding AnalyzeFoodImageCommand}"/>
-                                </Border.GestureRecognizers>
-                                <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
-                                    <Label Text="📸" FontSize="14" VerticalOptions="Center"/>
-                                    <Label Text="По фото" FontSize="12" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
-                                </HorizontalStackLayout>
-                            </Border>
-                        </Grid>
+                                <Border StrokeShape="RoundRectangle 8" BackgroundColor="#1E3A8A" Padding="12,6" Stroke="Transparent">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding AnalyzeFoodImageCommand}"/>
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                        <Label Text="📸" FontSize="14" VerticalOptions="Center"/>
+                                        <Label Text="Камера" FontSize="12" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </Border>
+
+                                <Border StrokeShape="RoundRectangle 8" BackgroundColor="#9333EA" Padding="12,6" Stroke="Transparent">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding PickFoodImageCommand}"/>
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                        <Label Text="🖼️" FontSize="14" VerticalOptions="Center"/>
+                                        <Label Text="Галерея" FontSize="12" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
                         
                         <ActivityIndicator IsRunning="{Binding IsAnalyzingImage}" IsVisible="{Binding IsAnalyzingImage}" Color="{StaticResource Primary}" />
                         

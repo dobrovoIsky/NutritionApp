@@ -16,7 +16,7 @@
 
         <!-- Header -->
         <Grid Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,24">
-            <Border WidthRequest="60" HeightRequest="60" StrokeShape="RoundRectangle 30"
+            <Border WidthRequest="90" HeightRequest="90" StrokeShape="RoundRectangle 45"
                     BackgroundColor="#FFFFFF22" Stroke="White" StrokeThickness="2"
                     HorizontalOptions="Start" VerticalOptions="Center">
                 <Border.Shadow>
@@ -30,15 +30,17 @@
                     <!-- Fallback Label -->
                     <Label Text="{Binding AvatarInitial}" 
                            IsVisible="{Binding HasAvatar, Converter={StaticResource InvertedBoolConverter}}"
-                           TextColor="White" FontAttributes="Bold" FontSize="28" 
-                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                           TextColor="White" FontAttributes="Bold" FontSize="40" 
+                           HorizontalOptions="Center" VerticalOptions="Center"
+                           HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                     
                     <!-- Base64 Image -->
                     <Image x:Name="AvatarImage"
-                           WidthRequest="60" HeightRequest="60"
+                           WidthRequest="90" HeightRequest="90"
                            Source="{Binding UserProfile.AvatarBase64, Converter={StaticResource Base64Converter}}"
                            IsVisible="{Binding HasAvatar}"
-                           Aspect="AspectFill" />
+                           Aspect="AspectFill"
+                           HorizontalOptions="Fill" VerticalOptions="Fill" />
                 </Grid>
             </Border>
             

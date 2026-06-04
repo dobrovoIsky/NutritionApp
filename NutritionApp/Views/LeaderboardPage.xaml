@@ -30,10 +30,10 @@
                                 <Label Grid.Column="0" Text="{Binding Rank}" VerticalOptions="Center" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextSecondary}" WidthRequest="30" />
                                 
                                 <!-- Аватар -->
-                                <Border Grid.Column="1" WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 20" StrokeThickness="0" Margin="10,0" BackgroundColor="{StaticResource AccentColor}">
+                                <Border Grid.Column="1" WidthRequest="60" HeightRequest="60" StrokeShape="RoundRectangle 30" StrokeThickness="0" Margin="10,0" BackgroundColor="{StaticResource AccentColor}">
                                     <Grid>
-                                        <Label Text="{Binding AvatarChar}" IsVisible="{Binding HasAvatar, Converter={StaticResource InvertedBoolConverter}}" VerticalOptions="Center" HorizontalOptions="Center" TextColor="White" FontAttributes="Bold" FontSize="16" />
-                                        <Image WidthRequest="40" HeightRequest="40" Source="{Binding User.AvatarBase64, Converter={StaticResource Base64Converter}}" IsVisible="{Binding HasAvatar}" Aspect="AspectFill" />
+                                        <Label Text="{Binding AvatarChar}" IsVisible="{Binding HasAvatar, Converter={StaticResource InvertedBoolConverter}}" VerticalOptions="Center" HorizontalOptions="Center" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="White" FontAttributes="Bold" FontSize="26" />
+                                        <Image WidthRequest="60" HeightRequest="60" Source="{Binding User.AvatarBase64, Converter={StaticResource Base64Converter}}" IsVisible="{Binding HasAvatar}" Aspect="AspectFill" HorizontalOptions="Fill" VerticalOptions="Fill" />
                                     </Grid>
                                 </Border>
                                 

@@ -157,9 +157,10 @@ namespace NutritionApp.ViewModels
         {
             int userId = Preferences.Get("UserId", 0);
 
-            // Якщо той самий користувач і дані вже є - пропускаємо
-            if (!forceRefresh && _isDataLoaded && _lastUserId == userId && UserProfile != null)
-                return;
+            // Завжди завантажуємо (ApiService швидко віддасть з пам'яті), 
+            // щоб підтягнути зміни після сторінки редагування профілю.
+            // if (!forceRefresh && _isDataLoaded && _lastUserId == userId && UserProfile != null)
+            //    return;
 
             if (IsLoading) return;
 

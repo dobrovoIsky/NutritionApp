@@ -104,12 +104,14 @@ namespace NutritionApp.ViewModels
         public ICommand SaveCommand { get; }
         public ICommand AnalyzeFoodImageCommand { get; }
         public ICommand ScanBarcodeCommand { get; }
+        public ICommand PickFoodImageCommand { get; }
 
         public AddFoodViewModel(ApiService apiService)
         {
             _apiService = apiService;
             SaveCommand = new Command(async () => await SaveFoodAsync());
             AnalyzeFoodImageCommand = new Command(async () => await AnalyzeFoodImageAsync());
+            PickFoodImageCommand = new Command(async () => await PickFoodImageAsync());
             ScanBarcodeCommand = new Command(async () => await ScanBarcodeAsync());
             
             // Load products in background
@@ -290,55 +292,7 @@ namespace NutritionApp.ViewModels
                     }
 
                     var photo = await MediaPicker.Default.CapturePhotoAsync();
-
-                    if (photo != null)
-                    {
-                        IsAnalyzingImage = true;
-                        byte[] imageBytes = null;
-
-#if ANDROID || IOS || MACCATALYST || WINDOWS
-                        try
-                        {
-                            using var stream = await photo.OpenReadAsync();
-                            Microsoft.Maui.Graphics.IImage image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream);
-                            if (image != null)
-                            {
-                                Microsoft.Maui.Graphics.IImage downsizedImage = image.Downsize(800, 800, true);
-                                using var resizedMs = new MemoryStream();
-                                downsizedImage.Save(resizedMs, Microsoft.Maui.Graphics.ImageFormat.Jpeg);
-                                imageBytes = resizedMs.ToArray();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"Failed to downsize image: {ex}");
-                        }
-#endif
-
-                        // Fallback if downsizing failed or skipped
-                        if (imageBytes == null)
-                        {
-                            using var stream = await photo.OpenReadAsync();
-                            using var originalMs = new MemoryStream();
-                            await stream.CopyToAsync(originalMs);
-                            imageBytes = originalMs.ToArray();
-                        }
-
-                        var result = await _apiService.AnalyzeFoodImageAsync(imageBytes);
-
-                        if (result != null)
-                        {
-                            Weight = "100"; // Default weight from gemini prompt
-                            SelectedProduct = result;
-                            
-                            // Let the user know
-                            await Application.Current.MainPage.DisplayAlert("Успіх", $"Розпізнано: {result.Name}", "Клас!");
-                        }
-                        else
-                        {
-                            await Application.Current.MainPage.DisplayAlert("Упс", "Не вдалося розпізнати їжу на фото. Спробуйте ще раз.", "ОК");
-                        }
-                    }
+                    await ProcessAndAnalyzeImageAsync(photo);
                 }
                 else
                 {
@@ -348,6 +302,75 @@ namespace NutritionApp.ViewModels
             catch (Exception ex)
             {
                 await Application.Current.MainPage.DisplayAlert("Помилка", $"Сталася помилка: {ex.Message}", "ОК");
+            }
+        }
+
+        private async Task PickFoodImageAsync()
+        {
+            if (IsAnalyzingImage) return;
+
+            try
+            {
+                var photo = await MediaPicker.Default.PickPhotoAsync();
+                await ProcessAndAnalyzeImageAsync(photo);
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Помилка", $"Сталася помилка: {ex.Message}", "ОК");
+            }
+        }
+
+        private async Task ProcessAndAnalyzeImageAsync(FileResult photo)
+        {
+            if (photo == null) return;
+            
+            try
+            {
+                IsAnalyzingImage = true;
+                byte[] imageBytes = null;
+
+#if ANDROID || IOS || MACCATALYST || WINDOWS
+                try
+                {
+                    using var stream = await photo.OpenReadAsync();
+                    Microsoft.Maui.Graphics.IImage image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream);
+                    if (image != null)
+                    {
+                        Microsoft.Maui.Graphics.IImage downsizedImage = image.Downsize(800, 800, true);
+                        using var resizedMs = new MemoryStream();
+                        downsizedImage.Save(resizedMs, Microsoft.Maui.Graphics.ImageFormat.Jpeg);
+                        imageBytes = resizedMs.ToArray();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to downsize image: {ex}");
+                }
+#endif
+
+                // Fallback if downsizing failed or skipped
+                if (imageBytes == null)
+                {
+                    using var stream = await photo.OpenReadAsync();
+                    using var originalMs = new MemoryStream();
+                    await stream.CopyToAsync(originalMs);
+                    imageBytes = originalMs.ToArray();
+                }
+
+                var result = await _apiService.AnalyzeFoodImageAsync(imageBytes);
+
+                if (result != null)
+                {
+                    Weight = "100"; // Default weight from gemini prompt
+                    SelectedProduct = result;
+                    
+                    // Let the user know
+                    await Application.Current.MainPage.DisplayAlert("Успіх", $"Розпізнано: {result.Name}", "Клас!");
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert("Упс", "Не вдалося розпізнати їжу на фото. Спробуйте ще раз.", "ОК");
+                }
             }
             finally
             {
