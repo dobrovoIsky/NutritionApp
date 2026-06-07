@@ -4,7 +4,7 @@
              xmlns:viewmodels="clr-namespace:NutritionApp.ViewModels"
              xmlns:converters="clr-namespace:NutritionApp.Converters"
              x:Class="NutritionApp.Views.LeaderboardPage"
-             Background="{StaticResource PageBackgroundGradient}"
+             BackgroundImageSource="app_background_img.png"
              Title="Рейтинг користувачів">
 
     <ContentPage.Resources>

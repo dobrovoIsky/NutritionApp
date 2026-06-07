@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NutritionApp.Views.RegisterPage"
              Shell.NavBarIsVisible="False"
-             Background="{StaticResource PageBackgroundGradient}">
+             BackgroundImageSource="app_background_img.png">
 
     <ScrollView VerticalScrollBarVisibility="Never">
         <Grid RowDefinitions="Auto,Auto,*" Padding="16,40,16,0" MinimumHeightRequest="800">

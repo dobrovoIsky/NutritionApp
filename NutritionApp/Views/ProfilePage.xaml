@@ -6,7 +6,7 @@
              x:Class="NutritionApp.Views.ProfilePage"
              x:DataType="viewmodels:ProfileViewModel"
              Shell.NavBarIsVisible="False"
-             Background="{StaticResource PageBackgroundGradient}">
+             BackgroundImageSource="app_background_img.png">
 
     <ContentPage.Resources>
         <converters:Base64ToImageSourceConverter x:Key="Base64Converter" />

@@ -7,7 +7,7 @@
              x:Class="NutritionApp.Views.HistoryPage"
              x:Name="HistoryPageRef"
              Shell.NavBarIsVisible="False"
-             Background="{StaticResource PageBackgroundGradient}">
+             BackgroundImageSource="app_background_img.png">
 
     <Grid RowDefinitions="Auto,*" Padding="16,20,16,0">
 

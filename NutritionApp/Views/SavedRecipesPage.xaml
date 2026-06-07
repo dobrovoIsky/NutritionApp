@@ -6,7 +6,7 @@
              x:Class="NutritionApp.Views.SavedRecipesPage"
              x:DataType="viewmodels:SavedRecipesViewModel"
              Shell.NavBarIsVisible="False"
-             Background="{StaticResource PageBackgroundGradient}">
+             BackgroundImageSource="app_background_img.png">
 
     <Grid RowDefinitions="Auto,*" Padding="16,20,16,0">
 

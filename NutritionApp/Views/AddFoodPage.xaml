@@ -6,7 +6,7 @@
              x:DataType="viewModels:AddFoodViewModel"
              x:Class="NutritionApp.Views.AddFoodPage"
              Title="Додати їжу"
-             Background="{StaticResource PageBackgroundGradient}">
+             BackgroundImageSource="app_background_img.png">
 
     <Grid RowDefinitions="Auto,*" Padding="16,20,16,0">
         <!-- Header -->

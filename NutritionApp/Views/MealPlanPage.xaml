@@ -5,7 +5,7 @@
              xmlns:viewModels="clr-namespace:NutritionApp.ViewModels"
              x:Class="NutritionApp.Views.MealPlanPage"
              Shell.NavBarIsVisible="False"
-             Background="{StaticResource PageBackgroundGradient}">
+             BackgroundImageSource="app_background_img.png">
 
 
 

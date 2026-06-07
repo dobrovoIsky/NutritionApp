@@ -7,7 +7,7 @@
              x:DataType="viewModels:MyRationViewModel"
              Title="Мій раціон"
              Shell.NavBarIsVisible="False"
-             Background="{StaticResource PageBackgroundGradient}">
+             BackgroundImageSource="app_background_img.png">
 
 
 

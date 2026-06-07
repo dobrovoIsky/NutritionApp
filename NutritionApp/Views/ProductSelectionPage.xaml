@@ -7,7 +7,7 @@
              x:Name="ThisPage"
              x:DataType="viewmodels:ProductSelectionViewModel"
              Shell.NavBarIsVisible="False"
-             Background="{StaticResource PageBackgroundGradient}">
+             BackgroundImageSource="app_background_img.png">
     <ContentPage.Resources>
         <local:BoolToColorConverter x:Key="BoolToColorConverter" xmlns:local="clr-namespace:NutritionApp.Converters"/>
     </ContentPage.Resources>
