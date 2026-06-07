@@ -49,15 +49,15 @@
                 <Label x:Name="UsernameLabel" Text="{Binding UserProfile.Username, StringFormat='{0}'}" FontAttributes="Bold" FontSize="32" TextColor="{StaticResource TextPrimary}" />
                 <HorizontalStackLayout Spacing="15" Margin="0,5,0,0">
                     <HorizontalStackLayout Spacing="4">
-                        <Image Source="diamond.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                        <Image Source="diamond.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
                         <Label Text="{Binding UserProfile.Balance}" TextColor="{StaticResource AccentColor}" FontAttributes="Bold" VerticalOptions="Center" />
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Spacing="4">
-                        <Image Source="xp.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                        <Image Source="xp.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
                         <Label Text="{Binding UserProfile.MonthlyPoints, StringFormat='{0} XP'}" TextColor="#FFD700" FontAttributes="Bold" VerticalOptions="Center" />
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Spacing="4">
-                        <Image Source="strik.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                        <Image Source="strik.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
                         <Label Text="{Binding UserProfile.CurrentStreak, StringFormat='{0} дн.'}" TextColor="#FF9500" FontAttributes="Bold" VerticalOptions="Center" />
                     </HorizontalStackLayout>
                 </HorizontalStackLayout>
@@ -79,7 +79,8 @@
                             FontSize="15"/>
 
                     <Button Grid.Column="1"
-                            Text="🚪 Вийти"
+                            ImageSource="signout.png"
+                            Text="Вийти"
                             Clicked="OnLogoutButtonClicked"
                             HeightRequest="52"
                             CornerRadius="26"
@@ -99,7 +100,7 @@
                     <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
                         <VerticalStackLayout Spacing="8">
                             <HorizontalStackLayout Spacing="8">
-                                <Image Source="height.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                                <Image Source="height.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
                                 <Label Text="Ріст" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
                             </HorizontalStackLayout>
                             <Label Text="{Binding UserProfile.Height, StringFormat='{0:F1} см'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
@@ -109,7 +110,7 @@
                     <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
                         <VerticalStackLayout Spacing="8">
                             <HorizontalStackLayout Spacing="8">
-                                <Image Source="weight.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                                <Image Source="weight.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
                                 <Label Text="Вага" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
                             </HorizontalStackLayout>
                             <Label Text="{Binding UserProfile.Weight, StringFormat='{0:F1} кг'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
@@ -119,7 +120,7 @@
                     <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
                         <VerticalStackLayout Spacing="8">
                             <HorizontalStackLayout Spacing="8">
-                                <Image Source="age.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                                <Image Source="age.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
                                 <Label Text="Вік" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
                             </HorizontalStackLayout>
                             <Label Text="{Binding UserProfile.Age, StringFormat='{0} років'}" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
@@ -129,7 +130,7 @@
                     <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
                         <VerticalStackLayout Spacing="8">
                             <HorizontalStackLayout Spacing="8">
-                                <Image Source="activity.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                                <Image Source="activity.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
                                 <Label Text="Активність" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
                             </HorizontalStackLayout>
                             <Label Text="{Binding ActivityLevelUa}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Primary}" LineBreakMode="TailTruncation" VerticalOptions="Center" HeightRequest="30"/>
@@ -139,7 +140,7 @@
                     <Border Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource ActiveGlowBorder}" BackgroundColor="{StaticResource CardBackground}" Padding="20">
                         <VerticalStackLayout Spacing="8">
                             <HorizontalStackLayout Spacing="8">
-                                <Image Source="goal.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
+                                <Image Source="goal.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center"/>
                                 <Label Text="Ціль" FontSize="14" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
                             </HorizontalStackLayout>
                             <Label Text="{Binding GoalUa}" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
