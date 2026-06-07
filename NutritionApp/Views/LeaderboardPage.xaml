@@ -41,7 +41,7 @@
                                 <VerticalStackLayout Grid.Column="2" VerticalOptions="Center">
                                     <Label Text="{Binding User.Username}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" FontSize="16" />
                                     <HorizontalStackLayout Spacing="4">
-                                        <Image Source="XP.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                        <Image Source="xp.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
                                         <Label Text="{Binding User.MonthlyPoints, StringFormat='{0} XP'}" TextColor="{StaticResource AccentColor}" FontSize="14" VerticalOptions="Center" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>

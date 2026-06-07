@@ -53,7 +53,7 @@
                         <Label Text="{Binding UserProfile.Balance}" TextColor="{StaticResource AccentColor}" FontAttributes="Bold" VerticalOptions="Center" />
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Spacing="4">
-                        <Image Source="XP.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                        <Image Source="xp.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
                         <Label Text="{Binding UserProfile.MonthlyPoints, StringFormat='{0} XP'}" TextColor="#FFD700" FontAttributes="Bold" VerticalOptions="Center" />
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Spacing="4">
