@@ -40,12 +40,15 @@
                                 <!-- Інфо -->
                                 <VerticalStackLayout Grid.Column="2" VerticalOptions="Center">
                                     <Label Text="{Binding User.Username}" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" FontSize="16" />
-                                    <Label Text="{Binding User.MonthlyPoints, StringFormat='{0} XP'}" TextColor="{StaticResource AccentColor}" FontSize="14" />
+                                    <HorizontalStackLayout Spacing="4">
+                                        <Image Source="XP.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                        <Label Text="{Binding User.MonthlyPoints, StringFormat='{0} XP'}" TextColor="{StaticResource AccentColor}" FontSize="14" VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
                                 </VerticalStackLayout>
                                 
                                 <!-- Стрік -->
                                 <HorizontalStackLayout Grid.Column="3" VerticalOptions="Center" Spacing="5">
-                                    <Label Text="🔥" FontSize="18" />
+                                    <Image Source="strik.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"/>
                                     <Label Text="{Binding User.CurrentStreak}" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold" FontSize="16" VerticalOptions="Center" />
                                 </HorizontalStackLayout>
                             </Grid>
