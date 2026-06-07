@@ -34,7 +34,7 @@
         <ShellContent
             Title="Рецепти"
             Route="SavedRecipesPage"
-            Icon="history_icon.png" 
+            Icon="receipt.png" 
             ContentTemplate="{DataTemplate local:SavedRecipesPage}" />
 
         <ShellContent
