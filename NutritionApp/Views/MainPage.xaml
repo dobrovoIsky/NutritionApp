@@ -227,17 +227,34 @@
 
                 <!-- Action Buttons -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,10,0,20">
-                    <Button Text="Мій раціон"
-                            ImageSource="my_ration.png"
-                            ContentLayout="Right, 8"
-                            Style="{StaticResource LimeButton}"
-                            Command="{Binding GoToMyRationCommand}" />
-                    <Button Grid.Column="1"
-                            Text="Рецепти"
-                            ImageSource="receipt.png"
-                            ContentLayout="Right, 8"
-                            Style="{StaticResource AccentButton}"
-                            Command="{Binding GoToMealPlanCommand}" />
+                    <Border Grid.Column="0"
+                            BackgroundColor="{StaticResource Primary}"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 24"
+                            Padding="16,14">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToMyRationCommand}" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+                            <Label Text="Мій раціон" TextColor="Black" FontFamily="OpenSansSemibold" VerticalOptions="Center" />
+                            <Image Source="my_ration.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                    
+                    <Border Grid.Column="1"
+                            BackgroundColor="#151515"
+                            Stroke="{StaticResource BorderColor}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 24"
+                            Padding="16,14">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToMealPlanCommand}" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+                            <Label Text="Рецепти" TextColor="{StaticResource Primary}" FontFamily="OpenSansSemibold" VerticalOptions="Center" />
+                            <Image Source="receipt.png" WidthRequest="24" HeightRequest="24" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
                 </Grid>
 
             </VerticalStackLayout>
